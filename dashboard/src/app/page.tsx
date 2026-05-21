@@ -368,7 +368,8 @@ export default function Dashboard() {
                   {repartidores.length === 0
                     ? <p className="text-center text-gray-400 py-12 text-sm">Sin rutas activas hoy</p>
                     : repartidores.map(r => (
-                      <div key={r.user_id} className="p-4 hover:bg-blue-50/50 transition-colors">
+                     <div key={r.user_id} className="p-4 hover:bg-blue-50/50 transition-colors cursor-pointer"
+  onClick={() => router.push(`/rutas/${r.route_id}`)}>
                         <div className="flex items-start justify-between">
                           <div>
                             <p className="font-bold text-gray-800">{r.repartidor}</p>
