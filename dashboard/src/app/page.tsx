@@ -181,6 +181,14 @@ export default function Dashboard() {
           <p className="text-blue-200 text-xs hidden md:block">
             Actualizado {formatDistanceToNow(lastUpdate, { locale: es, addSuffix: true })}
           </p>
+          <button onClick={() => router.push('/clientes')}
+           className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
+           👥 Clientes
+</button>
+          <button onClick={() => router.push('/rutas/nueva')}
+           className="bg-green-500 hover:bg-green-600 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
+            + Nueva ruta
+</button>
           <button onClick={loadData}
             className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
             ↻ Actualizar
