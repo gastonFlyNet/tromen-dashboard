@@ -316,7 +316,7 @@ const handleCreateAndAdd = async () => {
                 {/* Marcadores entregas pendientes */}
                 {pending.map((d: any, i: number) => d.latitude && d.longitude && (
                   <Marker key={d.id} latitude={Number(d.latitude)} longitude={Number(d.longitude)}
-                    onClick={() => setSelectedDelivery(d)}>
+                   onClick={() => router.push(`/entregas/${d.id}`)}>
                     <div className="w-8 h-8 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white text-xs font-bold cursor-pointer"
                       style={{ background: '#E67E22' }}>
                       {i + 1}
@@ -327,7 +327,7 @@ const handleCreateAndAdd = async () => {
                 {/* Marcadores entregas completadas */}
                 {done.map((d: any) => d.latitude && d.longitude && (
                   <Marker key={d.id} latitude={Number(d.latitude)} longitude={Number(d.longitude)}
-                    onClick={() => setSelectedDelivery(d)}>
+                    onClick={() => router.push(`/entregas/${d.id}`)}>
                     <div className="w-7 h-7 rounded-full border-2 border-white shadow-sm flex items-center justify-center text-white text-xs font-bold cursor-pointer"
                       style={{ background: STATUS_COLOR[d.status] ?? '#888' }}>
                       ✓
