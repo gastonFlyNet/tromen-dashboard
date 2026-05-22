@@ -57,7 +57,7 @@ export default function RutaDetallePage() {
 
   const loadRoute = useCallback(async () => {
     try {
-      const data = await apiFetch(`/api/routes/${routeId}`)
+      const data = await apiFetch(`/api/deliveries/${routeId}`)
       setRoute(data)
     } catch {}
   }, [routeId])
@@ -111,7 +111,7 @@ export default function RutaDetallePage() {
       const stops = selectedToAdd.map((c, i) => ({
         client_id: c.id, expected_amount: 0, stop_order: existingStops + i + 1,
       }))
-      await apiFetch(`/api/routes/${routeId}/stops`, {
+      await apiFetch(`/api/deliveries/${routeId}/stops`, {
         method: 'POST', body: JSON.stringify({ stops }),
       })
       setShowAddClients(false)
@@ -138,7 +138,7 @@ export default function RutaDetallePage() {
         }),
       })
       const existingStops = route?.deliveries?.length ?? 0
-      await apiFetch(`/api/routes/${routeId}/stops`, {
+      await apiFetch(`/api/deliveries/${routeId}/stops`, {
         method: 'POST',
         body: JSON.stringify({
           stops: [{ client_id: newClient.id, expected_amount: 0, stop_order: existingStops + 1 }],
