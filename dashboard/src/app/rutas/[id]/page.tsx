@@ -56,6 +56,11 @@ export default function RutaDetallePage() {
   const [searchClient, setSearchClient] = useState('')
   const [addingSaving, setAddingSaving] = useState(false)
   const [selectedToAdd, setSelectedToAdd] = useState<any[]>([])
+  const [showNewClient, setShowNewClient] = useState(false)
+const [newClientForm, setNewClientForm] = useState({
+  name: '', address: '', zone: '', phone: '', latitude: '', longitude: ''
+})
+const [savingNewClient, setSavingNewClient] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout>()
 
   const loadRoute = useCallback(async () => {
@@ -129,7 +134,38 @@ export default function RutaDetallePage() {
       alert(err.message ?? 'No se pudo agregar')
     } finally { setAddingSaving(false) }
   }
-
+const handleCreateAndAdd = async () => {
+  if (!newClientForm.name.trim()) return alert('El nombre es obligatorio')
+  if (!newClientForm.address.trim()) return alert('La dirección es obligatoria')
+  setSavingNewClient(true)
+  try {
+    const newClient = await apiFetch('/api/clients', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: newClientForm.name,
+        address: newClientForm.address,
+        zone: newClientForm.zone || null,
+        phone: newClientForm.phone || null,
+        latitude: newClientForm.latitude ? parseFloat(newClientForm.latitude) : null,
+        longitude: newClientForm.longitude ? parseFloat(newClientForm.longitude) : null,
+      }),
+    })
+    const existingStops = route?.deliveries?.length ?? 0
+    await apiFetch(`/api/routes/${routeId}/stops`, {
+      method: 'POST',
+      body: JSON.stringify({
+        stops: [{ client_id: newClient.id, expected_amount: 0, stop_order: existingStops + 1 }],
+      }),
+    })
+    setShowNewClient(false)
+    setNewClientForm({ name: '', address: '', zone: '', phone: '', latitude: '', longitude: '' })
+    setShowAddClients(false)
+    loadRoute()
+    alert('Cliente creado y agregado a la ruta ✓')
+  } catch (err: any) {
+    alert(err.message ?? 'Error al crear el cliente')
+  } finally { setSavingNewClient(false) }
+}
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-blue-50">
       <div className="text-center">
@@ -198,10 +234,16 @@ export default function RutaDetallePage() {
               : route.status === 'completada' ? '✓ Completada'
               : '○ Pendiente'}
           </span>
-          <button onClick={openAddClients}
-            className="bg-green-500 hover:bg-green-600 text-white rounded-xl px-4 py-2 text-sm font-bold transition-all">
-            + Agregar clientes
-          </button>
+          <div className="flex gap-2">
+  <button onClick={() => { setShowNewClient(true); setShowAddClients(false) }}
+    className="bg-white/20 hover:bg-white/30 text-white rounded-xl px-4 py-2 text-sm font-bold transition-all">
+    + Cliente nuevo
+  </button>
+  <button onClick={openAddClients}
+    className="bg-green-500 hover:bg-green-600 text-white rounded-xl px-4 py-2 text-sm font-bold transition-all">
+    + Agregar existente
+  </button>
+</div>
         </div>
       </nav>
 
@@ -395,7 +437,22 @@ export default function RutaDetallePage() {
           </div>
         </div>
       </div>
-
+{/* MODAL CLIENTE NUEVO */}
+{showNewClient && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+      <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+        <h2 className="font-bold text-lg text-gray-800">Nuevo cliente + agregar a ruta</h2>
+        <button onClick={() => setShowNewClient(false)} className="text-gray-400 text-xl">✕</button>
+      </div>
+      <div className="p-5 space-y-3">
+        {[
+          { key: 'name',      label: 'Nombre *',     placeholder: 'Almacén Don Carlos' },
+          { key: 'address',   label: 'Dirección *',  placeholder: 'Av. Roca 1234' },
+          { key: 'zone',      label: 'Zona',         placeholder: 'Centro, Norte...' },
+          { key: 'phone',     label: 'Teléfono',     placeholder: '2994000000' },
+          { key: 'latitude',  label: 'Latitud GPS',  placeholder: '-37.8855' },
+          { key: 'longitude', label
       {/* MODAL AGREGAR CLIENTES */}
       {showAddClients && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
