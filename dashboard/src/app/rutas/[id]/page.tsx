@@ -166,6 +166,7 @@ const handleCreateAndAdd = async () => {
     alert(err.message ?? 'Error al crear el cliente')
   } finally { setSavingNewClient(false) }
 }
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-blue-50">
       <div className="text-center">
@@ -356,7 +357,7 @@ const handleCreateAndAdd = async () => {
             <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
               {deliveries.map((d: any, i: number) => (
                 <button key={d.id}
-                  onClick={() => router.push(`/entregas/${d.id}`)}
+                  onClick={() => router.push(`/entregas/${d.id}`)}>
                   className="w-full text-left p-4 hover:bg-blue-50/50 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
