@@ -77,7 +77,7 @@ export default function EntregaDetallePage() {
   )
 
   const firma  = delivery.evidence?.find((e: any) => e.type === 'firma_digital')
-  const fotos  = delivery.evidence?.filter((e: any) => e.type !== 'firma_digital') ?? []
+  const fotos = delivery.evidence?.filter((e: any) => e.type === 'foto_entrega' || e.type === 'foto_ausente' || e.type === 'foto_venta_calle') ?? []
   const totalCobrado = Number(delivery.actual_amount ?? 0)
 
   return (
