@@ -20,7 +20,7 @@ async function apiFetch(path: string, options?: RequestInit) {
 
 const EMPTY_CLIENT = {
   name: '', address: '', zone: '', phone: '', email: '',
-  latitude: '', longitude: '', credit_limit: '0', notes: '',
+  latitude: '', longitude: '', balance: '0', notes: '',
 }
 
 export default function ClientesPage() {
@@ -63,7 +63,7 @@ export default function ClientesPage() {
       name: c.name ?? '', address: c.address ?? '', zone: c.zone ?? '',
       phone: c.phone ?? '', email: c.email ?? '',
       latitude: c.latitude ?? '', longitude: c.longitude ?? '',
-      credit_limit: c.credit_limit ?? '0', notes: c.notes ?? '',
+      balance: c.balance ?? '0', notes: c.notes ?? '',
     })
     setError('')
     setShowModal(true)
@@ -79,7 +79,7 @@ export default function ClientesPage() {
         ...form,
         latitude:  form.latitude  ? parseFloat(form.latitude)  : null,
         longitude: form.longitude ? parseFloat(form.longitude) : null,
-        credit_limit: parseFloat(form.credit_limit || '0'),
+        balance: parseFloat(form.balance || '0'),
       }
       if (editing) {
         await apiFetch(`/api/clients/${editing.id}`, { method: 'PUT', body: JSON.stringify(body) })
@@ -302,14 +302,14 @@ export default function ClientesPage() {
 
               <div>
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Límite de crédito (fiado)
+                  saldo pendiente
                 </label>
                 <input
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
                   placeholder="0"
                   type="number"
-                  value={form.credit_limit}
-                  onChange={e => setForm(f => ({ ...f, credit_limit: e.target.value }))}
+                  value={form.balance}
+                  onChange={e => setForm(f => ({ ...f, balance: e.target.value }))}
                 />
               </div>
 
