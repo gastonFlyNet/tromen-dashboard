@@ -349,13 +349,7 @@ export default function GeocercasPage() {
                     placeholder="Ej: Zona Norte"
                     value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
                 </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase">Tipo</label>
-                  <select className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
-                    {TIPOS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                  </select>
-                </div>
+                 
                 <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase">Descripción</label>
                   <input className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
