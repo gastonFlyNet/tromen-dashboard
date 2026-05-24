@@ -187,6 +187,10 @@ export default function Dashboard() {
           <button onClick={() => router.push('/clientes')}
            className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
            👥 Clientes
+           <button onClick={() => router.push('/geocercas')}
+  className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
+  📍 Geocercas
+</button>
 </button>
   <button onClick={() => router.push('/rutas/nueva')}
   className="bg-green-500 hover:bg-green-600 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
