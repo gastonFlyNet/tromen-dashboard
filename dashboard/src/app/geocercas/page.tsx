@@ -404,10 +404,14 @@ export default function GeocercasPage() {
                     </div>
                   </div>
                   <div className="flex gap-1 mt-2">
-                    <button onClick={() => startEdit(g)}
-                      className="flex-1 text-blue-600 hover:bg-blue-50 rounded-lg py-1 text-xs font-semibold">
-                      Editar
-                    </button>
+                   <button onClick={() => startEdit(g)}
+                    className="flex-1 text-blue-600 hover:bg-blue-50 rounded-lg py-1 text-xs font-semibold">
+                    Editar
+                  </button>
+                   <button onClick={() => { startEdit(g); setDrawMode('circle'); setDrawStep('center'); setDrawCenter(null); setDrawRadius(0); setShowForm(false); }}
+                     className="flex-1 text-green-600 hover:bg-green-50 rounded-lg py-1 text-xs font-semibold">
+                     ✏️ Redibujar
+                  </button>
                     <button onClick={() => handleToggle(g)}
                       className={`flex-1 rounded-lg py-1 text-xs font-semibold ${g.active ? 'text-red-400 hover:bg-red-50' : 'text-green-600 hover:bg-green-50'}`}>
                       {g.active ? 'Desactivar' : 'Activar'}
