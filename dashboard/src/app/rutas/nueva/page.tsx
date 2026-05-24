@@ -20,18 +20,18 @@ async function apiFetch(path: string, options?: RequestInit) {
 
 export default function NuevaRutaPage() {
   const router = useRouter()
-  const [clients, setClients]         = useState<any[]>([])
+  const [clients, setClients]           = useState<any[]>([])
   const [repartidores, setRepartidores] = useState<any[]>([])
-  const [geofences, setGeofences] = useState<any[]>([])
-  const [loading, setLoading]         = useState(true)
-  const [search, setSearch]           = useState('')
-  const [selected, setSelected]       = useState<any[]>([])
-  const [assignedTo, setAssignedTo]   = useState('')
+  const [geofences, setGeofences]       = useState<any[]>([])
+  const [loading, setLoading]           = useState(true)
+  const [search, setSearch]             = useState('')
+  const [selected, setSelected]         = useState<any[]>([])
+  const [assignedTo, setAssignedTo]     = useState('')
   const [selectedGeofence, setSelectedGeofence] = useState<string>('')
-  const [routeDate, setRouteDate]     = useState(new Date().toISOString().slice(0, 10))
-  const [saving, setSaving]           = useState(false)
-  const [error, setError]             = useState('')
-  const [success, setSuccess]         = useState(false)
+  const [routeDate, setRouteDate]       = useState(new Date().toISOString().slice(0, 10))
+  const [saving, setSaving]             = useState(false)
+  const [error, setError]               = useState('')
+  const [success, setSuccess]           = useState(false)
 
   useEffect(() => {
     const u = localStorage.getItem('tromen_user')
@@ -39,14 +39,15 @@ export default function NuevaRutaPage() {
     Promise.all([
       apiFetch('/api/clients?active=true'),
       apiFetch('/api/users?role=repartidor'),
-    ]).then(([clientsData, usersData]) => {
+      apiFetch('/api/geofences'),
+    ]).then(([clientsData, usersData, geoData]) => {
       setClients(Array.isArray(clientsData) ? clientsData : clientsData.clients ?? [])
       setRepartidores(Array.isArray(usersData) ? usersData : usersData.users ?? [])
+      setGeofences(Array.isArray(geoData) ? geoData.filter((g: any) => g.active) : [])
     }).catch(() => setError('Error cargando datos'))
     .finally(() => setLoading(false))
-      apiFetch('/api/geofences').then(data => setGeofences(Array.isArray(data) ? data.filter((g: any) => g.active) : [])).catch(() => {})
   }, [])
-       
+
   const toggleClient = (client: any) => {
     setSelected(prev => {
       const exists = prev.find(c => c.id === client.id)
@@ -94,6 +95,7 @@ export default function NuevaRutaPage() {
           user_id: assignedTo,
           route_date: routeDate,
           stops,
+          geofence_id: selectedGeofence || null,
         }),
       })
       setSuccess(true)
@@ -123,7 +125,7 @@ export default function NuevaRutaPage() {
             className="flex-1 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-gray-600">
             Ir al panel
           </button>
-          <button onClick={() => { setSuccess(false); setSelected([]); setAssignedTo('') }}
+          <button onClick={() => { setSuccess(false); setSelected([]); setAssignedTo(''); setSelectedGeofence('') }}
             className="flex-1 bg-blue-600 text-white rounded-xl py-3 text-sm font-bold">
             Nueva ruta
           </button>
@@ -162,13 +164,14 @@ export default function NuevaRutaPage() {
       <div className="p-4 md:p-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-          {/* COLUMNA IZQUIERDA — Configuración + lista seleccionados */}
+          {/* COLUMNA IZQUIERDA */}
           <div className="space-y-4">
 
             {/* Configuración */}
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
               <h3 className="font-bold text-gray-700 mb-4">⚙️ Configuración de la ruta</h3>
               <div className="space-y-4">
+
                 <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                     Repartidor *
@@ -183,24 +186,24 @@ export default function NuevaRutaPage() {
                       <option key={r.id} value={r.id}>{r.name}</option>
                     ))}
                   </select>
-                  </select>
-                  </div>
-                  <div>
+                </div>
+
+                <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                     Perímetro de la ruta (opcional)
                   </label>
-  <select
-    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
-    value={selectedGeofence}
-    onChange={e => setSelectedGeofence(e.target.value)}
-  >
-    <option value="">Sin perímetro asignado</option>
-    {geofences.map(g => (
-      <option key={g.id} value={g.id}>{g.name}</option>
-    ))}
-  </select>
-</div>
+                  <select
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    value={selectedGeofence}
+                    onChange={e => setSelectedGeofence(e.target.value)}
+                  >
+                    <option value="">Sin perímetro asignado</option>
+                    {geofences.map(g => (
+                      <option key={g.id} value={g.id}>{g.name}</option>
+                    ))}
+                  </select>
                 </div>
+
                 <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                     Fecha de la ruta
@@ -211,6 +214,7 @@ export default function NuevaRutaPage() {
                     onChange={e => setRouteDate(e.target.value)}
                   />
                 </div>
+
               </div>
             </div>
 
@@ -243,7 +247,6 @@ export default function NuevaRutaPage() {
                   {selected.map((c, i) => (
                     <div key={c.id} className="p-4">
                       <div className="flex items-center gap-3">
-                        {/* Número de orden */}
                         <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                           {i + 1}
                         </div>
@@ -251,7 +254,6 @@ export default function NuevaRutaPage() {
                           <p className="font-semibold text-gray-800 text-sm truncate">{c.name}</p>
                           <p className="text-xs text-gray-400 truncate">{c.address}</p>
                         </div>
-                        {/* Controles orden */}
                         <div className="flex flex-col gap-0.5">
                           <button onClick={() => moveUp(i)}
                             className="text-gray-400 hover:text-gray-600 text-xs px-1">▲</button>
@@ -261,7 +263,6 @@ export default function NuevaRutaPage() {
                         <button onClick={() => toggleClient(c)}
                           className="text-red-400 hover:text-red-600 text-sm px-2">✕</button>
                       </div>
-                      {/* Monto esperado */}
                       <div className="mt-2 flex items-center gap-2">
                         <span className="text-xs text-gray-400">Monto esperado $</span>
                         <input
