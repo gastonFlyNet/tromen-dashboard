@@ -106,6 +106,7 @@ export default function Dashboard() {
   const [repartidores, setRepartidores] = useState<Repartidor[]>([])
   const [positions, setPositions]   = useState<Position[]>([])
   const [alerts, setAlerts]         = useState<Alert | null>(null)
+  const [geofenceAlerts, setGeofenceAlerts] = useState<any[]>([])
   const [loading, setLoading]       = useState(true)
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
   const [selectedRep, setSelectedRep] = useState<string | null>(null)
@@ -131,6 +132,8 @@ export default function Dashboard() {
       setPositions(todayRes.data.live_positions ?? posRes.data ?? [])
       setAlerts(alertsRes.data)
       setLastUpdate(new Date())
+      const geoRes = await api.get('/api/gps/geofence-alerts').catch(() => ({ data: [] }))
+      setGeofenceAlerts(geoRes.data ?? [])
     } catch (err) {
       console.error('Error cargando datos:', err)
     } finally { setLoading(false) }
@@ -205,7 +208,14 @@ export default function Dashboard() {
       </nav>
 
       <div className="flex-1 p-4 md:p-6 space-y-6 max-w-screen-2xl mx-auto w-full">
-
+         {geofenceAlerts.length > 0 && (
+      <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-2 flex items-center gap-2">
+        <span>🚨</span>
+        <span className="text-red-700 text-sm font-semibold">
+      {geofenceAlerts.length} repartidor{geofenceAlerts.length > 1 ? 'es' : ''} fuera de zona — {geofenceAlerts.map((a: any) => a.repartidor).join(', ')}
+        </span>
+      </div>
+)}
         {/* ── ALERTAS ── */}
         {alerts && (alerts.overdue_clients > 0 || alerts.stopped_routes > 0 || alerts.pending_closings > 0) && (
           <div className="flex flex-wrap gap-3">
