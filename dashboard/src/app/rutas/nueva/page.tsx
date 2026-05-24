@@ -22,6 +22,8 @@ export default function NuevaRutaPage() {
   const router = useRouter()
   const [clients, setClients]         = useState<any[]>([])
   const [repartidores, setRepartidores] = useState<any[]>([])
+  const [geofences, setGeofences] = useState<any[]>([])
+  const [selectedGeofence, setSelectedGeofence] = useState<string>('')
   const [loading, setLoading]         = useState(true)
   const [search, setSearch]           = useState('')
   const [selected, setSelected]       = useState<any[]>([])
@@ -42,8 +44,9 @@ export default function NuevaRutaPage() {
       setRepartidores(Array.isArray(usersData) ? usersData : usersData.users ?? [])
     }).catch(() => setError('Error cargando datos'))
     .finally(() => setLoading(false))
+      apiFetch('/api/geofences').then(data => setGeofences(Array.isArray(data) ? data.filter((g: any) => g.active) : [])).catch(() => {})
   }, [])
-
+       
   const toggleClient = (client: any) => {
     setSelected(prev => {
       const exists = prev.find(c => c.id === client.id)
@@ -180,6 +183,23 @@ export default function NuevaRutaPage() {
                       <option key={r.id} value={r.id}>{r.name}</option>
                     ))}
                   </select>
+                  </select>
+                  </div>
+                  <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Perímetro de la ruta (opcional)
+                  </label>
+                  <select
+    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
+    value={selectedGeofence}
+    onChange={e => setSelectedGeofence(e.target.value)}
+  >
+    <option value="">Sin perímetro asignado</option>
+    {geofences.map(g => (
+      <option key={g.id} value={g.id}>{g.name}</option>
+    ))}
+  </select>
+</div>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
