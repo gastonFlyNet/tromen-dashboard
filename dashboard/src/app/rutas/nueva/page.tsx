@@ -182,8 +182,7 @@ export default function NuevaRutaPage() {
                     {repartidores.map(r => (
                       <option key={r.id} value={r.id}>{r.name}</option>
                     ))}
-                  </select>
-                  </select>
+                   </select>
                   </div>
                   <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
