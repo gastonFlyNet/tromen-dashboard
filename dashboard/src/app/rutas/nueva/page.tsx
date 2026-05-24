@@ -23,11 +23,11 @@ export default function NuevaRutaPage() {
   const [clients, setClients]         = useState<any[]>([])
   const [repartidores, setRepartidores] = useState<any[]>([])
   const [geofences, setGeofences] = useState<any[]>([])
-  const [selectedGeofence, setSelectedGeofence] = useState<string>('')
   const [loading, setLoading]         = useState(true)
   const [search, setSearch]           = useState('')
   const [selected, setSelected]       = useState<any[]>([])
   const [assignedTo, setAssignedTo]   = useState('')
+  const [selectedGeofence, setSelectedGeofence] = useState<string>('')
   const [routeDate, setRouteDate]     = useState(new Date().toISOString().slice(0, 10))
   const [saving, setSaving]           = useState(false)
   const [error, setError]             = useState('')
@@ -182,13 +182,14 @@ export default function NuevaRutaPage() {
                     {repartidores.map(r => (
                       <option key={r.id} value={r.id}>{r.name}</option>
                     ))}
-                   </select>
+                  </select>
+                  </select>
                   </div>
                   <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                     Perímetro de la ruta (opcional)
                   </label>
-                  <select
+  <select
     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
     value={selectedGeofence}
     onChange={e => setSelectedGeofence(e.target.value)}
