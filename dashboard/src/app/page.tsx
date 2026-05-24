@@ -187,18 +187,18 @@ export default function Dashboard() {
           <button onClick={() => router.push('/clientes')}
            className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
            👥 Clientes
+       </button>
+       <button onClick={() => router.push('/rutas/nueva')}
+         className="bg-green-500 hover:bg-green-600 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
+       + Nueva ruta
 </button>
-  <button onClick={() => router.push('/rutas/nueva')}
-  className="bg-green-500 hover:bg-green-600 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
-  + Nueva ruta
-</button>
-<button onClick={() => router.push('/productos')}
-  className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
+       <button onClick={() => router.push('/productos')}
+        className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
   🛒 Productos
-  <button onClick={() => router.push('/geocercas')}
+</button>
+<button onClick={() => router.push('/geocercas')}
   className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
   📍 Geocercas
-</button>
 </button>
           <button onClick={loadData}
             className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
