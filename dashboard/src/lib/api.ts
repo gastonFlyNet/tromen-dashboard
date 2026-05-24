@@ -49,6 +49,7 @@ export const routesApi = {
 export const gpsApi = {
   live: () => api.get('/api/gps/live'),
   track: (routeId: string) => api.get(`/api/gps/track/${routeId}`),
+  geofenceAlerts: () => api.get('/api/gps/geofence-alerts'),
 }
 
 export const clientsApi = {

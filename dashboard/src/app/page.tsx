@@ -132,7 +132,7 @@ export default function Dashboard() {
       setPositions(todayRes.data.live_positions ?? posRes.data ?? [])
       setAlerts(alertsRes.data)
       setLastUpdate(new Date())
-      const geoRes = await api.get('/api/gps/geofence-alerts').catch(() => ({ data: [] }))
+      const geoRes = await gpsApi.geofenceAlerts().catch(() => ({ data: [] }))
       setGeofenceAlerts(geoRes.data ?? [])
     } catch (err) {
       console.error('Error cargando datos:', err)
