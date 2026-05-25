@@ -216,11 +216,11 @@ export default function ClientesPage() {
                   )}
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
-                  <button onClick={() => openEdit(c)}
+                  <button onClick={(e) => { e.stopPropagation(); openEdit(c) }}
                     className="text-blue-600 hover:bg-blue-50 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
                     Editar
                   </button>
-                  <button onClick={() => setDeleteConfirm(c.id)}
+                  <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(c.id) }}
                     className="text-red-400 hover:bg-red-50 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
                     Borrar
                   </button>
