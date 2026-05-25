@@ -37,14 +37,14 @@ export default function ClienteDetallePage() {
   const params = useParams()
   const id = params?.id as string
 
-  const [client, setClient]       = useState<any>(null)
-  const [deliveries, setDeliveries] = useState<any[]>([])
-  const [loading, setLoading]     = useState(true)
-  const [error, setError]         = useState('')
-  const [expanded, setExpanded]   = useState<string | null>(null)
+  const [client, setClient]           = useState<any>(null)
+  const [deliveries, setDeliveries]   = useState<any[]>([])
+  const [loading, setLoading]         = useState(true)
+  const [error, setError]             = useState('')
+  const [expanded, setExpanded]       = useState<string | null>(null)
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [editingBalance, setEditingBalance] = useState(false)
-  const [newBalance, setNewBalance] = useState('')
+  const [newBalance, setNewBalance]   = useState('')
   const [savingBalance, setSavingBalance] = useState(false)
 
   useEffect(() => {
@@ -78,6 +78,17 @@ export default function ClienteDetallePage() {
       setEditingBalance(false)
     } catch { setError('No se pudo actualizar el saldo') }
     finally { setSavingBalance(false) }
+  }
+
+  const openPhoto = (fileUrl: string) => {
+    const w = window.open()
+    if (w) {
+      w.document.write(`
+        <html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+          <img src="${fileUrl}" style="max-width:100%;max-height:100vh;object-fit:contain;"/>
+        </body></html>
+      `)
+    }
   }
 
   const filtered = filterStatus === 'all'
@@ -128,10 +139,6 @@ export default function ClienteDetallePage() {
             <p className="text-blue-200 text-xs">{client?.address}</p>
           </div>
         </div>
-        <button onClick={() => router.push(`/clientes?edit=${id}`)}
-          className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold">
-          ✏️ Editar
-        </button>
       </nav>
 
       <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-6">
@@ -157,7 +164,8 @@ export default function ClienteDetallePage() {
               <p className="text-xs text-gray-400 uppercase font-semibold">Saldo pendiente</p>
               {editingBalance ? (
                 <div className="flex gap-2 mt-1">
-                  <input type="number" className="border border-gray-200 rounded-lg px-2 py-1 text-sm w-24 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  <input type="number"
+                    className="border border-gray-200 rounded-lg px-2 py-1 text-sm w-24 focus:outline-none focus:ring-2 focus:ring-blue-300"
                     value={newBalance} onChange={e => setNewBalance(e.target.value)} autoFocus />
                   <button onClick={handleSaveBalance} disabled={savingBalance}
                     className="bg-blue-600 text-white rounded-lg px-2 py-1 text-xs font-bold">
@@ -182,9 +190,9 @@ export default function ClienteDetallePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'Total cobrado', value: `$ ${totalCobrado.toLocaleString('es-AR')}`, color: '#1DB954', emoji: '💰' },
-            { label: 'Total fiado', value: `$ ${totalFiado.toLocaleString('es-AR')}`, color: '#E67E22', emoji: '📒' },
-            { label: 'Entregas', value: totalEntregas, color: '#0A5C8A', emoji: '✅' },
-            { label: 'No entregadas', value: totalNoEntregas, color: '#C0392B', emoji: '❌' },
+            { label: 'Total fiado',   value: `$ ${totalFiado.toLocaleString('es-AR')}`,   color: '#E67E22', emoji: '📒' },
+            { label: 'Entregas',      value: totalEntregas,                                color: '#0A5C8A', emoji: '✅' },
+            { label: 'No entregadas', value: totalNoEntregas,                              color: '#C0392B', emoji: '❌' },
           ].map(stat => (
             <div key={stat.label} className="bg-white rounded-2xl p-4 shadow-sm border border-blue-50">
               <p className="text-xs text-gray-400 uppercase font-semibold">{stat.label}</p>
@@ -201,7 +209,9 @@ export default function ClienteDetallePage() {
               {['all', 'entregado', 'no_entregado', 'pendiente'].map(s => (
                 <button key={s}
                   onClick={() => setFilterStatus(s)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${filterStatus === s ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                    filterStatus === s ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                  }`}>
                   {s === 'all' ? 'Todas' : STATUS_CFG[s]?.label ?? s}
                 </button>
               ))}
@@ -229,14 +239,16 @@ export default function ClienteDetallePage() {
                       className="w-full text-left px-5 py-4 hover:bg-gray-50 transition-colors">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-bold`}
+                          <span className="px-2 py-0.5 rounded-full text-xs font-bold"
                             style={{ backgroundColor: cfg.bg, color: cfg.color }}>
                             {cfg.label}
                           </span>
                           <div>
                             <p className="text-sm font-semibold text-gray-800">
                               {d.route_date
-                                ? new Date(d.route_date).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+                                ? new Date(d.route_date).toLocaleDateString('es-AR', {
+                                    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+                                  })
                                 : 'Fecha no disponible'}
                             </p>
                             <p className="text-xs text-gray-400 mt-0.5">
@@ -267,11 +279,11 @@ export default function ClienteDetallePage() {
                             <p className="text-xs font-bold text-gray-500 uppercase mb-3">💰 Detalle de pago</p>
                             <div className="grid grid-cols-2 gap-3">
                               {[
-                                ['Monto esperado', `$ ${Number(d.expected_amount ?? 0).toLocaleString('es-AR')}`],
-                                ['Monto cobrado', `$ ${Number(d.actual_amount ?? 0).toLocaleString('es-AR')}`],
-                                ['Efectivo', `$ ${Number(d.cash_received ?? 0).toLocaleString('es-AR')}`],
-                                ['Transferencia', `$ ${Number(d.transfer_amount ?? 0).toLocaleString('es-AR')}`],
-                                ['Fiado', `$ ${Number(d.credit_amount ?? 0).toLocaleString('es-AR')}`],
+                                ['Monto esperado',  `$ ${Number(d.expected_amount ?? 0).toLocaleString('es-AR')}`],
+                                ['Monto cobrado',   `$ ${Number(d.actual_amount ?? 0).toLocaleString('es-AR')}`],
+                                ['Efectivo',        `$ ${Number(d.cash_received ?? 0).toLocaleString('es-AR')}`],
+                                ['Transferencia',   `$ ${Number(d.transfer_amount ?? 0).toLocaleString('es-AR')}`],
+                                ['Fiado',           `$ ${Number(d.credit_amount ?? 0).toLocaleString('es-AR')}`],
                               ].map(([label, value]) => (
                                 <div key={label}>
                                   <p className="text-xs text-gray-400">{label}</p>
@@ -302,8 +314,9 @@ export default function ClienteDetallePage() {
                         {firma && (
                           <div className="bg-white rounded-xl p-4 border border-gray-100">
                             <p className="text-xs font-bold text-gray-500 uppercase mb-3">✍️ Firma del cliente</p>
-                            <div className="bg-gray-50 rounded-lg p-2 border border-gray-100 inline-block">
-                              <img src={firma.file_url} alt="Firma" className="h-20 object-contain" />
+                            <div className="bg-gray-50 rounded-lg p-2 border border-gray-100 inline-block cursor-pointer"
+                              onClick={() => openPhoto(firma.file_url)}>
+                              <img src={firma.file_url} alt="Firma" className="h-20 object-contain hover:opacity-80" />
                             </div>
                             {firma.created_at && (
                               <p className="text-xs text-gray-400 mt-2">
@@ -321,10 +334,13 @@ export default function ClienteDetallePage() {
                             </p>
                             <div className="grid grid-cols-3 gap-2">
                               {fotos.map((f: any) => (
-                                <a key={f.id} href={f.file_url} target="_blank" rel="noreferrer">
-                                  <img src={f.file_url} alt="Evidencia"
-                                    className="w-full h-24 object-cover rounded-lg border border-gray-100 hover:opacity-80 transition-opacity cursor-pointer" />
-                                </a>
+                                <img
+                                  key={f.id}
+                                  src={f.file_url}
+                                  alt="Evidencia"
+                                  className="w-full h-24 object-cover rounded-lg border border-gray-100 hover:opacity-80 transition-opacity cursor-pointer"
+                                  onClick={() => openPhoto(f.file_url)}
+                                />
                               ))}
                             </div>
                           </div>
