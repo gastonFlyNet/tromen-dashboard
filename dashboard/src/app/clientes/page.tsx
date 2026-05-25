@@ -186,7 +186,7 @@ export default function ClientesPage() {
         ) : (
           <div className="space-y-3">
             {filtered.map(c => (
-              <div key={c.id} className="bg-white rounded-2xl p-4 shadow-sm border border-blue-50 flex items-start gap-4">
+              <div key={c.id} className="bg-white rounded-2xl p-4 shadow-sm border border-blue-50 flex items-start gap-4 cursor-pointer hover:border-blue-200 transition-all" onClick={() => router.push(`/clientes/${c.id}`)}>
                 <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
                   style={{ background: '#0A5C8A' }}>
                   {c.name?.charAt(0).toUpperCase()}
