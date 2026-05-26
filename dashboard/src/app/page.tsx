@@ -25,7 +25,6 @@ interface Summary {
 interface Repartidor {
   user_id: string
   repartidor: string
-  email?: string
   route_status: string
   route_id: string
   total_deliveries: number
@@ -310,21 +309,11 @@ setTracks(tracksRes.tracks ?? {})
           <div className="bg-white rounded-2xl shadow-sm border border-blue-50 overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
               <h3 className="font-bold text-gray-700">🗺️ Posición en tiempo real</h3>
-              <div className="flex items-center gap-3">
-                <button onClick={() => setShowTracks(t => !t)}
-                  className="text-xs px-2.5 py-1 rounded-full font-semibold transition-all"
-                  style={{
-                    background: showTracks ? '#0A5C8A' : '#e5e7eb',
-                    color: showTracks ? 'white' : '#6b7280'
-                  }}>
-                  {showTracks ? '📍 Track ON' : '📍 Track OFF'}
-                </button>
-                <span className="text-xs text-gray-400">
-                  {positions.length} repartidor{positions.length !== 1 ? 'es' : ''} activo{positions.length !== 1 ? 's' : ''}
-                </span>
-              </div>
+              <span className="text-xs text-gray-400">
+                {positions.length} repartidor{positions.length !== 1 ? 'es' : ''} activo{positions.length !== 1 ? 's' : ''}
+              </span>
             </div>
-            <div style={{ height: '400px', position: 'relative' }}>
+            <div style={{ height: '400px' }}>
               <Map
                 mapboxAccessToken={MAPBOX_TOKEN}
                 initialViewState={{
@@ -371,39 +360,7 @@ setTracks(tracksRes.tracks ?? {})
                     </div>
                   </Marker>
                 ))}
-                {/* ── TRACKS DEL DÍA ── */}
-                {showTracks && Object.entries(tracks).map(([userId, points]) => {
-                  if (points.length < 2) return null
-                  const rep = repartidores.find(r => r.user_id === userId)
-                  const color = getRepColor(userId, undefined)
-                  const coordinates = points.map(p => [p.lng, p.lat])
-                  return (
-                    <Source key={`track-${userId}`} id={`track-${userId}`} type="geojson" data={{
-                      type: 'Feature',
-                      geometry: { type: 'LineString', coordinates }
-                    }}>
-                      <Layer id={`track-line-${userId}`} type="line"
-                        layout={{ 'line-join': 'round', 'line-cap': 'round' }}
-                        paint={{ 'line-color': color, 'line-width': 3, 'line-opacity': 0.75 }}
-                      />
-                    </Source>
-                  )
-                })}
               </Map>
-              {showTracks && Object.keys(tracks).length > 0 && (
-                <div className="absolute bottom-3 left-3 z-10 bg-black/65 rounded-xl px-3 py-2 space-y-1.5">
-                  {Object.keys(tracks).map(userId => {
-                    const rep = repartidores.find(r => r.user_id === userId)
-                    const color = getRepColor(userId, undefined)
-                    return (
-                      <div key={userId} className="flex items-center gap-2">
-                        <span className="block w-5 h-1.5 rounded-full" style={{ background: color }} />
-                        <span className="text-white text-xs font-medium">{rep?.repartidor ?? 'Repartidor'}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
             </div>
             {positions.length === 0 && (
               <div className="flex items-center justify-center py-8 text-gray-400 text-sm">
@@ -442,6 +399,10 @@ setTracks(tracksRes.tracks ?? {})
                         <div className="flex items-start justify-between">
                           <div>
                             <p className="font-bold text-gray-800">{r.repartidor}</p>
+                              <button onClick={e => { e.stopPropagation(); router.push(`/repartidores/${r.user_id}`) }}
+                                className="text-xs text-blue-500 hover:text-blue-700 font-semibold">
+                                ver perfil →
+                              </button>
                             <div className="flex items-center gap-1.5 mt-1">
                               <span className="w-2 h-2 rounded-full"
                                 style={{ background: STATUS_COLOR[r.route_status] ?? '#888' }} />
