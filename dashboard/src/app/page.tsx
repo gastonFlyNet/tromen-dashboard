@@ -114,6 +114,8 @@ export default function Dashboard() {
   const [activeTab, setActiveTab]   = useState<'rutas' | 'cobros' | 'clientes'>('rutas')
   const intervalRef = useRef<NodeJS.Timeout>()
   const [tracks, setTracks] = useState<Record<string, {lat: number, lng: number, timestamp: string}[]>>({})
+  const [pauses, setPauses] = useState<any[]>([])
+  const [selectedPauseRoute, setSelectedPauseRoute] = useState<string | null>(null)
   const [showTracks, setShowTracks] = useState(true)
   const mapRef = useRef<any>(null)
 
@@ -142,6 +144,10 @@ export default function Dashboard() {
       headers: { Authorization: `Bearer ${localStorage.getItem('tromen_token')}` }
       }).then(r => r.json()).catch(() => ({ tracks: {} }))
 setTracks(tracksRes.tracks ?? {})
+const pausesRes = await fetch(`${API_URL}/api/routes/pauses/today`, {
+  headers: { Authorization: `Bearer ${localStorage.getItem('tromen_token')}` }
+}).then(r => r.json()).catch(() => [])
+setPauses(Array.isArray(pausesRes) ? pausesRes : [])
     } catch (err) {
       console.error('Error cargando datos:', err)
     } finally { setLoading(false) }
@@ -402,7 +408,40 @@ setTracks(tracksRes.tracks ?? {})
   onClick={() => router.push(`/rutas/${r.route_id}`)}>
                         <div className="flex items-start justify-between">
                           <div>
-                            <p className="font-bold text-gray-800">{r.repartidor}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-gray-800">{r.repartidor}</p>
+                              {r.route_status === 'pausada' && (
+                                <button
+                                  onClick={e => { e.stopPropagation(); setSelectedPauseRoute(selectedPauseRoute === r.route_id ? null : r.route_id) }}
+                                  className="text-xs px-2 py-0.5 rounded-full font-bold animate-pulse"
+                                  style={{ background: '#FEF3C7', color: '#92400E' }}>
+                                  ⏸ Pausada
+                                </button>
+                              )}
+                            </div>
+                            {selectedPauseRoute === r.route_id && (
+                              <div className="mt-2 bg-amber-50 border border-amber-200 rounded-xl p-3">
+                                <p className="text-xs font-bold text-amber-800 mb-2">Historial de pausas</p>
+                                {pauses.filter(p => p.route_id === r.route_id).length === 0
+                                  ? <p className="text-xs text-amber-600">Sin pausas registradas</p>
+                                  : pauses.filter(p => p.route_id === r.route_id).map(p => (
+                                    <div key={p.id} className="mb-2 pb-2 border-b border-amber-200 last:border-0 last:mb-0 last:pb-0">
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-xs font-semibold text-amber-900">
+                                          {p.resumed_at ? '✅ Reanudada' : '⏸ En pausa'}
+                                        </span>
+                                        <span className="text-xs text-amber-600">
+                                          {new Date(p.paused_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
+                                          {p.resumed_at && ` → ${new Date(p.resumed_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`}
+                                        </span>
+                                      </div>
+                                      {p.reason && <p className="text-xs text-amber-700 mt-0.5">Motivo: {p.reason}</p>}
+                                      {p.authorized_by_name && <p className="text-xs text-amber-600 mt-0.5">Autorizado por: {p.authorized_by_name}</p>}
+                                    </div>
+                                  ))
+                                }
+                              </div>
+                            )}
                               <button onClick={e => { e.stopPropagation(); router.push(`/repartidores/${r.user_id}`) }}
                                 className="text-xs text-blue-500 hover:text-blue-700 font-semibold">
                                 ver perfil →
