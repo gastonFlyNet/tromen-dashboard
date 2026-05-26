@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import Map, { Marker } from 'react-map-gl'
+import Map, { Marker, Source, Layer } from 'react-map-gl'
+import { getRepColor } from '@/lib/repColors'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
@@ -54,7 +55,7 @@ export default function RutaDetallePage() {
   })
   const [savingNewClient, setSavingNewClient]   = useState(false)
   const intervalRef = useRef<NodeJS.Timeout>()
-
+  const [trackPoints, setTrackPoints] = useState<{lat: number, lng: number}[]>([])
   const loadRoute = useCallback(async () => {
     try {
       const data = await apiFetch(`/api/routes/${routeId}`)
@@ -74,7 +75,16 @@ export default function RutaDetallePage() {
   useEffect(() => {
     const u = localStorage.getItem('tromen_user')
     if (!u) { router.push('/login'); return }
-    Promise.all([loadRoute(), loadPosition()]).finally(() => setLoading(false))
+    Promise.all([loadRoute(), loadPosition()]).then(async () => {
+      try {
+        const token = localStorage.getItem('tromen_token')
+        const gps = await fetch(`${API_URL}/api/gps/track/${routeId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).then(r => r.json())
+        const pts = Array.isArray(gps) ? gps : gps.points ?? []
+        setTrackPoints(pts.map((p: any) => ({ lat: p.latitude, lng: p.longitude })))
+      } catch {}
+    }).finally(() => setLoading(false))
     intervalRef.current = setInterval(() => { loadRoute(); loadPosition() }, 15000)
     return () => clearInterval(intervalRef.current)
   }, [loadRoute, loadPosition])
@@ -296,6 +306,20 @@ export default function RutaDetallePage() {
                       cursor: 'pointer' }}>✓</div>
                   </Marker>
                 ))}
+                {trackPoints.length >= 2 && (
+                  <Source id="route-track" type="geojson" data={{
+                    type: 'Feature',
+                    geometry: {
+                      type: 'LineString',
+                      coordinates: trackPoints.map(p => [p.lng, p.lat])
+                    }
+                  }}>
+                    <Layer id="route-track-line" type="line"
+                      layout={{ 'line-join': 'round', 'line-cap': 'round' }}
+                      paint={{ 'line-color': '#0A5C8A', 'line-width': 4, 'line-opacity': 0.8 }}
+                    />
+                  </Source>
+                )}
               </Map>
             </div>
             {!position && (
