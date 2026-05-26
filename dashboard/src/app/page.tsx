@@ -223,7 +223,7 @@ if (loading) return (
         style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
         <div className="flex items-center gap-3">
           <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 12, padding: '4px 12px' }}>
-            <img src="/tromen-logo.png" alt="TROMEN" style={{ height: 36, objectFit: 'contain' }} />
+            <img src="/tromen-logo.png" alt="TROMEN" style={{ height: 52, objectFit: 'contain' }} />
           </div>
           <div>
             <p className="text-blue-200 text-xs">Panel Administrativo · Catriel</p>
