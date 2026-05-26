@@ -208,6 +208,10 @@ setTracks(tracksRes.tracks ?? {})
   className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
   📍 Geocercas
 </button>
+<button onClick={() => router.push('/stock')}
+  className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
+  📦 Stock
+</button>
           <button onClick={loadData}
             className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
             ↻ Actualizar
