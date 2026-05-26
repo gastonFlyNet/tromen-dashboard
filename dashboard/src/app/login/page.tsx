@@ -44,9 +44,9 @@ export default function LoginPage() {
 
         {/* LOGO */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-2">
+          <div className="inline-flex items-center justify-center mb-2" style={{ minHeight: 140 }}>
             <img src="/tromen-logo.png" alt="TROMEN"
-              style={{ height: 200, objectFit: 'contain', filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.3))', maxWidth: '280px' }} />
+              style={{ height: 300, objectFit: 'contain', filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.3))', maxWidth: '280px' }} />
           </div>
           <p className="text-blue-200 mt-3 text-sm font-medium tracking-wide">Panel Administrativo · Catriel</p>
         </div>
