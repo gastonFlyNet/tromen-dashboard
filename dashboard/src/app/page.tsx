@@ -229,7 +229,7 @@ export default function Dashboard() {
       {/* ── NAVBAR ── */}
       <nav style={{ background: C.navy, padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <img src="/tromen-logo.png" alt="TROMEN" style={{ height: 120, objectFit: 'contain', filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.5)) brightness(1.1)' }} />
+          <img src="/tromen-logo.png" alt="TROMEN" style={{ height: 100, objectFit: 'contain', filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.5)) brightness(1.1)' }} />
           <div>
             <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, letterSpacing: '0.05em' }}>Panel Administrativo · Catriel</p>
           </div>

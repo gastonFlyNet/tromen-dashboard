@@ -56,7 +56,7 @@ export default function LoginPage() {
             alignItems: 'center',
           }}>
             <img src="/tromen-logo.png" alt="TROMEN"
-              style={{ height: 150, objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} />
+              style={{ height: 250, objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} />
             <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 12, marginTop: 10, letterSpacing: '0.08em', fontWeight: 500 }}>
               PANEL ADMINISTRATIVO · CATRIEL
             </p>
