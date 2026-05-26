@@ -44,7 +44,7 @@ export default function LoginPage() {
           <div className="flex flex-col items-center justify-center py-8 px-6"
             style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
             <img src="/tromen-logo.png" alt="TROMEN"
-              style={{ height: 100, objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} />
+              style={{ height: 300, objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} />
             <p className="text-blue-100 text-xs mt-3 font-medium tracking-wide">Panel Administrativo · Catriel</p>
           </div>
 
