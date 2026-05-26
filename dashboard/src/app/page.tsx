@@ -175,7 +175,7 @@ if (loading) return (
         <div style={{ position: 'relative', display: 'inline-block', marginBottom: 24, padding: '0 20px' }}>
           {/* Bidón */}
           <img src="/tromen-bidon.png" alt="TROMEN"
-            style={{ height: 260, objectFit: 'contain', filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.3))', position: 'relative', zIndex: 2, display: 'block' }} />
+            style={{ height: 320, objectFit: 'contain', filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.3))', position: 'relative', zIndex: 2, display: 'block' }} />
           {/* Agua animada DENTRO del bidón */}
           <div style={{
             position: 'absolute', bottom: 18, left: '22%', right: '22%',
@@ -190,11 +190,7 @@ if (loading) return (
             }} />
           </div>
         </div>
-        {/* Logo sin fondo */}
-        <div style={{ marginBottom: 16 }}>
-          <img src="/tromen-logo.png" alt="TROMEN"
-            style={{ height: 64, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.95 }} />
-        </div>
+        
         <p className="text-blue-200 text-sm font-medium">Cargando panel administrativo...</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 16 }}>
           {[0,1,2].map(i => (
