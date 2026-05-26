@@ -222,8 +222,8 @@ if (loading) return (
       <nav className="text-white px-6 py-4 flex items-center justify-between shadow-lg"
         style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
         <div className="flex items-center gap-3">
-          <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 12, padding: '4px 12px' }}>
-            <img src="/tromen-logo.png" alt="TROMEN" style={{ height: 52, objectFit: 'contain' }} />
+          <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 12, padding: '6px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+            <img src="/tromen-logo.png" alt="TROMEN" style={{ height: 48, objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
           </div>
           <div>
             <p className="text-blue-200 text-xs">Panel Administrativo · Catriel</p>
