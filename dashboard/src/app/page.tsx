@@ -172,10 +172,10 @@ if (loading) return (
     <div className="min-h-screen flex items-center justify-center"
       style={{ background: 'linear-gradient(160deg, #063D5E 0%, #0A5C8A 50%, #1A8FBF 100%)' }}>
       <div className="text-center">
-        <div style={{ position: 'relative', display: 'inline-block', marginBottom: 24 }}>
+        <div style={{ position: 'relative', display: 'inline-block', marginBottom: 24, padding: '0 20px' }}>
           {/* Bidón */}
           <img src="/tromen-bidon.png" alt="TROMEN"
-            style={{ height: 200, objectFit: 'contain', filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.3))', position: 'relative', zIndex: 2 }} />
+            style={{ height: 260, objectFit: 'contain', filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.3))', position: 'relative', zIndex: 2, display: 'block' }} />
           {/* Agua animada DENTRO del bidón */}
           <div style={{
             position: 'absolute', bottom: 18, left: '22%', right: '22%',
