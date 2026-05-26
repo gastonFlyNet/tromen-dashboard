@@ -29,7 +29,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden"
+    <div className="min-h-screen flex items-center justify-center relative overflow-y-auto"
       style={{ background: 'linear-gradient(160deg, #063D5E 0%, #0A5C8A 50%, #1A8FBF 100%)' }}>
 
       {/* Círculos decorativos */}
@@ -40,7 +40,7 @@ export default function LoginPage() {
       <div className="absolute rounded-full"
         style={{ width: 200, height: 200, top: '40%', right: '15%', background: 'rgba(255,255,255,0.03)' }} />
 
-      <div className="relative z-10 w-full max-w-md px-6">
+      <div className="relative z-10 w-full max-w-md px-6 py-8">
 
         {/* LOGO */}
         <div className="text-center mb-8">
