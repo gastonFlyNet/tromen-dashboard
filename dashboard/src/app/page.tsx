@@ -5,8 +5,9 @@ import Map, { Marker, Source, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { dashboardApi, gpsApi, routesApi } from '@/lib/api'
 import { formatDistanceToNow } from 'date-fns'
+import { getRepColor } from '@/lib/repColors'
 import { es } from 'date-fns/locale'
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
 
 // ── TIPOS ─────────────────────────────────────────────────────
@@ -24,6 +25,7 @@ interface Summary {
 interface Repartidor {
   user_id: string
   repartidor: string
+  email?: string
   route_status: string
   route_id: string
   total_deliveries: number
@@ -112,6 +114,9 @@ export default function Dashboard() {
   const [selectedRep, setSelectedRep] = useState<string | null>(null)
   const [activeTab, setActiveTab]   = useState<'rutas' | 'cobros' | 'clientes'>('rutas')
   const intervalRef = useRef<NodeJS.Timeout>()
+  const [tracks, setTracks] = useState<Record<string, {lat: number, lng: number, timestamp: string}[]>>({})
+  const [showTracks, setShowTracks] = useState(true)
+  const mapRef = useRef<any>(null)
 
   // Auth check
   useEffect(() => {
@@ -134,6 +139,10 @@ export default function Dashboard() {
       setLastUpdate(new Date())
       const geoRes = await gpsApi.geofenceAlerts().catch(() => ({ data: [] }))
       setGeofenceAlerts(geoRes.data ?? [])
+      const tracksRes = await fetch(`${API_URL}/api/gps/tracks-today`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('tromen_token')}` }
+      }).then(r => r.json()).catch(() => ({ tracks: {} }))
+setTracks(tracksRes.tracks ?? {})
     } catch (err) {
       console.error('Error cargando datos:', err)
     } finally { setLoading(false) }
@@ -301,11 +310,21 @@ export default function Dashboard() {
           <div className="bg-white rounded-2xl shadow-sm border border-blue-50 overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
               <h3 className="font-bold text-gray-700">🗺️ Posición en tiempo real</h3>
-              <span className="text-xs text-gray-400">
-                {positions.length} repartidor{positions.length !== 1 ? 'es' : ''} activo{positions.length !== 1 ? 's' : ''}
-              </span>
+              <div className="flex items-center gap-3">
+                <button onClick={() => setShowTracks(t => !t)}
+                  className="text-xs px-2.5 py-1 rounded-full font-semibold transition-all"
+                  style={{
+                    background: showTracks ? '#0A5C8A' : '#e5e7eb',
+                    color: showTracks ? 'white' : '#6b7280'
+                  }}>
+                  {showTracks ? '📍 Track ON' : '📍 Track OFF'}
+                </button>
+                <span className="text-xs text-gray-400">
+                  {positions.length} repartidor{positions.length !== 1 ? 'es' : ''} activo{positions.length !== 1 ? 's' : ''}
+                </span>
+              </div>
             </div>
-            <div style={{ height: '400px' }}>
+            <div style={{ height: '400px', position: 'relative' }}>
               <Map
                 mapboxAccessToken={MAPBOX_TOKEN}
                 initialViewState={{
@@ -352,7 +371,39 @@ export default function Dashboard() {
                     </div>
                   </Marker>
                 ))}
+                {/* ── TRACKS DEL DÍA ── */}
+                {showTracks && Object.entries(tracks).map(([userId, points]) => {
+                  if (points.length < 2) return null
+                  const rep = repartidores.find(r => r.user_id === userId)
+                  const color = getRepColor(userId, undefined)
+                  const coordinates = points.map(p => [p.lng, p.lat])
+                  return (
+                    <Source key={`track-${userId}`} id={`track-${userId}`} type="geojson" data={{
+                      type: 'Feature',
+                      geometry: { type: 'LineString', coordinates }
+                    }}>
+                      <Layer id={`track-line-${userId}`} type="line"
+                        layout={{ 'line-join': 'round', 'line-cap': 'round' }}
+                        paint={{ 'line-color': color, 'line-width': 3, 'line-opacity': 0.75 }}
+                      />
+                    </Source>
+                  )
+                })}
               </Map>
+              {showTracks && Object.keys(tracks).length > 0 && (
+                <div className="absolute bottom-3 left-3 z-10 bg-black/65 rounded-xl px-3 py-2 space-y-1.5">
+                  {Object.keys(tracks).map(userId => {
+                    const rep = repartidores.find(r => r.user_id === userId)
+                    const color = getRepColor(userId, undefined)
+                    return (
+                      <div key={userId} className="flex items-center gap-2">
+                        <span className="block w-5 h-1.5 rounded-full" style={{ background: color }} />
+                        <span className="text-white text-xs font-medium">{rep?.repartidor ?? 'Repartidor'}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
             {positions.length === 0 && (
               <div className="flex items-center justify-center py-8 text-gray-400 text-sm">
