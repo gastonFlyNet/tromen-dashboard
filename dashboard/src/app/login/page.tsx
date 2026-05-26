@@ -29,61 +29,64 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center"
-      style={{ background: 'linear-gradient(135deg, #0A5C8A 0%, #1A8FBF 100%)' }}>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden"
+      style={{ background: 'linear-gradient(160deg, #063D5E 0%, #0A5C8A 50%, #1A8FBF 100%)' }}>
 
       {/* Círculos decorativos */}
-      <div className="absolute w-96 h-96 rounded-full opacity-10 bg-white"
-        style={{ top: '-80px', right: '-80px' }} />
-      <div className="absolute w-64 h-64 rounded-full opacity-10 bg-white"
-        style={{ bottom: '40px', left: '-40px' }} />
+      <div className="absolute rounded-full"
+        style={{ width: 500, height: 500, top: -120, right: -120, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }} />
+      <div className="absolute rounded-full"
+        style={{ width: 300, height: 300, bottom: -80, left: -80, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }} />
+      <div className="absolute rounded-full"
+        style={{ width: 200, height: 200, top: '40%', right: '15%', background: 'rgba(255,255,255,0.03)' }} />
 
       <div className="relative z-10 w-full max-w-md px-6">
+
+        {/* LOGO */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4"
-            style={{ background: 'rgba(255,255,255,0.2)', border: '2px solid rgba(255,255,255,0.3)' }}>
-            <span className="text-4xl">💧</span>
+          <div className="inline-flex items-center justify-center mb-2"
+            style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 24, padding: '16px 32px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+            <img src="/tromen-logo.png" alt="TROMEN" style={{ height: 80, objectFit: 'contain' }} />
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-widest">TROMEN</h1>
-          <p className="text-blue-100 mt-1 text-sm">Panel Administrativo · Catriel</p>
+          <p className="text-blue-200 mt-3 text-sm font-medium tracking-wide">Panel Administrativo · Catriel</p>
         </div>
 
-        <form onSubmit={handleLogin}
-          className="bg-white rounded-2xl p-8 shadow-2xl">
+        {/* FORM */}
+        <div className="bg-white rounded-2xl p-8 shadow-2xl">
           <h2 className="text-xl font-bold text-gray-800 mb-6">Iniciar sesión</h2>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4">
               <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
 
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-500 mb-2">Email</label>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Email</label>
             <input
               type="email" value={email} onChange={e => setEmail(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:border-blue-400"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm"
               placeholder="admin@tromen.com" required
             />
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-500 mb-2">Contraseña</label>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Contraseña</label>
             <input
               type="password" value={password} onChange={e => setPassword(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:border-blue-400"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm"
               placeholder="••••••••" required
             />
           </div>
 
-          <button type="submit" disabled={loading}
-            className="w-full py-3 rounded-xl font-bold text-white text-base transition-all"
-            style={{ background: loading ? '#aaa' : '#0A5C8A' }}>
-            {loading ? 'Ingresando...' : '💧  Ingresar al panel'}
+          <button type="submit" onClick={handleLogin} disabled={loading}
+            className="w-full py-3 rounded-xl font-bold text-white text-sm transition-all"
+            style={{ background: loading ? '#aaa' : 'linear-gradient(135deg, #0A5C8A, #1A8FBF)', boxShadow: '0 4px 16px rgba(10,92,138,0.3)' }}>
+            {loading ? 'Ingresando...' : 'Ingresar al panel'}
           </button>
-        </form>
+        </div>
 
-        <p className="text-center text-blue-200 text-xs mt-6">BYF Soluciones · v1.0</p>
+        <p className="text-center text-blue-300 text-xs mt-6">BYF Soluciones · TROMEN v1.0</p>
       </div>
     </div>
   )

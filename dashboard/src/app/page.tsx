@@ -169,11 +169,48 @@ setPauses(Array.isArray(pausesRes) ? pausesRes : [])
     : 0
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50">
+    <div className="min-h-screen flex items-center justify-center"
+      style={{ background: 'linear-gradient(160deg, #063D5E 0%, #0A5C8A 50%, #1A8FBF 100%)' }}>
       <div className="text-center">
-        <span className="text-6xl">💧</span>
-        <p className="text-gray-500 mt-4 font-medium">Cargando panel TROMEN...</p>
+        <div style={{ position: 'relative', display: 'inline-block', marginBottom: 24 }}>
+          <img src="/tromen-bidon.png" alt="TROMEN" style={{ height: 180, objectFit: 'contain', filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.3))' }} />
+          {/* Animación de agua llenando */}
+          <div style={{
+            position: 'absolute', bottom: 12, left: '15%', right: '15%', height: '60%',
+            borderRadius: '0 0 40% 40%', overflow: 'hidden', opacity: 0.25,
+          }}>
+            <div style={{
+              position: 'absolute', bottom: 0, left: '-20%', right: '-20%',
+              background: 'linear-gradient(180deg, #7DD3F8, #0A5C8A)',
+              animation: 'fillWater 2s ease-in-out infinite alternate',
+            }} />
+          </div>
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <img src="/tromen-logo.png" alt="TROMEN" style={{ height: 48, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.9 }} />
+        </div>
+        <p className="text-blue-200 text-sm font-medium">Cargando panel administrativo...</p>
+        {/* Puntos animados */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 16 }}>
+          {[0,1,2].map(i => (
+            <div key={i} style={{
+              width: 8, height: 8, borderRadius: 4,
+              background: 'rgba(255,255,255,0.6)',
+              animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
+            }} />
+          ))}
+        </div>
       </div>
+      <style>{`
+        @keyframes fillWater {
+          0%   { height: 20%; }
+          100% { height: 85%; }
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); opacity: 0.4; }
+          50%       { transform: translateY(-8px); opacity: 1; }
+        }
+      `}</style>
     </div>
   )
 
@@ -184,9 +221,10 @@ setPauses(Array.isArray(pausesRes) ? pausesRes : [])
       <nav className="text-white px-6 py-4 flex items-center justify-between shadow-lg"
         style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
         <div className="flex items-center gap-3">
-          <span className="text-2xl">💧</span>
+          <div style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 12, padding: '4px 12px' }}>
+            <img src="/tromen-logo.png" alt="TROMEN" style={{ height: 36, objectFit: 'contain' }} />
+          </div>
           <div>
-            <h1 className="font-bold text-lg tracking-wider">TROMEN</h1>
             <p className="text-blue-200 text-xs">Panel Administrativo · Catriel</p>
           </div>
         </div>
