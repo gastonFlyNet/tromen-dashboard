@@ -28,63 +28,84 @@ export default function LoginPage() {
     } finally { setLoading(false) }
   }
 
- return (
-    <div className="min-h-screen flex items-center justify-center relative"
-      style={{ background: 'linear-gradient(160deg, #063D5E 0%, #0A5C8A 50%, #1A8FBF 100%)' }}>
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(160deg, #0D1F33 0%, #1A2E4A 50%, #2D7DD2 100%)',
+      fontFamily: 'Inter, sans-serif',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Círculos decorativos */}
+      <div style={{ position: 'absolute', width: 500, height: 500, top: -120, right: -120, borderRadius: '50%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }} />
+      <div style={{ position: 'absolute', width: 300, height: 300, bottom: -80, left: -80, borderRadius: '50%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }} />
 
-      <div className="absolute rounded-full"
-        style={{ width: 500, height: 500, top: -120, right: -120, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }} />
-      <div className="absolute rounded-full"
-        style={{ width: 300, height: 300, bottom: -80, left: -80, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }} />
+      <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: 420, padding: '0 24px' }}>
+        {/* CARD */}
+        <div style={{ background: 'white', borderRadius: 20, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
 
-      <div className="relative z-10 w-full max-w-md px-6">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-
-          {/* HEADER AZUL CON LOGO */}
-          <div className="flex flex-col items-center justify-center py-8 px-6"
-            style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
+          {/* HEADER CON LOGO */}
+          <div style={{
+            background: 'linear-gradient(135deg, #1A2E4A, #2D7DD2)',
+            padding: '36px 32px 28px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}>
             <img src="/tromen-logo.png" alt="TROMEN"
-              style={{ height: 300, objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} />
-            <p className="text-blue-100 text-xs mt-3 font-medium tracking-wide">Panel Administrativo · Catriel</p>
+              style={{ height: 90, objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} />
+            <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 12, marginTop: 10, letterSpacing: '0.08em', fontWeight: 500 }}>
+              PANEL ADMINISTRATIVO · CATRIEL
+            </p>
           </div>
 
           {/* FORMULARIO */}
-          <div className="p-8">
-            <h2 className="text-xl font-bold text-gray-800 mb-6">Iniciar sesión</h2>
+          <div style={{ padding: '28px 32px 32px' }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 20 }}>Iniciar sesión</h2>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4">
-                <p className="text-red-600 text-sm">{error}</p>
+              <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 10, padding: '10px 14px', marginBottom: 16 }}>
+                <p style={{ color: '#C0392B', fontSize: 13 }}>{error}</p>
               </div>
             )}
 
-            <div className="mb-4">
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Email</label>
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#555555', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Email</label>
               <input
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm"
+                style={{ width: '100%', border: '1px solid #E5E7EB', borderRadius: 10, padding: '11px 14px', fontSize: 14, color: '#1A1A1A', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' }}
                 placeholder="admin@tromen.com" required
               />
             </div>
 
-            <div className="mb-6">
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Contraseña</label>
+            <div style={{ marginBottom: 22 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#555555', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Contraseña</label>
               <input
                 type="password" value={password} onChange={e => setPassword(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm"
+                style={{ width: '100%', border: '1px solid #E5E7EB', borderRadius: 10, padding: '11px 14px', fontSize: 14, color: '#1A1A1A', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' }}
                 placeholder="••••••••" required
               />
             </div>
 
-            <button type="submit" onClick={handleLogin} disabled={loading}
-              className="w-full py-3 rounded-xl font-bold text-white text-sm transition-all"
-              style={{ background: loading ? '#aaa' : 'linear-gradient(135deg, #0A5C8A, #1A8FBF)', boxShadow: '0 4px 16px rgba(10,92,138,0.3)' }}>
+            <button onClick={handleLogin} disabled={loading}
+              style={{
+                width: '100%', padding: '13px', borderRadius: 10, fontWeight: 700, color: 'white', fontSize: 14,
+                background: loading ? '#aaa' : 'linear-gradient(135deg, #1A2E4A, #2D7DD2)',
+                border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                boxShadow: '0 4px 16px rgba(26,46,74,0.3)',
+                fontFamily: 'Inter, sans-serif',
+              }}>
               {loading ? 'Ingresando...' : 'Ingresar al panel'}
             </button>
           </div>
         </div>
 
-        <p className="text-center text-blue-300 text-xs mt-6">BYF Soluciones · TROMEN v1.0</p>
+        <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: 11, marginTop: 20 }}>
+          BYF Soluciones · TROMEN v1.0
+        </p>
       </div>
     </div>
   )
