@@ -279,7 +279,7 @@ export default function ClienteDetallePage() {
                             <p className="text-xs font-bold text-gray-500 uppercase mb-3">💰 Detalle de pago</p>
                             <div className="grid grid-cols-2 gap-3">
                               {[
-                                ['Monto esperado',  `$ ${Number(d.expected_amount ?? 0).toLocaleString('es-AR')}`],
+                                
                                 ['Monto cobrado',   `$ ${Number(d.actual_amount ?? 0).toLocaleString('es-AR')}`],
                                 ['Efectivo',        `$ ${Number(d.cash_received ?? 0).toLocaleString('es-AR')}`],
                                 ['Transferencia',   `$ ${Number(d.transfer_amount ?? 0).toLocaleString('es-AR')}`],

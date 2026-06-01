@@ -171,7 +171,7 @@ export default function EntregaDetallePage() {
             <h3 className="font-bold text-gray-700 mb-4">💰 Resumen de pago</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                <span className="text-sm text-gray-400">Monto esperado</span>
+                
                 <span className="text-sm font-semibold text-gray-800">
                   ${Number(delivery.expected_amount ?? 0).toLocaleString('es-AR')}
                 </span>

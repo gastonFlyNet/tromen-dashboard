@@ -52,13 +52,11 @@ export default function NuevaRutaPage() {
     setSelected(prev => {
       const exists = prev.find(c => c.id === client.id)
       if (exists) return prev.filter(c => c.id !== client.id)
-      return [...prev, { ...client, expected_amount: '' }]
+      return [...prev, { ...client, expected_amount: '0' }]
     })
   }
 
-  const updateAmount = (clientId: string, amount: string) => {
-    setSelected(prev => prev.map(c => c.id === clientId ? { ...c, expected_amount: amount } : c))
-  }
+  
 
   const moveUp = (index: number) => {
     if (index === 0) return
@@ -263,31 +261,13 @@ export default function NuevaRutaPage() {
                         <button onClick={() => toggleClient(c)}
                           className="text-red-400 hover:text-red-600 text-sm px-2">✕</button>
                       </div>
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className="text-xs text-gray-400">Monto esperado $</span>
-                        <input
-                          type="number"
-                          className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                          placeholder="0.00"
-                          value={c.expected_amount}
-                          onChange={e => updateAmount(c.id, e.target.value)}
-                        />
-                      </div>
+                      
                     </div>
                   ))}
                 </div>
               )}
 
-              {selected.length > 0 && (
-                <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
-                  <p className="text-sm text-gray-600">
-                    Total esperado:{' '}
-                    <span className="font-bold text-blue-700">
-                      ${selected.reduce((s, c) => s + parseFloat(c.expected_amount || '0'), 0).toLocaleString('es-AR')}
-                    </span>
-                  </p>
-                </div>
-              )}
+              
             </div>
           </div>
 
