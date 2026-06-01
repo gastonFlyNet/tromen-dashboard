@@ -27,7 +27,7 @@ export default function NuevaRutaPage() {
   const [search, setSearch]             = useState('')
   const [selected, setSelected]         = useState<any[]>([])
   const [assignedTo, setAssignedTo]     = useState('')
-  const [selectedGeofence, setSelectedGeofence] = useState<string>('')
+  const [selectedGeofences, setSelectedGeofences] = useState<string[]>([])
   const [routeDate, setRouteDate]       = useState(new Date().toISOString().slice(0, 10))
   const [saving, setSaving]             = useState(false)
   const [error, setError]               = useState('')
@@ -56,8 +56,6 @@ export default function NuevaRutaPage() {
     })
   }
 
-  
-
   const moveUp = (index: number) => {
     if (index === 0) return
     setSelected(prev => {
@@ -77,8 +75,8 @@ export default function NuevaRutaPage() {
   }
 
   const handleCreate = async () => {
-    if (!assignedTo) return setError('Seleccioná un repartidor')
-    if (selected.length === 0) return setError('Seleccioná al menos un cliente')
+    if (!assignedTo) return setError('Selecciona un repartidor')
+    if (selected.length === 0) return setError('Selecciona al menos un cliente')
     setSaving(true)
     setError('')
     try {
@@ -87,15 +85,20 @@ export default function NuevaRutaPage() {
         expected_amount: parseFloat(c.expected_amount || '0'),
         stop_order: i + 1,
       }))
-      await apiFetch('/api/routes', {
+      const route = await apiFetch('/api/routes', {
         method: 'POST',
         body: JSON.stringify({
           user_id: assignedTo,
           route_date: routeDate,
           stops,
-          geofence_id: selectedGeofence || null,
         }),
       })
+      if (selectedGeofences.length > 0 && route.id) {
+        await apiFetch(`/api/routes/${route.id}/geofences`, {
+          method: 'POST',
+          body: JSON.stringify({ geofence_ids: selectedGeofences }),
+        })
+      }
       setSuccess(true)
     } catch (err: any) {
       setError(err.message ?? 'No se pudo crear la ruta')
@@ -114,16 +117,16 @@ export default function NuevaRutaPage() {
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#F0F7FC' }}>
       <div className="bg-white rounded-2xl p-10 shadow-xl text-center max-w-sm w-full">
         <p className="text-6xl mb-4">✅</p>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">¡Ruta creada!</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Ruta creada!</h2>
         <p className="text-gray-500 text-sm mb-6">
-          La ruta fue asignada al repartidor. Ya puede verla en la app móvil.
+          La ruta fue asignada al repartidor. Ya puede verla en la app movil.
         </p>
         <div className="flex gap-3">
           <button onClick={() => router.push('/')}
             className="flex-1 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-gray-600">
             Ir al panel
           </button>
-          <button onClick={() => { setSuccess(false); setSelected([]); setAssignedTo(''); setSelectedGeofence('') }}
+          <button onClick={() => { setSuccess(false); setSelected([]); setAssignedTo(''); setSelectedGeofences([]) }}
             className="flex-1 bg-blue-600 text-white rounded-xl py-3 text-sm font-bold">
             Nueva ruta
           </button>
@@ -143,13 +146,13 @@ export default function NuevaRutaPage() {
             className="text-blue-200 hover:text-white text-sm mr-2">← Volver</button>
           <span className="text-2xl">🚚</span>
           <div>
-            <h1 className="font-bold text-lg">Nueva ruta del día</h1>
+            <h1 className="font-bold text-lg">Nueva ruta del dia</h1>
             <p className="text-blue-200 text-xs">TROMEN · Catriel</p>
           </div>
         </div>
         <button onClick={handleCreate} disabled={saving || selected.length === 0 || !assignedTo}
           className="bg-green-500 hover:bg-green-600 disabled:opacity-40 text-white rounded-xl px-5 py-2 text-sm font-bold transition-all">
-          {saving ? 'Creando...' : `✓ Crear ruta (${selected.length})`}
+          {saving ? 'Creando...' : `Crear ruta (${selected.length})`}
         </button>
       </nav>
 
@@ -165,11 +168,12 @@ export default function NuevaRutaPage() {
           {/* COLUMNA IZQUIERDA */}
           <div className="space-y-4">
 
-            {/* Configuración */}
+            {/* Configuracion */}
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
-              <h3 className="font-bold text-gray-700 mb-4">⚙️ Configuración de la ruta</h3>
+              <h3 className="font-bold text-gray-700 mb-4">⚙️ Configuracion de la ruta</h3>
               <div className="space-y-4">
 
+                {/* Repartidor */}
                 <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                     Repartidor *
@@ -179,29 +183,14 @@ export default function NuevaRutaPage() {
                     value={assignedTo}
                     onChange={e => setAssignedTo(e.target.value)}
                   >
-                    <option value="">Seleccioná un repartidor...</option>
+                    <option value="">Seleccionar repartidor...</option>
                     {repartidores.map(r => (
                       <option key={r.id} value={r.id}>{r.name}</option>
                     ))}
                   </select>
                 </div>
 
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    Perímetro de la ruta (opcional)
-                  </label>
-                  <select
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    value={selectedGeofence}
-                    onChange={e => setSelectedGeofence(e.target.value)}
-                  >
-                    <option value="">Sin perímetro asignado</option>
-                    {geofences.map(g => (
-                      <option key={g.id} value={g.id}>{g.name}</option>
-                    ))}
-                  </select>
-                </div>
-
+                {/* Fecha */}
                 <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                     Fecha de la ruta
@@ -211,6 +200,44 @@ export default function NuevaRutaPage() {
                     value={routeDate}
                     onChange={e => setRouteDate(e.target.value)}
                   />
+                </div>
+
+                {/* Geocercas */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Geocercas de la ruta (opcional)
+                  </label>
+                  <div className="mt-1 border border-gray-200 rounded-xl overflow-hidden">
+                    {geofences.length === 0 ? (
+                      <p className="text-xs text-gray-400 px-4 py-3">No hay geocercas activas</p>
+                    ) : geofences.map((g: any) => (
+                      <label key={g.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-0">
+                        <input
+                          type="checkbox"
+                          checked={selectedGeofences.includes(g.id)}
+                          onChange={e => {
+                            if (e.target.checked) {
+                              setSelectedGeofences(prev => [...prev, g.id])
+                            } else {
+                              setSelectedGeofences(prev => prev.filter(id => id !== g.id))
+                            }
+                          }}
+                          className="w-4 h-4 accent-blue-600"
+                        />
+                        <span className="text-sm text-gray-700">{g.name}</span>
+                        <span className="text-xs text-gray-400 ml-auto">
+                          {Number(g.radius_meters) >= 1000
+                            ? `${(Number(g.radius_meters)/1000).toFixed(1)} km`
+                            : `${Number(g.radius_meters)} m`}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                  {selectedGeofences.length > 0 && (
+                    <p className="text-xs text-blue-600 mt-1 font-semibold">
+                      {selectedGeofences.length} geocerca{selectedGeofences.length > 1 ? 's' : ''} seleccionada{selectedGeofences.length > 1 ? 's' : ''}
+                    </p>
+                  )}
                 </div>
 
               </div>
@@ -238,7 +265,7 @@ export default function NuevaRutaPage() {
               {selected.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
                   <p className="text-3xl mb-2">👈</p>
-                  <p className="text-sm">Seleccioná clientes de la lista de la derecha</p>
+                  <p className="text-sm">Selecciona clientes de la lista de la derecha</p>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-50">
@@ -261,13 +288,10 @@ export default function NuevaRutaPage() {
                         <button onClick={() => toggleClient(c)}
                           className="text-red-400 hover:text-red-600 text-sm px-2">✕</button>
                       </div>
-                      
                     </div>
                   ))}
                 </div>
               )}
-
-              
             </div>
           </div>
 
@@ -287,7 +311,7 @@ export default function NuevaRutaPage() {
                 <p className="text-center text-gray-400 py-12 text-sm">Cargando clientes...</p>
               ) : filtered.length === 0 ? (
                 <p className="text-center text-gray-400 py-12 text-sm">
-                  {search ? 'Sin resultados' : 'Todos los clientes ya están en la ruta'}
+                  {search ? 'Sin resultados' : 'Todos los clientes ya estan en la ruta'}
                 </p>
               ) : filtered.map(c => (
                 <button key={c.id}
@@ -318,11 +342,11 @@ export default function NuevaRutaPage() {
           </div>
         </div>
 
-        {/* BOTÓN CREAR — visible en móvil */}
+        {/* BOTON CREAR movil */}
         <div className="mt-6 lg:hidden">
           <button onClick={handleCreate} disabled={saving || selected.length === 0 || !assignedTo}
             className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-40 text-white rounded-xl py-4 text-base font-bold transition-all">
-            {saving ? 'Creando ruta...' : `✓ Crear ruta (${selected.length} clientes)`}
+            {saving ? 'Creando ruta...' : `Crear ruta (${selected.length} clientes)`}
           </button>
         </div>
       </div>
