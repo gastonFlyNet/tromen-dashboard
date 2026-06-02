@@ -92,6 +92,8 @@ function ModalVentaDeposito({ onClose, onSaved }: { onClose: () => void; onSaved
   const [notes, setNotes]                 = useState('')
   const [saving, setSaving]               = useState(false)
   const [error, setError]                 = useState('')
+  const [bidonesVacios, setBidonesVacios] = useState(0)
+  const [sifonesVacios, setSifonesVacios] = useState(0)
 
   useEffect(() => {
     apiFetch('/api/clients?active=true').then((d: any) => setClientes(Array.isArray(d) ? d : [])).catch(() => {})
@@ -132,6 +134,12 @@ function ModalVentaDeposito({ onClose, onSaved }: { onClose: () => void; onSaved
       const transferAmount = method === 'transferencia' || method === 'mixto' ? tranN : 0
       const creditAmount = method === 'cuenta_corriente' ? total : creditAuto
 
+      const notaFinal = [
+        notes,
+        bidonesVacios > 0 ? `Bidones vacios devueltos: ${bidonesVacios}` : '',
+        sifonesVacios > 0 ? `Sifones vacios devueltos: ${sifonesVacios}` : '',
+      ].filter(Boolean).join(' | ')
+
       await apiFetch('/api/ventas-deposito', {
         method: 'POST',
         body: JSON.stringify({
@@ -143,7 +151,9 @@ function ModalVentaDeposito({ onClose, onSaved }: { onClose: () => void; onSaved
           cash_received: cashReceived,
           transfer_amount: transferAmount,
           credit_amount: creditAmount,
-          notes,
+          notes: notaFinal || null,
+          bidones_vacios: bidonesVacios,
+          sifones_vacios: sifonesVacios,
         }),
       })
       onSaved()
@@ -294,6 +304,39 @@ function ModalVentaDeposito({ onClose, onSaved }: { onClose: () => void; onSaved
                   </div>
                 </div>
               )}
+
+              {/* Envases vacíos devueltos */}
+              <div className="border-t border-gray-100 pt-3">
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Envases vacíos devueltos</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🪣</span>
+                      <p className="font-semibold text-sm text-gray-700">Bidones 20L</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button onClick={() => setBidonesVacios(v => Math.max(0, v - 1))}
+                        className="w-8 h-8 rounded-full bg-white border border-gray-200 font-bold text-gray-600 hover:bg-gray-100 transition-all flex items-center justify-center">−</button>
+                      <span className="w-6 text-center font-bold text-blue-700">{bidonesVacios}</span>
+                      <button onClick={() => setBidonesVacios(v => v + 1)}
+                        className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all flex items-center justify-center">+</button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🫙</span>
+                      <p className="font-semibold text-sm text-gray-700">Sifones</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button onClick={() => setSifonesVacios(v => Math.max(0, v - 1))}
+                        className="w-8 h-8 rounded-full bg-white border border-gray-200 font-bold text-gray-600 hover:bg-gray-100 transition-all flex items-center justify-center">−</button>
+                      <span className="w-6 text-center font-bold text-green-700">{sifonesVacios}</span>
+                      <button onClick={() => setSifonesVacios(v => v + 1)}
+                        className="w-8 h-8 rounded-full bg-green-600 text-white font-bold hover:bg-green-700 transition-all flex items-center justify-center">+</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -309,6 +352,22 @@ function ModalVentaDeposito({ onClose, onSaved }: { onClose: () => void; onSaved
                   <p className="text-sm text-gray-600">Total</p>
                   <p className="font-bold text-blue-700">${total.toLocaleString('es-AR')}</p>
                 </div>
+                {(bidonesVacios > 0 || sifonesVacios > 0) && (
+                  <div className="border-t border-blue-100 mt-2 pt-2 space-y-1">
+                    {bidonesVacios > 0 && (
+                      <div className="flex justify-between">
+                        <p className="text-xs text-blue-600">🪣 Bidones devueltos</p>
+                        <p className="text-xs font-semibold text-blue-700">{bidonesVacios}</p>
+                      </div>
+                    )}
+                    {sifonesVacios > 0 && (
+                      <div className="flex justify-between">
+                        <p className="text-xs text-blue-600">🫙 Sifones devueltos</p>
+                        <p className="text-xs font-semibold text-blue-700">{sifonesVacios}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div>
