@@ -566,6 +566,10 @@ export default function Dashboard() {
             className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
             👥 Clientes
           </button>
+          <button onClick={() => router.push('/productos')}
+            className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
+            📦 Productos
+          </button>
           <button onClick={() => router.push('/rutas/nueva')}
             className="bg-green-500 hover:bg-green-600 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
             + Nueva ruta
