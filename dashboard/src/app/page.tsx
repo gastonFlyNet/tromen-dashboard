@@ -94,7 +94,7 @@ function ModalVentaDeposito({ onClose, onSaved }: { onClose: () => void; onSaved
   const [error, setError]                 = useState('')
 
   useEffect(() => {
-    apiFetch('/api/clients?active=true').then((d: any) => setClients(Array.isArray(d) ? d : [])).catch(() => {})
+    apiFetch('/api/clients?active=true').then((d: any) => setClientes(Array.isArray(d) ? d : [])).catch(() => {})
     apiFetch('/api/products').then((d: any) => setProducts(Array.isArray(d) ? d : [])).catch(() => {})
   }, [])
 
