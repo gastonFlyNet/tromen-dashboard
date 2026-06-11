@@ -384,7 +384,7 @@ export default function RutaDetallePage() {
       </div>
 
       {showAddClients && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.7)' }} className_x=" p-4">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
           <div className="rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
               <div>
@@ -435,7 +435,7 @@ export default function RutaDetallePage() {
       )}
 
       {showNewClient && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.7)' }} className_x=" p-4">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
           <div className="rounded-2xl w-full max-w-md" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
               <h2 className="font-bold text-lg text-slate-100">Nuevo cliente y agregar a ruta</h2>
