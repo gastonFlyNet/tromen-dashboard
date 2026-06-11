@@ -130,6 +130,12 @@ export default function ClientesPage() {
   const cardCls =
     'rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-sm)]'
 
+  // ---- estilos claros para los modales ----
+  const modalInputCls =
+    'w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-white border border-gray-300 ' +
+    'text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors'
+  const modalLabelCls = 'text-xs font-semibold text-gray-500 uppercase tracking-wide'
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
 
@@ -257,19 +263,17 @@ export default function ClientesPage() {
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
           style={{ background: 'rgba(0,0,0,0.65)' }}>
-          <div className="rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[var(--surface)] border border-[var(--border)]"
-            style={{ boxShadow: 'var(--shadow)' }}>
-            <div className="p-6 border-b border-[var(--border)] flex items-center justify-between sticky top-0 bg-[var(--surface)]">
-              <h2 className="font-bold text-lg text-[var(--text)]">
+          <div className="rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white border border-gray-200 shadow-xl">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white">
+              <h2 className="font-bold text-lg text-gray-800">
                 {editing ? 'Editar cliente' : 'Nuevo cliente'}
               </h2>
               <button onClick={() => setShowModal(false)}
-                className="text-[var(--text-faint)] hover:text-[var(--text)] text-xl transition-colors">✕</button>
+                className="text-gray-400 hover:text-gray-700 text-xl transition-colors">✕</button>
             </div>
             <div className="p-6 space-y-4">
               {error && (
-                <div className="rounded-xl p-3 text-sm"
-                  style={{ background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid var(--danger)' }}>
+                <div className="rounded-xl p-3 text-sm bg-red-50 text-red-600 border border-red-200">
                   {error}
                 </div>
               )}
@@ -282,9 +286,9 @@ export default function ClientesPage() {
                 { key: 'email',   label: 'Email',        placeholder: 'cliente@email.com' },
               ].map(({ key, label, placeholder }) => (
                 <div key={key}>
-                  <label className={labelCls}>{label}</label>
+                  <label className={modalLabelCls}>{label}</label>
                   <input
-                    className={inputCls}
+                    className={modalInputCls}
                     placeholder={placeholder}
                     value={(form as any)[key]}
                     onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
@@ -295,55 +299,55 @@ export default function ClientesPage() {
               {/* COORDENADAS GPS */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className={labelCls}>Coordenadas GPS</label>
+                  <label className={modalLabelCls}>Coordenadas GPS</label>
                   <button onClick={getCoords}
                     className="text-xs font-semibold hover:brightness-125 transition-all"
-                    style={{ color: 'var(--primary)' }}>
+                    style={{ color: '#0A5C8A' }}>
                     🔍 Buscar por dirección
                   </button>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-[var(--text-faint)]">Latitud</label>
-                    <input className={inputCls} placeholder="-37.8855"
+                    <label className="text-xs text-gray-400">Latitud</label>
+                    <input className={modalInputCls} placeholder="-37.8855"
                       value={form.latitude}
                       onChange={e => setForm(f => ({ ...f, latitude: e.target.value }))} />
                   </div>
                   <div>
-                    <label className="text-xs text-[var(--text-faint)]">Longitud</label>
-                    <input className={inputCls} placeholder="-68.0783"
+                    <label className="text-xs text-gray-400">Longitud</label>
+                    <input className={modalInputCls} placeholder="-68.0783"
                       value={form.longitude}
                       onChange={e => setForm(f => ({ ...f, longitude: e.target.value }))} />
                   </div>
                 </div>
-                <p className="text-xs text-[var(--text-faint)] mt-1">
+                <p className="text-xs text-gray-400 mt-1">
                   Tip: En Google Maps, clic derecho sobre la dirección y copiá las coordenadas
                 </p>
               </div>
 
               <div>
-                <label className={labelCls}>Saldo pendiente</label>
-                <input className={inputCls} placeholder="0" type="number"
+                <label className={modalLabelCls}>Saldo pendiente</label>
+                <input className={modalInputCls} placeholder="0" type="number"
                   value={form.balance}
                   onChange={e => setForm(f => ({ ...f, balance: e.target.value }))} />
               </div>
 
               <div>
-                <label className={labelCls}>Notas</label>
-                <textarea className={inputCls + ' h-20 resize-none'}
+                <label className={modalLabelCls}>Notas</label>
+                <textarea className={modalInputCls + ' h-20 resize-none'}
                   placeholder="Observaciones del cliente..."
                   value={form.notes}
                   onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
               </div>
             </div>
-            <div className="p-6 border-t border-[var(--border)] flex gap-3 sticky bottom-0 bg-[var(--surface)]">
+            <div className="p-6 border-t border-gray-100 flex gap-3 sticky bottom-0 bg-white">
               <button onClick={() => setShowModal(false)}
-                className="flex-1 rounded-xl py-3 text-sm font-semibold transition-all border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--surface-2)]">
+                className="flex-1 rounded-xl py-3 text-sm font-semibold transition-all border border-gray-300 text-gray-600 hover:bg-gray-50">
                 Cancelar
               </button>
               <button onClick={handleSave} disabled={saving}
                 className="flex-1 text-white rounded-xl py-3 text-sm font-bold transition-all disabled:opacity-50 hover:brightness-110"
-                style={{ background: 'var(--primary)' }}>
+                style={{ background: '#0A5C8A' }}>
                 {saving ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear cliente'}
               </button>
             </div>
@@ -355,21 +359,20 @@ export default function ClientesPage() {
       {deleteConfirm && (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
           style={{ background: 'rgba(0,0,0,0.65)' }}>
-          <div className="rounded-2xl p-6 max-w-sm w-full bg-[var(--surface)] border border-[var(--border)]"
-            style={{ boxShadow: 'var(--shadow)' }}>
+          <div className="rounded-2xl p-6 max-w-sm w-full bg-white border border-gray-200 shadow-xl">
             <p className="text-3xl text-center mb-3">⚠️</p>
-            <h3 className="font-bold text-center text-[var(--text)] mb-2">¿Borrar este cliente?</h3>
-            <p className="text-sm text-[var(--text-muted)] text-center mb-6">
+            <h3 className="font-bold text-center text-gray-800 mb-2">¿Borrar este cliente?</h3>
+            <p className="text-sm text-gray-500 text-center mb-6">
               Esta acción no se puede deshacer. Se eliminarán todos los datos del cliente.
             </p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteConfirm(null)}
-                className="flex-1 rounded-xl py-2.5 text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-all">
+                className="flex-1 rounded-xl py-2.5 text-sm font-semibold border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all">
                 Cancelar
               </button>
               <button onClick={() => handleDelete(deleteConfirm)}
                 className="flex-1 text-white rounded-xl py-2.5 text-sm font-bold transition-all hover:brightness-110"
-                style={{ background: 'var(--danger)' }}>
+                style={{ background: '#C0392B' }}>
                 Sí, borrar
               </button>
             </div>
