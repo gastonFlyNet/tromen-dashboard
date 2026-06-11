@@ -455,6 +455,7 @@ export default function Dashboard() {
           <button style={navBtnStyle()} onClick={() => router.push('/clientes')}>👥 Clientes</button>
           <button style={navBtnStyle()} onClick={() => router.push('/productos')}>📦 Productos</button>
           <button style={navBtnStyle(D.blue)} onClick={() => router.push('/rutas/nueva')}>+ Nueva ruta</button>
+                          <button style={navBtnStyle()} onClick={() => router.push('/rutas/plantillas')}>📋 Plantillas</button>
           <button style={navBtnStyle()} onClick={loadData}>↻</button>
           <button style={{ ...navBtnStyle(), color: '#475569' }} onClick={handleLogout}>Salir</button>
         </div>
