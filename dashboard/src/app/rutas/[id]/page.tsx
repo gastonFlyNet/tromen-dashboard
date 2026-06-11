@@ -177,7 +177,7 @@ export default function RutaDetallePage() {
     <div className="min-h-screen flex items-center justify-center bg-blue-50">
       <div className="text-center">
         <p className="text-4xl mb-3">❌</p>
-        <p className="text-gray-500">Ruta no encontrada</p>
+        <p className="text-slate-500">Ruta no encontrada</p>
         <button onClick={() => router.push('/')}
           className="mt-4 text-blue-600 text-sm font-semibold">Volver al panel</button>
       </div>
@@ -200,10 +200,10 @@ export default function RutaDetallePage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#F0F7FC' }}>
+    <div className="min-h-screen" style={{ background: '#0f1117' }}>
 
       <nav className="text-white px-6 py-4 flex items-center justify-between shadow-lg"
-        style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
+        style={{ background: '#151b27', borderBottom: '1px solid #1e2d40' }}>
         <div className="flex items-center gap-3">
           <button onClick={() => router.push('/')}
             className="text-blue-200 hover:text-white text-sm mr-2">← Volver</button>
@@ -250,7 +250,7 @@ export default function RutaDetallePage() {
               return s + (m ? parseInt(m[1]) : 0)
             }, 0)), 'recuperados hoy', '#2980B9', '🫙'],
           ].map(([l, v, sub, c, e]) => (
-            <div key={l as string} className="bg-white rounded-2xl p-4 shadow-sm border border-blue-50">
+            <div key={l as string} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-800">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{l as string}</p>
@@ -267,11 +267,11 @@ export default function RutaDetallePage() {
 
           <div className="bg-white rounded-2xl shadow-sm border border-blue-50 overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="font-bold text-gray-700">🗺️ Posicion en tiempo real</h3>
+              <h3 className="font-bold text-slate-200">🗺️ Posicion en tiempo real</h3>
               {position && (
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-xs text-gray-400">{Number(position.speed ?? 0).toFixed(0)} km/h</span>
+                  <span className="text-xs text-slate-600">{Number(position.speed ?? 0).toFixed(0)} km/h</span>
                 </div>
               )}
             </div>
@@ -323,22 +323,22 @@ export default function RutaDetallePage() {
               </Map>
             </div>
             {!position && (
-              <div className="px-5 py-3 text-center text-gray-400 text-xs border-t border-gray-100">
+              <div className="px-5 py-3 text-center text-gray-400 text-xs border-t border-slate-800">
                 Sin posicion GPS — el repartidor debe tener la ruta iniciada
               </div>
             )}
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm border border-blue-50 flex flex-col" style={{ maxHeight: '500px' }}>
-            <div className="px-5 py-4 border-b border-gray-100">
-              <h3 className="font-bold text-gray-700">📋 Entregas de la ruta</h3>
+            <div className="px-5 py-4 border-b border-slate-800">
+              <h3 className="font-bold text-slate-200">📋 Entregas de la ruta</h3>
               <div className="flex gap-3 mt-2 text-xs">
                 <span className="text-orange-500 font-semibold">⏳ {pending.length} pendientes</span>
                 <span className="text-green-600 font-semibold">✓ {done.filter((d: any) => d.status === 'entregado').length} entregadas</span>
                 <span className="text-red-500 font-semibold">✗ {done.filter((d: any) => d.status === 'no_entregado').length} no entregadas</span>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-800">
               {deliveries.map((d: any, i: number) => (
                 <button key={d.id}
                   onClick={() => router.push(`/entregas/${d.id}`)}
@@ -366,16 +366,16 @@ export default function RutaDetallePage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-800">
           <div className="flex justify-between items-center mb-3">
-            <h3 className="font-bold text-gray-700">Progreso de la ruta</h3>
+            <h3 className="font-bold text-slate-200">Progreso de la ruta</h3>
             <span className="text-2xl font-bold" style={{ color: '#0A5C8A' }}>{pct}%</span>
           </div>
           <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
             <div className="h-4 rounded-full transition-all duration-700"
               style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #0A5C8A, #1A8FBF)' }} />
           </div>
-          <div className="flex gap-4 mt-3 text-xs text-gray-400">
+          <div className="flex gap-4 mt-3 text-xs text-slate-600">
             <span>🟢 {done.filter((d: any) => d.status === 'entregado').length} entregadas</span>
             <span>🔴 {done.filter((d: any) => d.status === 'no_entregado').length} no entregadas</span>
             <span>🟡 {pending.length} pendientes</span>
@@ -384,23 +384,23 @@ export default function RutaDetallePage() {
       </div>
 
       {showAddClients && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl">
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.7)' }} className_x=" p-4">
+          <div className="rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
               <div>
-                <h2 className="font-bold text-lg text-gray-800">Agregar clientes a la ruta</h2>
+                <h2 className="font-bold text-lg text-slate-100">Agregar clientes a la ruta</h2>
                 <p className="text-xs text-gray-400 mt-1">
                   {selectedToAdd.length > 0 ? `${selectedToAdd.length} seleccionados` : 'Selecciona clientes'}
                 </p>
               </div>
               <button onClick={() => setShowAddClients(false)} className="text-gray-400 text-xl">✕</button>
             </div>
-            <div className="p-4 border-b border-gray-100">
-              <input className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+            <div className="p-4 border-b border-slate-800">
+              <input className="w-full rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ background: '#1a2236', border: '1px solid #243347', color: '#f1f5f9' }}
                 placeholder="Buscar cliente..."
                 value={searchClient} onChange={e => setSearchClient(e.target.value)} />
             </div>
-            <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-800">
               {filteredClients.length === 0
                 ? <p className="text-center text-gray-400 py-10 text-sm">Sin clientes disponibles</p>
                 : filteredClients.map(c => {
@@ -422,7 +422,7 @@ export default function RutaDetallePage() {
             </div>
             <div className="p-4 border-t border-gray-100 flex gap-3">
               <button onClick={() => setShowAddClients(false)}
-                className="flex-1 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-gray-600">
+                className="flex-1 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-slate-400">
                 Cancelar
               </button>
               <button onClick={handleAddClients} disabled={addingSaving || selectedToAdd.length === 0}
@@ -435,10 +435,10 @@ export default function RutaDetallePage() {
       )}
 
       {showNewClient && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.7)' }} className_x=" p-4">
+          <div className="rounded-2xl w-full max-w-md" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="font-bold text-lg text-gray-800">Nuevo cliente y agregar a ruta</h2>
+              <h2 className="font-bold text-lg text-slate-100">Nuevo cliente y agregar a ruta</h2>
               <button onClick={() => setShowNewClient(false)} className="text-gray-400 text-xl">✕</button>
             </div>
             <div className="p-5 space-y-3">
@@ -451,9 +451,9 @@ export default function RutaDetallePage() {
                 { key: 'longitude', label: 'Longitud GPS', placeholder: '-68.0783' },
               ].map(({ key, label, placeholder }) => (
                 <div key={key}>
-                  <label className="text-xs font-semibold text-gray-500 uppercase">{label}</label>
+                  <label className="text-xs font-semibold uppercase text-slate-500">{label}</label>
                   <input
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    className="w-full rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style={{ background: '#1a2236', border: '1px solid #243347', color: '#f1f5f9' }}
                     placeholder={placeholder}
                     value={(newClientForm as any)[key]}
                     onChange={e => setNewClientForm(f => ({ ...f, [key]: e.target.value }))}
@@ -463,7 +463,7 @@ export default function RutaDetallePage() {
             </div>
             <div className="p-5 border-t border-gray-100 flex gap-3">
               <button onClick={() => setShowNewClient(false)}
-                className="flex-1 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-gray-600">
+                className="flex-1 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-slate-400">
                 Cancelar
               </button>
               <button onClick={handleCreateAndAdd} disabled={savingNewClient}

@@ -122,23 +122,32 @@ export default function ClientesPage() {
     c.zone?.toLowerCase().includes(search.toLowerCase())
   )
 
+  const inputCls =
+    'w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-[var(--surface-3)] ' +
+    'border border-[var(--border)] text-[var(--text)] placeholder-[var(--text-faint)] ' +
+    'focus:outline-none focus:border-[var(--primary)] transition-colors'
+  const labelCls = 'text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide'
+  const cardCls =
+    'rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-sm)]'
+
   return (
-    <div className="min-h-screen" style={{ background: '#F0F7FC' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
 
       {/* NAVBAR */}
-      <nav className="text-white px-6 py-4 flex items-center justify-between shadow-lg"
-        style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
+      <nav className="px-6 py-4 flex items-center justify-between sticky top-0 z-30 border-b border-[var(--border)]"
+        style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)', boxShadow: 'var(--shadow)' }}>
         <div className="flex items-center gap-3">
           <button onClick={() => router.push('/')}
-            className="text-blue-200 hover:text-white text-sm mr-2">← Volver</button>
+            className="text-white/70 hover:text-white text-sm mr-2 transition-colors">← Volver</button>
           <span className="text-2xl">👥</span>
           <div>
-            <h1 className="font-bold text-lg">Clientes</h1>
-            <p className="text-blue-200 text-xs">TROMEN · Catriel</p>
+            <h1 className="font-bold text-lg text-white">Clientes</h1>
+            <p className="text-white/60 text-xs">TROMEN · Catriel</p>
           </div>
         </div>
         <button onClick={openNew}
-          className="bg-green-500 hover:bg-green-600 text-white rounded-xl px-4 py-2 text-sm font-bold transition-all">
+          className="text-white rounded-xl px-4 py-2 text-sm font-bold transition-all hover:brightness-110"
+          style={{ background: 'var(--success)' }}>
           + Nuevo cliente
         </button>
       </nav>
@@ -146,9 +155,9 @@ export default function ClientesPage() {
       <div className="p-4 md:p-6 max-w-5xl mx-auto">
 
         {/* BUSCADOR */}
-        <div className="mb-4">
+        <div className="mb-5">
           <input
-            className="w-full border border-blue-100 rounded-xl px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className={inputCls + ' !mt-0 py-3 shadow-[var(--shadow-sm)]'}
             placeholder="🔍 Buscar por nombre, dirección o zona..."
             value={search} onChange={e => setSearch(e.target.value)}
           />
@@ -156,94 +165,113 @@ export default function ClientesPage() {
 
         {/* STATS */}
         <div className="grid grid-cols-3 gap-3 mb-6">
-          {[
-            ['Total clientes', clients.length, '👥', '#0A5C8A'],
-            ['Con coordenadas GPS', clients.filter(c => c.latitude && c.longitude).length, '📍', '#1A7A4A'],
-            ['Con saldo pendiente', clients.filter(c => Number(c.balance ?? c.current_balance) > 0).length, '💰', '#E67E22'],
-          ].map(([l, v, e, c]) => (
-            <div key={l as string} className="bg-white rounded-2xl p-4 shadow-sm border border-blue-50 text-center">
-              <p className="text-2xl">{e as string}</p>
-              <p className="text-2xl font-bold mt-1" style={{ color: c as string }}>{v as number}</p>
-              <p className="text-xs text-gray-400 mt-1">{l as string}</p>
+          {([
+            ['Total clientes', clients.length, '👥', 'var(--primary)'],
+            ['Con GPS', clients.filter(c => c.latitude && c.longitude).length, '📍', 'var(--success)'],
+            ['Con saldo', clients.filter(c => Number(c.balance ?? c.current_balance) > 0).length, '💰', 'var(--warning)'],
+          ] as const).map(([l, v, e, c]) => (
+            <div key={l} className={cardCls + ' p-4 text-center'}>
+              <p className="text-2xl">{e}</p>
+              <p className="text-2xl font-bold mt-1" style={{ color: c }}>{v}</p>
+              <p className="text-xs text-[var(--text-faint)] mt-1">{l}</p>
             </div>
           ))}
         </div>
 
         {/* LISTA */}
         {loading ? (
-          <div className="text-center py-20 text-gray-400">Cargando clientes...</div>
+          <div className="text-center py-20 text-[var(--text-faint)]">Cargando clientes...</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-gray-400">
+          <div className="text-center py-20 text-[var(--text-faint)]">
             <p className="text-4xl mb-3">👥</p>
             <p>{search ? 'Sin resultados para esa búsqueda' : 'No hay clientes cargados'}</p>
             {!search && (
               <button onClick={openNew}
-                className="mt-4 bg-blue-600 text-white rounded-xl px-6 py-2 text-sm font-bold">
+                className="mt-4 text-white rounded-xl px-6 py-2 text-sm font-bold"
+                style={{ background: 'var(--primary)' }}>
                 + Agregar primer cliente
               </button>
             )}
           </div>
         ) : (
           <div className="space-y-3">
-            {filtered.map(c => (
-              <div key={c.id} className="bg-white rounded-2xl p-4 shadow-sm border border-blue-50 flex items-start gap-4 cursor-pointer hover:border-blue-200 transition-all" onClick={() => router.push(`/clientes/${c.id}`)}>
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                  style={{ background: '#0A5C8A' }}>
-                  {c.name?.charAt(0).toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-bold text-gray-800">{c.name}</p>
-                    {c.zone && (
-                      <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">{c.zone}</span>
-                    )}
-                    {c.latitude && c.longitude
-                      ? <span className="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">📍 GPS OK</span>
-                      : <span className="text-xs bg-red-50 text-red-400 px-2 py-0.5 rounded-full">Sin GPS</span>
-                    }
-                    {Number(c.balance ?? c.current_balance) > 0 && (
-                      <span className="text-xs bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">
-                        💰 ${Number(c.balance ?? c.current_balance).toLocaleString('es-AR')}
-                      </span>
+            {filtered.map(c => {
+              const hasGps = c.latitude && c.longitude
+              const balance = Number(c.balance ?? c.current_balance)
+              return (
+                <div key={c.id}
+                  className={cardCls + ' p-4 flex items-start gap-4 cursor-pointer transition-colors hover:bg-[var(--surface-2)] hover:border-[var(--border-strong)]'}
+                  onClick={() => router.push(`/clientes/${c.id}`)}>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+                    style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
+                    {c.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-bold text-[var(--text)]">{c.name}</p>
+                      {c.zone && (
+                        <span className="text-xs px-2 py-0.5 rounded-full"
+                          style={{ background: 'var(--primary-soft)', color: 'var(--primary)' }}>{c.zone}</span>
+                      )}
+                      {hasGps
+                        ? <span className="text-xs px-2 py-0.5 rounded-full"
+                            style={{ background: 'var(--success-soft)', color: 'var(--success)' }}>📍 GPS OK</span>
+                        : <span className="text-xs px-2 py-0.5 rounded-full"
+                            style={{ background: 'var(--danger-soft)', color: 'var(--danger)' }}>Sin GPS</span>
+                      }
+                      {balance > 0 && (
+                        <span className="text-xs px-2 py-0.5 rounded-full"
+                          style={{ background: 'var(--warning-soft)', color: 'var(--warning)' }}>
+                          💰 ${balance.toLocaleString('es-AR')}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-[var(--text-muted)] mt-1">📍 {c.address}</p>
+                    {c.phone && <p className="text-xs text-[var(--text-faint)] mt-0.5">📞 {c.phone}</p>}
+                    {hasGps && (
+                      <p className="text-xs text-[var(--text-faint)] mt-0.5">
+                        {Number(c.latitude).toFixed(5)}, {Number(c.longitude).toFixed(5)}
+                      </p>
                     )}
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">📍 {c.address}</p>
-                  {c.phone && <p className="text-xs text-gray-400 mt-0.5">📞 {c.phone}</p>}
-                  {c.latitude && c.longitude && (
-                    <p className="text-xs text-gray-300 mt-0.5">
-                      {Number(c.latitude).toFixed(5)}, {Number(c.longitude).toFixed(5)}
-                    </p>
-                  )}
+                  <div className="flex gap-2 flex-shrink-0">
+                    <button onClick={(e) => { e.stopPropagation(); openEdit(c) }}
+                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[var(--surface-2)]"
+                      style={{ color: 'var(--primary)' }}>
+                      Editar
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(c.id) }}
+                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[var(--danger-soft)]"
+                      style={{ color: 'var(--danger)' }}>
+                      Borrar
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2 flex-shrink-0">
-                  <button onClick={(e) => { e.stopPropagation(); openEdit(c) }}
-                    className="text-blue-600 hover:bg-blue-50 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
-                    Editar
-                  </button>
-                  <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(c.id) }}
-                    className="text-red-400 hover:bg-red-50 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
-                    Borrar
-                  </button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
 
       {/* MODAL CLIENTE */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="font-bold text-lg text-gray-800">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
+          style={{ background: 'rgba(0,0,0,0.65)' }}>
+          <div className="rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[var(--surface)] border border-[var(--border)]"
+            style={{ boxShadow: 'var(--shadow)' }}>
+            <div className="p-6 border-b border-[var(--border)] flex items-center justify-between sticky top-0 bg-[var(--surface)]">
+              <h2 className="font-bold text-lg text-[var(--text)]">
                 {editing ? 'Editar cliente' : 'Nuevo cliente'}
               </h2>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+              <button onClick={() => setShowModal(false)}
+                className="text-[var(--text-faint)] hover:text-[var(--text)] text-xl transition-colors">✕</button>
             </div>
             <div className="p-6 space-y-4">
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">{error}</div>
+                <div className="rounded-xl p-3 text-sm"
+                  style={{ background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid var(--danger)' }}>
+                  {error}
+                </div>
               )}
 
               {[
@@ -254,9 +282,9 @@ export default function ClientesPage() {
                 { key: 'email',   label: 'Email',        placeholder: 'cliente@email.com' },
               ].map(({ key, label, placeholder }) => (
                 <div key={key}>
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{label}</label>
+                  <label className={labelCls}>{label}</label>
                   <input
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    className={inputCls}
                     placeholder={placeholder}
                     value={(form as any)[key]}
                     onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
@@ -267,69 +295,55 @@ export default function ClientesPage() {
               {/* COORDENADAS GPS */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    Coordenadas GPS
-                  </label>
+                  <label className={labelCls}>Coordenadas GPS</label>
                   <button onClick={getCoords}
-                    className="text-xs text-blue-600 hover:text-blue-800 font-semibold">
+                    className="text-xs font-semibold hover:brightness-125 transition-all"
+                    style={{ color: 'var(--primary)' }}>
                     🔍 Buscar por dirección
                   </button>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-gray-400">Latitud</label>
-                    <input
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                      placeholder="-37.8855"
+                    <label className="text-xs text-[var(--text-faint)]">Latitud</label>
+                    <input className={inputCls} placeholder="-37.8855"
                       value={form.latitude}
-                      onChange={e => setForm(f => ({ ...f, latitude: e.target.value }))}
-                    />
+                      onChange={e => setForm(f => ({ ...f, latitude: e.target.value }))} />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-400">Longitud</label>
-                    <input
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                      placeholder="-68.0783"
+                    <label className="text-xs text-[var(--text-faint)]">Longitud</label>
+                    <input className={inputCls} placeholder="-68.0783"
                       value={form.longitude}
-                      onChange={e => setForm(f => ({ ...f, longitude: e.target.value }))}
-                    />
+                      onChange={e => setForm(f => ({ ...f, longitude: e.target.value }))} />
                   </div>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">
-                  Tip: En Google Maps, hacé clic derecho sobre la dirección y copiá las coordenadas
+                <p className="text-xs text-[var(--text-faint)] mt-1">
+                  Tip: En Google Maps, clic derecho sobre la dirección y copiá las coordenadas
                 </p>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  saldo pendiente
-                </label>
-                <input
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  placeholder="0"
-                  type="number"
+                <label className={labelCls}>Saldo pendiente</label>
+                <input className={inputCls} placeholder="0" type="number"
                   value={form.balance}
-                  onChange={e => setForm(f => ({ ...f, balance: e.target.value }))}
-                />
+                  onChange={e => setForm(f => ({ ...f, balance: e.target.value }))} />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Notas</label>
-                <textarea
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300 h-20 resize-none"
+                <label className={labelCls}>Notas</label>
+                <textarea className={inputCls + ' h-20 resize-none'}
                   placeholder="Observaciones del cliente..."
                   value={form.notes}
-                  onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-                />
+                  onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
               </div>
             </div>
-            <div className="p-6 border-t border-gray-100 flex gap-3">
+            <div className="p-6 border-t border-[var(--border)] flex gap-3 sticky bottom-0 bg-[var(--surface)]">
               <button onClick={() => setShowModal(false)}
-                className="flex-1 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-all">
+                className="flex-1 rounded-xl py-3 text-sm font-semibold transition-all border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--surface-2)]">
                 Cancelar
               </button>
               <button onClick={handleSave} disabled={saving}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 text-sm font-bold transition-all disabled:opacity-50">
+                className="flex-1 text-white rounded-xl py-3 text-sm font-bold transition-all disabled:opacity-50 hover:brightness-110"
+                style={{ background: 'var(--primary)' }}>
                 {saving ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear cliente'}
               </button>
             </div>
@@ -339,20 +353,23 @@ export default function ClientesPage() {
 
       {/* MODAL CONFIRMAR BORRADO */}
       {deleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
+          style={{ background: 'rgba(0,0,0,0.65)' }}>
+          <div className="rounded-2xl p-6 max-w-sm w-full bg-[var(--surface)] border border-[var(--border)]"
+            style={{ boxShadow: 'var(--shadow)' }}>
             <p className="text-3xl text-center mb-3">⚠️</p>
-            <h3 className="font-bold text-center text-gray-800 mb-2">¿Borrar este cliente?</h3>
-            <p className="text-sm text-gray-500 text-center mb-6">
+            <h3 className="font-bold text-center text-[var(--text)] mb-2">¿Borrar este cliente?</h3>
+            <p className="text-sm text-[var(--text-muted)] text-center mb-6">
               Esta acción no se puede deshacer. Se eliminarán todos los datos del cliente.
             </p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteConfirm(null)}
-                className="flex-1 border border-gray-200 rounded-xl py-2.5 text-sm font-semibold text-gray-600">
+                className="flex-1 rounded-xl py-2.5 text-sm font-semibold border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--surface-2)] transition-all">
                 Cancelar
               </button>
               <button onClick={() => handleDelete(deleteConfirm)}
-                className="flex-1 bg-red-500 hover:bg-red-600 text-white rounded-xl py-2.5 text-sm font-bold">
+                className="flex-1 text-white rounded-xl py-2.5 text-sm font-bold transition-all hover:brightness-110"
+                style={{ background: 'var(--danger)' }}>
                 Sí, borrar
               </button>
             </div>

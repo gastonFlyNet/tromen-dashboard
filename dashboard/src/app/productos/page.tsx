@@ -115,23 +115,33 @@ export default function ProductosPage() {
     } catch {}
   }
 
+  // ---- estilos reutilizables (tokens del design system) ----
+  const inputCls =
+    'w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-[var(--surface-3)] ' +
+    'border border-[var(--border)] text-[var(--text)] placeholder-[var(--text-faint)] ' +
+    'focus:outline-none focus:border-[var(--primary)] transition-colors'
+  const labelCls = 'text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide'
+  const cardCls =
+    'rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-sm)]'
+
   return (
-    <div className="min-h-screen" style={{ background: '#F0F7FC' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
 
       {/* NAVBAR */}
-      <nav className="text-white px-6 py-4 flex items-center justify-between shadow-lg"
-        style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
+      <nav className="px-6 py-4 flex items-center justify-between sticky top-0 z-30 border-b border-[var(--border)]"
+        style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)', boxShadow: 'var(--shadow)' }}>
         <div className="flex items-center gap-3">
           <button onClick={() => router.push('/')}
-            className="text-blue-200 hover:text-white text-sm mr-2">← Volver</button>
+            className="text-white/70 hover:text-white text-sm mr-2 transition-colors">← Volver</button>
           <span className="text-2xl">🛒</span>
           <div>
-            <h1 className="font-bold text-lg">Productos y precios</h1>
-            <p className="text-blue-200 text-xs">TROMEN · Catriel</p>
+            <h1 className="font-bold text-lg text-white">Productos y precios</h1>
+            <p className="text-white/60 text-xs">TROMEN · Catriel</p>
           </div>
         </div>
         <button onClick={openNew}
-          className="bg-green-500 hover:bg-green-600 text-white rounded-xl px-4 py-2 text-sm font-bold transition-all">
+          className="text-white rounded-xl px-4 py-2 text-sm font-bold transition-all hover:brightness-110"
+          style={{ background: 'var(--success)' }}>
           + Nuevo producto
         </button>
       </nav>
@@ -139,15 +149,19 @@ export default function ProductosPage() {
       <div className="p-4 md:p-6 max-w-4xl mx-auto">
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm mb-4">{error}</div>
+          <div className="rounded-xl p-3 text-sm mb-4"
+            style={{ background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid var(--danger)' }}>
+            {error}
+          </div>
         )}
 
         {/* INFO */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+        <div className="rounded-xl p-4 mb-6 flex items-start gap-3"
+          style={{ background: 'var(--primary-soft)', border: '1px solid var(--border)' }}>
           <span className="text-2xl">💡</span>
           <div>
-            <p className="text-blue-800 font-semibold text-sm">Precios que ve el repartidor</p>
-            <p className="text-blue-600 text-xs mt-1">
+            <p className="font-semibold text-sm" style={{ color: 'var(--text)' }}>Precios que ve el repartidor</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
               Estos precios aparecen en la app del repartidor al registrar una entrega.
               Podés editarlos en cualquier momento y se actualizan automáticamente.
             </p>
@@ -156,41 +170,48 @@ export default function ProductosPage() {
 
         {/* LISTA */}
         {loading ? (
-          <div className="text-center py-20 text-gray-400">Cargando productos...</div>
+          <div className="text-center py-20 text-[var(--text-faint)]">Cargando productos...</div>
         ) : (
           <div className="space-y-3">
             {products.map(p => (
-              <div key={p.id} className={`bg-white rounded-2xl p-4 shadow-sm border transition-all ${p.active ? 'border-blue-50' : 'border-gray-100 opacity-60'}`}>
+              <div key={p.id}
+                className={cardCls + ' p-4 transition-all hover:bg-[var(--surface-2)]'}
+                style={{ opacity: p.active ? 1 : 0.55 }}>
                 <div className="flex items-center gap-4">
                   {/* Orden */}
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-bold flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                    style={{ background: 'var(--primary-soft)', color: 'var(--primary)' }}>
                     {p.sort_order}
                   </div>
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-bold text-gray-800">{p.name}</p>
-                      <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                      <p className="font-bold text-[var(--text)]">{p.name}</p>
+                      <span className="text-xs px-2 py-0.5 rounded-full"
+                        style={{ background: 'var(--surface-3)', color: 'var(--text-muted)' }}>
                         por {p.unit}
                       </span>
                       {p.has_empty_return && (
-                        <span className="text-xs bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">
+                        <span className="text-xs px-2 py-0.5 rounded-full"
+                          style={{ background: 'var(--warning-soft)', color: 'var(--warning)' }}>
                           🫙 devuelve envase
                         </span>
                       )}
                       {!p.active && (
-                        <span className="text-xs bg-red-50 text-red-400 px-2 py-0.5 rounded-full">Inactivo</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full"
+                          style={{ background: 'var(--danger-soft)', color: 'var(--danger)' }}>Inactivo</span>
                       )}
                     </div>
                   </div>
 
                   {/* Precio editable rápido */}
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-gray-400 text-sm">$</span>
+                    <span className="text-[var(--text-faint)] text-sm">$</span>
                     <input
                       type="number"
-                      className="w-28 border border-gray-200 rounded-xl px-3 py-2 text-sm font-bold text-blue-700 text-center focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      className="w-28 rounded-xl px-3 py-2 text-sm font-bold text-center bg-[var(--surface-3)] border border-[var(--border)] focus:outline-none focus:border-[var(--primary)] transition-colors"
+                      style={{ color: 'var(--primary)' }}
                       defaultValue={Number(p.price)}
                       onBlur={e => {
                         if (e.target.value !== String(Number(p.price))) {
@@ -209,15 +230,13 @@ export default function ProductosPage() {
                   {/* Acciones */}
                   <div className="flex gap-2 flex-shrink-0">
                     <button onClick={() => openEdit(p)}
-                      className="text-blue-600 hover:bg-blue-50 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
+                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[var(--surface-2)]"
+                      style={{ color: 'var(--primary)' }}>
                       Editar
                     </button>
                     <button onClick={() => handleToggleActive(p)}
-                      className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-all ${
-                        p.active
-                          ? 'text-red-400 hover:bg-red-50'
-                          : 'text-green-600 hover:bg-green-50'
-                      }`}>
+                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:brightness-125"
+                      style={{ color: p.active ? 'var(--danger)' : 'var(--success)' }}>
                       {p.active ? 'Desactivar' : 'Activar'}
                     </button>
                   </div>
@@ -226,11 +245,12 @@ export default function ProductosPage() {
             ))}
 
             {products.length === 0 && (
-              <div className="text-center py-20 text-gray-400">
+              <div className="text-center py-20 text-[var(--text-faint)]">
                 <p className="text-4xl mb-3">🛒</p>
                 <p>No hay productos cargados</p>
                 <button onClick={openNew}
-                  className="mt-4 bg-blue-600 text-white rounded-xl px-6 py-2 text-sm font-bold">
+                  className="mt-4 text-white rounded-xl px-6 py-2 text-sm font-bold"
+                  style={{ background: 'var(--primary)' }}>
                   + Agregar primer producto
                 </button>
               </div>
@@ -241,63 +261,69 @@ export default function ProductosPage() {
 
       {/* MODAL */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="font-bold text-lg text-gray-800">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="rounded-2xl w-full max-w-md bg-[var(--surface)] border border-[var(--border)]"
+            style={{ boxShadow: 'var(--shadow)' }}>
+            <div className="p-5 border-b border-[var(--border)] flex items-center justify-between">
+              <h2 className="font-bold text-lg text-[var(--text)]">
                 {editing ? 'Editar producto' : 'Nuevo producto'}
               </h2>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 text-xl">✕</button>
+              <button onClick={() => setShowModal(false)}
+                className="text-[var(--text-faint)] hover:text-[var(--text)] text-xl transition-colors">✕</button>
             </div>
             <div className="p-5 space-y-4">
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">{error}</div>
+                <div className="rounded-xl p-3 text-sm"
+                  style={{ background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid var(--danger)' }}>
+                  {error}
+                </div>
               )}
               <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase">Nombre *</label>
-                <input className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                <label className={labelCls}>Nombre *</label>
+                <input className={inputCls}
                   placeholder="Ej: Bidón de agua 20L"
                   value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase">Unidad</label>
-                  <select className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  <label className={labelCls}>Unidad</label>
+                  <select className={inputCls}
                     value={form.unit} onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}>
                     {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase">Precio $ *</label>
-                  <input type="number" className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  <label className={labelCls}>Precio $ *</label>
+                  <input type="number" className={inputCls}
                     placeholder="0.00"
                     value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase">Orden en app</label>
-                  <input type="number" className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  <label className={labelCls}>Orden en app</label>
+                  <input type="number" className={inputCls}
                     placeholder="1"
                     value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: e.target.value }))} />
                 </div>
                 <div className="flex flex-col justify-end">
-                  <label className="flex items-center gap-3 cursor-pointer p-3 border border-gray-200 rounded-xl hover:bg-gray-50">
-                    <input type="checkbox" className="w-4 h-4 accent-blue-600"
+                  <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-[var(--border)] hover:bg-[var(--surface-2)] transition-colors">
+                    <input type="checkbox" className="w-4 h-4 accent-[var(--primary)]"
                       checked={form.has_empty_return}
                       onChange={e => setForm(f => ({ ...f, has_empty_return: e.target.checked }))} />
-                    <span className="text-sm text-gray-700">🫙 Devuelve envase</span>
+                    <span className="text-sm text-[var(--text-muted)]">🫙 Devuelve envase</span>
                   </label>
                 </div>
               </div>
             </div>
-            <div className="p-5 border-t border-gray-100 flex gap-3">
+            <div className="p-5 border-t border-[var(--border)] flex gap-3">
               <button onClick={() => setShowModal(false)}
-                className="flex-1 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50">
+                className="flex-1 rounded-xl py-3 text-sm font-semibold transition-all border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--surface-2)]">
                 Cancelar
               </button>
               <button onClick={handleSave} disabled={saving}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl py-3 text-sm font-bold">
+                className="flex-1 text-white rounded-xl py-3 text-sm font-bold transition-all disabled:opacity-50 hover:brightness-110"
+                style={{ background: 'var(--primary)' }}>
                 {saving ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear producto'}
               </button>
             </div>
