@@ -18,7 +18,6 @@ async function apiFetch(path: string, options?: RequestInit) {
   return res.json()
 }
 
-// Colores oscuros (mismo criterio que el resto del dashboard)
 const D = {
   bg: '#0f1117', surface: '#151b27', surface2: '#1a2236',
   border: '#1e2d40', text: '#f1f5f9', muted: '#64748b',
@@ -40,11 +39,11 @@ export default function PlantillasPage() {
   const router = useRouter()
   const [templates, setTemplates] = useState<any[]>([])
   const [repartidores, setRepartidores] = useState<any[]>([])
+  const [geofences, setGeofences] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [msg, setMsg] = useState('')
 
-  // modal crear/editar
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [userId, setUserId] = useState('')
@@ -53,11 +52,10 @@ export default function PlantillasPage() {
   const [clients, setClients] = useState<any[]>([])
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<any[]>([])
+  const [selectedGeofences, setSelectedGeofences] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
 
-  // confirmar borrado
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
-  // confirmar generar
   const [generateConfirm, setGenerateConfirm] = useState<any | null>(null)
   const [generateDate, setGenerateDate] = useState(new Date().toISOString().slice(0, 10))
 
@@ -70,12 +68,14 @@ export default function PlantillasPage() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [tpls, users] = await Promise.all([
+      const [tpls, users, geo] = await Promise.all([
         apiFetch('/api/route-templates'),
         apiFetch('/api/users?role=repartidor'),
+        apiFetch('/api/geofences'),
       ])
       setTemplates(Array.isArray(tpls) ? tpls : [])
       setRepartidores(Array.isArray(users) ? users : users.users ?? [])
+      setGeofences(Array.isArray(geo) ? geo.filter((g: any) => g.active) : [])
     } catch {
       setError('Error cargando las plantillas')
     } finally { setLoading(false) }
@@ -94,6 +94,7 @@ export default function PlantillasPage() {
     setWeekday(1)
     setTemplateName('')
     setSelected([])
+    setSelectedGeofences([])
     setSearch('')
     setError('')
     await loadClients()
@@ -115,6 +116,7 @@ export default function PlantillasPage() {
         address: s.address,
         expected_amount: String(s.expected_amount ?? '0'),
       })))
+      setSelectedGeofences((tpl.geofences ?? []).map((g: any) => g.id))
       setShowModal(true)
     } catch {
       setError('No se pudo abrir la plantilla')
@@ -127,6 +129,12 @@ export default function PlantillasPage() {
       if (exists) return prev.filter(c => c.id !== client.id)
       return [...prev, { ...client, expected_amount: '0' }]
     })
+  }
+
+  const toggleGeofence = (gid: string) => {
+    setSelectedGeofences(prev =>
+      prev.includes(gid) ? prev.filter(id => id !== gid) : [...prev, gid]
+    )
   }
 
   const moveUp = (i: number) => {
@@ -160,12 +168,12 @@ export default function PlantillasPage() {
       if (editingId) {
         await apiFetch(`/api/route-templates/${editingId}`, {
           method: 'PUT',
-          body: JSON.stringify({ name: templateName || null, stops }),
+          body: JSON.stringify({ name: templateName || null, stops, geofence_ids: selectedGeofences }),
         })
       } else {
         await apiFetch('/api/route-templates', {
           method: 'POST',
-          body: JSON.stringify({ user_id: userId, weekday, name: templateName || null, stops }),
+          body: JSON.stringify({ user_id: userId, weekday, name: templateName || null, stops, geofence_ids: selectedGeofences }),
         })
       }
       setShowModal(false)
@@ -209,7 +217,6 @@ export default function PlantillasPage() {
     )
   )
 
-  // estilos claros para modales
   const modalInput = {
     width: '100%', borderRadius: 10, padding: '10px 14px', fontSize: 13,
     background: '#fff', border: '1px solid #d1d5db', color: '#1f2937',
@@ -223,7 +230,6 @@ export default function PlantillasPage() {
   return (
     <div style={{ minHeight: '100vh', background: D.bg }}>
 
-      {/* NAVBAR */}
       <nav style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button onClick={() => router.push('/')}
@@ -242,7 +248,6 @@ export default function PlantillasPage() {
         </button>
       </nav>
 
-      {/* Mensajes */}
       {msg && (
         <div style={{ position: 'fixed', top: 70, right: 20, zIndex: 50, background: '#16a34a', color: '#fff', padding: '10px 18px', borderRadius: 10, fontWeight: 600, fontSize: 13 }}>
           {msg}
@@ -257,19 +262,17 @@ export default function PlantillasPage() {
           </div>
         )}
 
-        {/* Info */}
         <div style={{ background: `${D.accent}10`, border: `1px solid ${D.accent}30`, borderRadius: 12, padding: '14px 16px', marginBottom: 20, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
           <span style={{ fontSize: 22 }}>💡</span>
           <div>
             <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>¿Cómo funcionan las plantillas?</p>
             <p style={{ fontSize: 12, color: D.muted, marginTop: 4 }}>
-              Creá una plantilla con los clientes de un repartidor para un día fijo (ej: "Lunes de Juan").
-              Después, con un clic en "Generar ruta", se crea la ruta real de ese día con todas las paradas en orden.
+              Creá una plantilla con los clientes y geocercas de un repartidor para un día fijo.
+              Después, con un clic en "Generar ruta", se crea la ruta real con todas las paradas y geocercas.
             </p>
           </div>
         </div>
 
-        {/* LISTA */}
         {loading ? (
           <p style={{ textAlign: 'center', color: D.muted, padding: 60, fontSize: 13 }}>Cargando plantillas...</p>
         ) : templates.length === 0 ? (
@@ -318,7 +321,6 @@ export default function PlantillasPage() {
         )}
       </div>
 
-      {/* MODAL CREAR/EDITAR (claro) */}
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 16 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 640, maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
@@ -337,7 +339,6 @@ export default function PlantillasPage() {
                 </div>
               )}
 
-              {/* Config */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={modalLabel}>Repartidor *</label>
@@ -373,7 +374,29 @@ export default function PlantillasPage() {
                 </p>
               )}
 
-              {/* Paradas seleccionadas */}
+              {/* GEOCERCAS */}
+              <div>
+                <label style={modalLabel}>Geocercas de la ruta ({selectedGeofences.length})</label>
+                <div style={{ border: '1px solid #e5e7eb', borderRadius: 10, marginTop: 6, overflow: 'hidden' }}>
+                  {geofences.length === 0 ? (
+                    <p style={{ textAlign: 'center', color: '#9ca3af', fontSize: 12, padding: 14 }}>No hay geocercas activas</p>
+                  ) : geofences.map((g: any) => (
+                    <label key={g.id}
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }}>
+                      <input type="checkbox"
+                        checked={selectedGeofences.includes(g.id)}
+                        onChange={() => toggleGeofence(g.id)}
+                        style={{ width: 16, height: 16, accentColor: '#0A5C8A' }} />
+                      <span style={{ fontSize: 13, color: '#1f2937' }}>{g.name}</span>
+                      <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 'auto' }}>
+                        {g.radius_meters ? (Number(g.radius_meters) >= 1000 ? `${(Number(g.radius_meters)/1000).toFixed(1)} km` : `${g.radius_meters} m`) : ''}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* PARADAS */}
               <div>
                 <label style={modalLabel}>Paradas en orden ({selected.length})</label>
                 <div style={{ border: '1px solid #e5e7eb', borderRadius: 10, marginTop: 6, maxHeight: 200, overflowY: 'auto' }}>
@@ -400,7 +423,6 @@ export default function PlantillasPage() {
                 </div>
               </div>
 
-              {/* Buscador de clientes */}
               <div>
                 <label style={modalLabel}>Agregar clientes</label>
                 <input style={modalInput} placeholder="🔍 Buscar cliente..."
@@ -441,7 +463,6 @@ export default function PlantillasPage() {
         </div>
       )}
 
-      {/* MODAL GENERAR RUTA (claro) */}
       {generateConfirm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 16 }}>
           <div style={{ background: '#fff', borderRadius: 16, maxWidth: 380, width: '100%', padding: 24, boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
@@ -466,7 +487,6 @@ export default function PlantillasPage() {
         </div>
       )}
 
-      {/* MODAL CONFIRMAR BORRADO (claro) */}
       {deleteConfirm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 16 }}>
           <div style={{ background: '#fff', borderRadius: 16, maxWidth: 360, width: '100%', padding: 24, boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
