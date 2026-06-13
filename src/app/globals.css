@@ -4,25 +4,133 @@
 
 @import 'mapbox-gl/dist/mapbox-gl.css';
 
+/* ============================================================
+   TROMEN · TrackCrew — Design System (Dark)
+   BYF Soluciones
+   Tokens semánticos: cambiá un valor acá y se propaga a todo.
+   ============================================================ */
+:root {
+  /* Superficies */
+  --bg:            #0f1117;  /* fondo de página */
+  --surface:       #151b27;  /* tarjetas, navs, modales */
+  --surface-2:     #1c2433;  /* superficie elevada / hover */
+  --surface-3:     #232d3f;  /* inputs, chips */
+
+  /* Bordes */
+  --border:        #233044;
+  --border-strong: #2e3d54;
+
+  /* Texto */
+  --text:          #e8eef6;  /* texto principal */
+  --text-muted:    #9fb0c3;  /* secundario */
+  --text-faint:    #6b7c91;  /* terciario / placeholders */
+
+  /* Marca */
+  --primary:       #1A8FBF;
+  --primary-deep:  #0A5C8A;
+  --primary-soft:  rgba(26, 143, 191, 0.14);
+
+  /* Estados */
+  --success:       #2ecc71;
+  --success-soft:  rgba(46, 204, 113, 0.13);
+  --warning:       #e67e22;
+  --warning-soft:  rgba(230, 126, 34, 0.14);
+  --danger:        #e74c3c;
+  --danger-soft:   rgba(231, 76, 60, 0.13);
+
+  --radius:        16px;
+  --shadow:        0 8px 30px rgba(0, 0, 0, 0.45);
+  --shadow-sm:     0 2px 10px rgba(0, 0, 0, 0.30);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
-  background: #F0F7FC;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: #1A2733;
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-feature-settings: 'cv01', 'cv03', 'tnum';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #f0f0f0;
-}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb {
-  background: #C8DFE8;
-  border-radius: 3px;
+  background: var(--surface-3);
+  border-radius: 4px;
 }
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+::selection { background: var(--primary-soft); color: var(--text); }
+
+/* ============================================================
+   CAPA DE COMPATIBILIDAD (defensiva)
+   Las páginas legacy usan utilidades claras de Tailwind
+   (bg-white, text-gray-800, border-blue-50…) y estilos inline
+   #F0F7FC. Acá las reinterpretamos para que NINGUNA página
+   quede blanca aunque no se haya tocado su JSX.
+   Quitá este bloque cuando todas las páginas usen los tokens.
+   ============================================================ */
+@layer utilities {
+  /* Superficies blancas -> superficie oscura */
+  .bg-white { background-color: var(--surface) !important; }
+  .bg-gray-50, .bg-slate-50, .bg-neutral-50 { background-color: var(--surface-2) !important; }
+
+  /* Fondos celestes claros de marca -> fondo de página */
+  .bg-blue-50, .bg-sky-50, .bg-accent { background-color: var(--bg) !important; }
+
+  /* Texto oscuro -> texto claro */
+  .text-gray-900, .text-gray-800, .text-gray-700, .text-slate-800, .text-slate-700,
+  .text-black { color: var(--text) !important; }
+  .text-gray-600, .text-gray-500, .text-slate-500 { color: var(--text-muted) !important; }
+  .text-gray-400, .text-gray-300, .text-slate-400 { color: var(--text-faint) !important; }
+
+  /* Bordes claros -> borde oscuro */
+  .border-gray-100, .border-gray-200, .border-blue-50, .border-blue-100,
+  .border-slate-100, .border-slate-200 { border-color: var(--border) !important; }
+
+  /* Chips de estado: dar contraste sobre fondo oscuro */
+  .bg-green-50  { background-color: var(--success-soft) !important; }
+  .bg-orange-50 { background-color: var(--warning-soft) !important; }
+  .bg-red-50    { background-color: var(--danger-soft) !important; }
+  .bg-blue-100  { background-color: var(--primary-soft) !important; }
+  .text-green-600, .text-green-700 { color: var(--success) !important; }
+  .text-orange-600 { color: var(--warning) !important; }
+  .text-red-600, .text-red-400, .text-red-500 { color: var(--danger) !important; }
+  .text-blue-600, .text-blue-700 { color: var(--primary) !important; }
+
+  /* Hovers claros -> elevación oscura */
+  .hover\:bg-gray-50:hover, .hover\:bg-blue-50:hover { background-color: var(--surface-2) !important; }
+  .hover\:bg-red-50:hover { background-color: var(--danger-soft) !important; }
+
+  /* Divisores */
+  .divide-gray-50 > :not([hidden]) ~ :not([hidden]),
+  .divide-gray-100 > :not([hidden]) ~ :not([hidden]) { border-color: var(--border) !important; }
+}
+
+/* Inputs/selects/textarea legacy: fondo y texto coherentes */
+input, select, textarea {
+  background-color: var(--surface-3);
+  color: var(--text);
+  border-color: var(--border);
+}
+input::placeholder, textarea::placeholder { color: var(--text-faint); }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px var(--primary-soft) !important;
+  outline: none;
+}
+select option { background: var(--surface); color: var(--text); }
+
+/* Inputs de fecha: ícono visible en dark */
+input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.8); }
+
+/* Neutralizar fondos inline celestes (#F0F7FC y variantes) en páginas no migradas.
+   Sólo afecta al contenedor raíz min-h-screen, no toca el navbar con gradiente. */
+.min-h-screen[style*="F0F7FC"],
+.min-h-screen[style*="f0f7fc"] { background: var(--bg) !important; }

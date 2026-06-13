@@ -165,7 +165,7 @@ export default function RutaDetallePage() {
   }
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50">
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0f1117' }}>
       <div className="text-center">
         <span className="text-5xl">💧</span>
         <p className="text-gray-400 mt-3">Cargando ruta...</p>
@@ -174,7 +174,7 @@ export default function RutaDetallePage() {
   )
 
   if (!route) return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50">
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0f1117' }}>
       <div className="text-center">
         <p className="text-4xl mb-3">❌</p>
         <p className="text-slate-500">Ruta no encontrada</p>
@@ -250,7 +250,7 @@ export default function RutaDetallePage() {
               return s + (m ? parseInt(m[1]) : 0)
             }, 0)), 'recuperados hoy', '#2980B9', '🫙'],
           ].map(([l, v, sub, c, e]) => (
-            <div key={l as string} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-800">
+            <div key={l as string} className="rounded-2xl p-4 shadow-sm" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{l as string}</p>
@@ -265,13 +265,13 @@ export default function RutaDetallePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-          <div className="bg-white rounded-2xl shadow-sm border border-blue-50 overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="rounded-2xl shadow-sm overflow-hidden" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
+            <div className="px-5 py-4 border-b flex items-center justify-between" style={{ borderColor: '#1e2d40' }}>
               <h3 className="font-bold text-slate-200">🗺️ Posicion en tiempo real</h3>
               {position && (
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-xs text-slate-600">{Number(position.speed ?? 0).toFixed(0)} km/h</span>
+                  <span className="text-xs text-slate-400">{Number(position.speed ?? 0).toFixed(0)} km/h</span>
                 </div>
               )}
             </div>
@@ -329,7 +329,7 @@ export default function RutaDetallePage() {
             )}
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-blue-50 flex flex-col" style={{ maxHeight: '500px' }}>
+          <div className="rounded-2xl shadow-sm flex flex-col" style={{ maxHeight: '500px', background: '#151b27', border: '1px solid #1e2d40' }}>
             <div className="px-5 py-4 border-b border-slate-800">
               <h3 className="font-bold text-slate-200">📋 Entregas de la ruta</h3>
               <div className="flex gap-3 mt-2 text-xs">
@@ -342,13 +342,13 @@ export default function RutaDetallePage() {
               {deliveries.map((d: any, i: number) => (
                 <button key={d.id}
                   onClick={() => router.push(`/entregas/${d.id}`)}
-                  className="w-full text-left p-4 hover:bg-blue-50/50 transition-colors flex items-center gap-3">
+                  className="w-full text-left p-4 hover:bg-slate-800/50 transition-colors flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
                     style={{ background: d.status === 'pendiente' ? '#E67E22' : STATUS_COLOR[d.status] ?? '#888' }}>
                     {d.status === 'pendiente' ? i + 1 : '✓'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-800 text-sm truncate">{d.client_name}</p>
+                    <p className="font-semibold text-slate-100 text-sm truncate">{d.client_name}</p>
                     <p className="text-xs text-gray-400 truncate">{d.address}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
@@ -356,26 +356,26 @@ export default function RutaDetallePage() {
                       {STATUS_LABEL[d.status] ?? 'Pendiente'}
                     </p>
                     {d.actual_amount > 0 && (
-                      <p className="text-xs text-gray-500 mt-0.5">${Number(d.actual_amount).toLocaleString('es-AR')}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">${Number(d.actual_amount).toLocaleString('es-AR')}</p>
                     )}
                   </div>
-                  <span className="text-gray-300 text-sm flex-shrink-0">›</span>
+                  <span className="text-slate-500 text-sm flex-shrink-0">›</span>
                 </button>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-800">
+        <div className="rounded-2xl p-5 shadow-sm" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-bold text-slate-200">Progreso de la ruta</h3>
             <span className="text-2xl font-bold" style={{ color: '#0A5C8A' }}>{pct}%</span>
           </div>
-          <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-4 rounded-full overflow-hidden" style={{ background: '#1e2d40' }}>
             <div className="h-4 rounded-full transition-all duration-700"
               style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #0A5C8A, #1A8FBF)' }} />
           </div>
-          <div className="flex gap-4 mt-3 text-xs text-slate-600">
+          <div className="flex gap-4 mt-3 text-xs text-slate-400">
             <span>🟢 {done.filter((d: any) => d.status === 'entregado').length} entregadas</span>
             <span>🔴 {done.filter((d: any) => d.status === 'no_entregado').length} no entregadas</span>
             <span>🟡 {pending.length} pendientes</span>
@@ -386,7 +386,7 @@ export default function RutaDetallePage() {
       {showAddClients && (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
           <div className="rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-5 border-b flex items-center justify-between" style={{ borderColor: '#1e2d40' }}>
               <div>
                 <h2 className="font-bold text-lg text-slate-100">Agregar clientes a la ruta</h2>
                 <p className="text-xs text-gray-400 mt-1">
@@ -407,22 +407,22 @@ export default function RutaDetallePage() {
                   const isSel = selectedToAdd.find(s => s.id === c.id)
                   return (
                     <button key={c.id} onClick={() => toggleClientToAdd(c)}
-                      className="w-full text-left p-4 hover:bg-blue-50/50 transition-colors flex items-center gap-3">
+                      className="w-full text-left p-4 hover:bg-slate-800/50 transition-colors flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
                         style={{ background: isSel ? '#1A7A4A' : '#0A5C8A' }}>
                         {isSel ? '✓' : c.name?.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-800 text-sm">{c.name}</p>
+                        <p className="font-semibold text-slate-100 text-sm">{c.name}</p>
                         <p className="text-xs text-gray-400 truncate">{c.address}</p>
                       </div>
                     </button>
                   )
                 })}
             </div>
-            <div className="p-4 border-t border-gray-100 flex gap-3">
+            <div className="p-4 border-t flex gap-3" style={{ borderColor: '#1e2d40' }}>
               <button onClick={() => setShowAddClients(false)}
-                className="flex-1 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-slate-400">
+                className="flex-1 rounded-xl py-3 text-sm font-semibold text-slate-400" style={{ border: '1px solid #1e2d40' }}>
                 Cancelar
               </button>
               <button onClick={handleAddClients} disabled={addingSaving || selectedToAdd.length === 0}
@@ -437,7 +437,7 @@ export default function RutaDetallePage() {
       {showNewClient && (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
           <div className="rounded-2xl w-full max-w-md" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-5 border-b flex items-center justify-between" style={{ borderColor: '#1e2d40' }}>
               <h2 className="font-bold text-lg text-slate-100">Nuevo cliente y agregar a ruta</h2>
               <button onClick={() => setShowNewClient(false)} className="text-gray-400 text-xl">✕</button>
             </div>
@@ -461,9 +461,9 @@ export default function RutaDetallePage() {
                 </div>
               ))}
             </div>
-            <div className="p-5 border-t border-gray-100 flex gap-3">
+            <div className="p-5 border-t flex gap-3" style={{ borderColor: '#1e2d40' }}>
               <button onClick={() => setShowNewClient(false)}
-                className="flex-1 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-slate-400">
+                className="flex-1 rounded-xl py-3 text-sm font-semibold text-slate-400" style={{ border: '1px solid #1e2d40' }}>
                 Cancelar
               </button>
               <button onClick={handleCreateAndAdd} disabled={savingNewClient}

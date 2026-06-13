@@ -258,78 +258,77 @@ export default function ProductosPage() {
           </div>
         )}
       </div>
-
       {/* MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="rounded-2xl w-full max-w-md bg-[var(--surface)] border border-[var(--border)]"
-            style={{ boxShadow: 'var(--shadow)' }}>
-            <div className="p-5 border-b border-[var(--border)] flex items-center justify-between">
-              <h2 className="font-bold text-lg text-[var(--text)]">
+          <div className="rounded-2xl w-full max-w-md bg-white border border-gray-200 shadow-xl">
+            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="font-bold text-lg text-gray-800">
                 {editing ? 'Editar producto' : 'Nuevo producto'}
               </h2>
               <button onClick={() => setShowModal(false)}
-                className="text-[var(--text-faint)] hover:text-[var(--text)] text-xl transition-colors">✕</button>
+                className="text-gray-400 hover:text-gray-700 text-xl transition-colors">✕</button>
             </div>
             <div className="p-5 space-y-4">
               {error && (
-                <div className="rounded-xl p-3 text-sm"
-                  style={{ background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid var(--danger)' }}>
+                <div className="rounded-xl p-3 text-sm bg-red-50 text-red-600 border border-red-200">
                   {error}
                 </div>
               )}
               <div>
-                <label className={labelCls}>Nombre *</label>
-                <input className={inputCls}
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Nombre *</label>
+                <input
+                  className="w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-white border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
                   placeholder="Ej: Bidón de agua 20L"
                   value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>Unidad</label>
-                  <select className={inputCls}
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Unidad</label>
+                  <select
+                    className="w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-white border border-gray-300 text-gray-800 focus:outline-none focus:border-blue-500 transition-colors"
                     value={form.unit} onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}>
                     {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className={labelCls}>Precio $ *</label>
-                  <input type="number" className={inputCls}
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Precio $ *</label>
+                  <input type="number"
+                    className="w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-white border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
                     placeholder="0.00"
                     value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>Orden en app</label>
-                  <input type="number" className={inputCls}
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Orden en app</label>
+                  <input type="number"
+                    className="w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-white border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
                     placeholder="1"
                     value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: e.target.value }))} />
                 </div>
                 <div className="flex flex-col justify-end">
-                  <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-[var(--border)] hover:bg-[var(--surface-2)] transition-colors">
-                    <input type="checkbox" className="w-4 h-4 accent-[var(--primary)]"
+                  <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-gray-300 hover:bg-gray-50 transition-colors">
+                    <input type="checkbox" className="w-4 h-4 accent-blue-600"
                       checked={form.has_empty_return}
                       onChange={e => setForm(f => ({ ...f, has_empty_return: e.target.checked }))} />
-                    <span className="text-sm text-[var(--text-muted)]">🫙 Devuelve envase</span>
+                    <span className="text-sm text-gray-600">🫙 Devuelve envase</span>
                   </label>
                 </div>
               </div>
             </div>
-            <div className="p-5 border-t border-[var(--border)] flex gap-3">
+            <div className="p-5 border-t border-gray-100 flex gap-3">
               <button onClick={() => setShowModal(false)}
-                className="flex-1 rounded-xl py-3 text-sm font-semibold transition-all border border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--surface-2)]">
+                className="flex-1 rounded-xl py-3 text-sm font-semibold transition-all border border-gray-300 text-gray-600 hover:bg-gray-50">
                 Cancelar
               </button>
               <button onClick={handleSave} disabled={saving}
                 className="flex-1 text-white rounded-xl py-3 text-sm font-bold transition-all disabled:opacity-50 hover:brightness-110"
-                style={{ background: 'var(--primary)' }}>
+                style={{ background: '#0A5C8A' }}>
                 {saving ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear producto'}
               </button>
             </div>
           </div>
         </div>
-      )}
-    </div>
-  )
+      )
 }
