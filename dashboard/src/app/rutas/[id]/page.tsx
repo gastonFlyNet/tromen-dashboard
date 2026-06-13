@@ -167,7 +167,8 @@ export default function RutaDetallePage() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#0f1117' }}>
       <div className="text-center">
-        <p className="text-[var(--text-faint)] mt-3">Cargando ruta...</p>
+        <img src="/tromen-logo.png" alt="TROMEN" style={{ width: 180, height: 'auto', objectFit: 'contain', margin: '0 auto' }} />
+        <p className="text-[var(--text-faint)] mt-4">Cargando ruta...</p>
       </div>
     </div>
   )
