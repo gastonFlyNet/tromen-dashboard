@@ -167,8 +167,7 @@ export default function RutaDetallePage() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#0f1117' }}>
       <div className="text-center">
-        <span className="text-5xl">💧</span>
-        <p className="text-gray-400 mt-3">Cargando ruta...</p>
+        <p className="text-[var(--text-faint)] mt-3">Cargando ruta...</p>
       </div>
     </div>
   )
