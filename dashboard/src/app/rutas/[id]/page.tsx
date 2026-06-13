@@ -166,15 +166,22 @@ export default function RutaDetallePage() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#0f1117' }}>
+      <style>{`@keyframes pulse{0%,100%{opacity:0.3;transform:scale(0.8)}50%{opacity:1;transform:scale(1.2)}}.dot1{animation:pulse 1.2s ease-in-out infinite}.dot2{animation:pulse 1.2s ease-in-out 0.2s infinite}.dot3{animation:pulse 1.2s ease-in-out 0.4s infinite}`}</style>
       <div className="text-center">
-        <img src="/tromen-logo.png" alt="TROMEN" style={{ width: 180, height: 'auto', objectFit: 'contain', margin: '0 auto' }} />
-        <p className="text-[var(--text-faint)] mt-4">Cargando ruta...</p>
+        <img src="/tromen-logo.png" alt="TROMEN" style={{ width: 240, height: 'auto', objectFit: 'contain', margin: '0 auto' }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 18 }}>
+          <div className="dot1" style={{ width: 7, height: 7, borderRadius: '50%', background: '#38bdf8' }} />
+          <div className="dot2" style={{ width: 7, height: 7, borderRadius: '50%', background: '#38bdf8' }} />
+          <div className="dot3" style={{ width: 7, height: 7, borderRadius: '50%', background: '#38bdf8' }} />
+        </div>
+        <p style={{ color: '#475569', fontSize: 11, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 18 }}>Cargando ruta</p>
       </div>
     </div>
   )
 
   if (!route) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#0f1117' }}>
+      
       <div className="text-center">
         <p className="text-4xl mb-3">❌</p>
         <p className="text-slate-500">Ruta no encontrada</p>
