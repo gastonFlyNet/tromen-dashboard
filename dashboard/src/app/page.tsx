@@ -425,8 +425,18 @@ export default function Dashboard() {
     color: accent ? '#fff' : D.muted,
   })
 
+  const sideBtnStyle = (accent?: string) => ({
+    padding: '10px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+    border: `1px solid ${accent ? 'transparent' : 'transparent'}`,
+    background: accent ?? 'transparent',
+    color: accent ? '#fff' : D.text,
+    textAlign: 'left' as const,
+    width: '100%',
+    transition: 'background 0.15s',
+  })
+
   return (
-    <div style={{ minHeight: '100vh', background: D.bg, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', background: D.bg, display: 'flex', flexDirection: 'row' }}>
 
       {showVentaDeposito && (
         <ModalVentaDeposito
@@ -441,28 +451,32 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* NAVBAR */}
-      <nav style={{ background: D.surface, borderBottom: `1px solid ${D.border}`, padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 40 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src="/tromen-logo.png" alt="TROMEN" style={{ height: 48, width: 'auto', objectFit: 'contain' }} />
-          <p style={{ fontSize: 12, color: D.muted, fontWeight: 500 }}>Panel Administrativo · Catriel</p>
+      {/* SIDEBAR */}
+      <aside style={{ width: 220, background: D.surface, borderRight: `1px solid ${D.border}`, display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh', flexShrink: 0 }}>
+        <div style={{ padding: '20px 18px', borderBottom: `1px solid ${D.border}` }}>
+          <img src="/tromen-logo.png" alt="TROMEN" style={{ height: 44, width: 'auto', objectFit: 'contain' }} />
+          <p style={{ fontSize: 11, color: D.muted, fontWeight: 500, marginTop: 8 }}>Panel Administrativo · Catriel</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <p style={{ fontSize: 10, color: D.muted, marginRight: 4 }}>
+        <nav style={{ flex: 1, padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto' }}>
+          <button style={sideBtnStyle()} onClick={() => router.push('/clientes')}>👥 Clientes</button>
+          <button style={sideBtnStyle()} onClick={() => router.push('/productos')}>📦 Productos</button>
+          <button style={sideBtnStyle()} onClick={() => router.push('/stock')}>📊 Stock</button>
+          <button style={sideBtnStyle()} onClick={() => router.push('/geocercas')}>🗺️ Geocercas</button>
+          <button style={sideBtnStyle()} onClick={() => router.push('/rutas/plantillas')}>📋 Plantillas</button>
+          <div style={{ height: 1, background: D.border, margin: '8px 4px' }} />
+          <button style={sideBtnStyle('#f97316')} onClick={() => setShowVentaDeposito(true)}>🏪 Venta depósito</button>
+          <button style={sideBtnStyle(D.blue)} onClick={() => router.push('/rutas/nueva')}>+ Nueva ruta</button>
+        </nav>
+        <div style={{ padding: '12px 10px', borderTop: `1px solid ${D.border}`, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <p style={{ fontSize: 10, color: D.muted, padding: '0 8px 4px' }}>
             {formatDistanceToNow(lastUpdate, { locale: es, addSuffix: true })}
           </p>
-          <button style={navBtnStyle('#f97316')} onClick={() => setShowVentaDeposito(true)}>🏪 Venta depósito</button>
-          <button style={navBtnStyle()} onClick={() => router.push('/clientes')}>👥 Clientes</button>
-                      <button style={navBtnStyle()} onClick={() => router.push('/geocercas')}>🗺️ Geocercas</button>
-          <button style={navBtnStyle()} onClick={() => router.push('/productos')}>📦 Productos</button>
-          <button style={navBtnStyle(D.blue)} onClick={() => router.push('/rutas/nueva')}>+ Nueva ruta</button>
-                          <button style={navBtnStyle()} onClick={() => router.push('/rutas/plantillas')}>📋 Plantillas</button>
-          <button style={navBtnStyle()} onClick={loadData}>↻</button>
-          <button style={{ ...navBtnStyle(), color: '#475569' }} onClick={handleLogout}>Salir</button>
+          <button style={sideBtnStyle()} onClick={loadData}>↻ Actualizar</button>
+          <button style={{ ...sideBtnStyle(), color: '#94a3b8' }} onClick={handleLogout}>⏻ Salir</button>
         </div>
-      </nav>
+      </aside>
 
-      <div style={{ flex: 1, padding: '20px 24px', maxWidth: 1400, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ flex: 1, padding: '20px 24px', maxWidth: 1400, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', height: '100vh' }}>
 
         {/* ALERTAS */}
         {alerts && (alerts.overdue_clients > 0 || alerts.stopped_routes > 0) && (
