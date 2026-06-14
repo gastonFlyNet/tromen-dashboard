@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Sidebar from '@/components/Sidebar'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -125,23 +126,25 @@ export default function ProductosPage() {
     'rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-sm)]'
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
+    <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
 
-      {/* NAVBAR */}
-      <nav className="px-6 py-4 flex items-center justify-between sticky top-0 z-30 border-b border-[var(--border)]"
-        style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)', boxShadow: 'var(--shadow)' }}>
+      <Sidebar />
+
+      <div style={{ flex: 1, height: '100vh', overflowY: 'auto' }}>
+
+      {/* HEADER */}
+      <nav className="px-6 py-4 flex items-center justify-between sticky top-0 z-30"
+        style={{ background: '#151b27', borderBottom: '1px solid #1e2d40' }}>
         <div className="flex items-center gap-3">
-          <button onClick={() => router.push('/')}
-            className="text-white/70 hover:text-white text-sm mr-2 transition-colors">← Volver</button>
           <span className="text-2xl">🛒</span>
           <div>
-            <h1 className="font-bold text-lg text-white">Productos y precios</h1>
-            <p className="text-white/60 text-xs">TROMEN · Catriel</p>
+            <h1 className="font-bold text-lg" style={{ color: '#f1f5f9' }}>Productos y precios</h1>
+            <p className="text-xs" style={{ color: '#64748b' }}>TROMEN · Catriel</p>
           </div>
         </div>
         <button onClick={openNew}
           className="text-white rounded-xl px-4 py-2 text-sm font-bold transition-all hover:brightness-110"
-          style={{ background: 'var(--success)' }}>
+          style={{ background: '#16a34a' }}>
           + Nuevo producto
         </button>
       </nav>
@@ -332,6 +335,7 @@ export default function ProductosPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }
