@@ -34,15 +34,21 @@ export default function StockPage() {
   const [filterProduct, setFilterProduct] = useState<string>('')
   const [error, setError]           = useState<string>('')
   const [successMsg, setSuccessMsg] = useState<string>('')
+  const [destino, setDestino]       = useState<'repartidor' | 'deposito'>('repartidor')
+  const [repartidorId, setRepartidorId] = useState<string>('')
+  const [repartidores, setRepartidores] = useState<any[]>([])
 
   const loadData = useCallback(async () => {
     try {
-      const [stockRes, histRes] = await Promise.all([
+      const [stockRes, histRes, usersRes] = await Promise.all([
         apiFetch('/api/products/stock'),
         apiFetch('/api/products/stock/history?limit=100'),
+        apiFetch('/api/users').catch(() => []),
       ])
       setProducts(Array.isArray(stockRes) ? stockRes : [])
       setHistory(Array.isArray(histRes) ? histRes : [])
+      const reps = (Array.isArray(usersRes) ? usersRes : []).filter((u: any) => u.role === 'repartidor' || u.role === 'supervisor')
+      setRepartidores(reps)
     } catch (err: any) {
       setError('Error cargando datos de stock')
     } finally { setLoading(false) }
@@ -57,6 +63,7 @@ export default function StockPage() {
   const handleMovement = async () => {
     if (!selectedProduct) return setError('Seleccioná un producto')
     if (!quantity || parseInt(quantity) < 1) return setError('Ingresá una cantidad válida')
+    if (movType === 'salida' && destino === 'repartidor' && !repartidorId) return setError('Seleccioná qué repartidor se lleva el stock')
     setSaving(true)
     setError('')
     try {
@@ -68,6 +75,8 @@ export default function StockPage() {
           quantity: parseInt(quantity),
           reason: reason || null,
           notes: notes || null,
+          destino: movType === 'salida' ? destino : undefined,
+          repartidor_id: movType === 'salida' && destino === 'repartidor' ? (repartidorId || undefined) : undefined,
         }),
       })
       setSuccessMsg(`${movType === 'entrada' ? 'Entrada' : 'Salida'} registrada correctamente`)
@@ -245,6 +254,36 @@ export default function StockPage() {
                 </select>
               </div>
 
+              {/* Destino (solo salida) */}
+              {movType === 'salida' && (
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase block mb-1">Destino de la salida</label>
+                  <div className="grid grid-cols-2 gap-2 mb-2">
+                    <button type="button" onClick={() => setDestino('repartidor')}
+                      className="rounded-xl py-2 text-sm font-semibold transition-all"
+                      style={{ background: destino === 'repartidor' ? '#0A5C8A' : '#F0F7FC', color: destino === 'repartidor' ? 'white' : '#6b7280' }}>
+                      🚚 Repartidor
+                    </button>
+                    <button type="button" onClick={() => setDestino('deposito')}
+                      className="rounded-xl py-2 text-sm font-semibold transition-all"
+                      style={{ background: destino === 'deposito' ? '#0A5C8A' : '#F0F7FC', color: destino === 'deposito' ? 'white' : '#6b7280' }}>
+                      🏪 Venta depósito
+                    </button>
+                  </div>
+                  {destino === 'repartidor' && (
+                    <select
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      value={repartidorId}
+                      onChange={e => setRepartidorId(e.target.value)}>
+                      <option value="">¿Qué repartidor?</option>
+                      {repartidores.map(r => (
+                        <option key={r.id} value={r.id}>{r.name}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              )}
+
               {/* Cantidad */}
               <div>
                 <label className="text-xs font-semibold text-gray-500 uppercase block mb-1">Cantidad</label>
@@ -319,12 +358,13 @@ export default function StockPage() {
                   <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Tipo</th>
                   <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Cantidad</th>
                   <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Motivo</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Destino</th>
                   <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Usuario</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {filteredHistory.length === 0
-                  ? <tr><td colSpan={6} className="text-center text-gray-400 py-12">Sin movimientos registrados</td></tr>
+                  ? <tr><td colSpan={7} className="text-center text-gray-400 py-12">Sin movimientos registrados</td></tr>
                   : filteredHistory.map(h => (
                     <tr key={h.id} className="hover:bg-blue-50/50 transition-colors">
                       <td className="px-5 py-3 text-gray-500 text-xs whitespace-nowrap">
@@ -347,6 +387,11 @@ export default function StockPage() {
                         {h.type === 'entrada' ? '+' : '-'}{h.quantity} {h.unit}
                       </td>
                       <td className="px-5 py-3 text-gray-500">{h.reason ?? '—'}</td>
+                      <td className="px-5 py-3 text-gray-500 text-xs">
+                        {h.type === 'salida' && h.destino === 'repartidor' ? `🚚 ${h.repartidor_name ?? 'Repartidor'}`
+                          : h.type === 'salida' && h.destino === 'deposito' ? '🏪 Depósito'
+                          : '—'}
+                      </td>
                       <td className="px-5 py-3 text-gray-500">{h.user_name}</td>
                     </tr>
                   ))
