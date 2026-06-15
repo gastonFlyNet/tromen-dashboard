@@ -3,6 +3,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Map, { Marker, Source, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import Sidebar from '@/components/Sidebar'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
@@ -180,18 +181,20 @@ export default function GeocercasPage() {
   const getTipo = (type: string) => TIPOS.find(t => t.value === type) ?? TIPOS[0]
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#F0F7FC' }}>
+    <div style={{ height: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
 
-      {/* NAVBAR */}
-      <nav className="text-white px-6 py-4 flex items-center justify-between shadow-lg flex-shrink-0"
-        style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
+      <Sidebar />
+
+      <div className="flex flex-col" style={{ flex: 1, height: '100vh', overflow: 'hidden' }}>
+
+      {/* HEADER */}
+      <nav className="px-6 py-4 flex items-center justify-between flex-shrink-0"
+        style={{ background: '#151b27', borderBottom: '1px solid #1e2d40' }}>
         <div className="flex items-center gap-3">
-          <button onClick={() => router.push('/')}
-            className="text-blue-200 hover:text-white text-sm mr-2">← Volver</button>
           <span className="text-2xl">📍</span>
           <div>
-            <h1 className="font-bold text-lg">Geocercas</h1>
-            <p className="text-blue-200 text-xs">TROMEN · Catriel</p>
+            <h1 className="font-bold text-lg" style={{ color: '#f1f5f9' }}>Geocercas</h1>
+            <p className="text-xs" style={{ color: '#64748b' }}>TROMEN · Catriel</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -437,6 +440,7 @@ export default function GeocercasPage() {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   )
