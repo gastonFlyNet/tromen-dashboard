@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
+import FadeIn from '@/components/FadeIn'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -118,7 +119,7 @@ export default function ProductosPage() {
 
   // ---- estilos reutilizables (tokens del design system) ----
   const inputCls =
-    'w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-[var(--surface-3)] ' +
+    'w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-[#f9fafb] ' +
     'border border-[#e5e7eb] text-[#1f2937] placeholder-[#9ca3af] ' +
     'focus:outline-none focus:border-[#0A5C8A] transition-colors'
   const labelCls = 'text-xs font-semibold text-[#6b7280] uppercase tracking-wide'
@@ -143,7 +144,7 @@ export default function ProductosPage() {
           </div>
         </div>
         <button onClick={openNew}
-          className="text-white rounded-xl px-4 py-2 text-sm font-bold transition-all hover:brightness-110"
+          className="cult-btn text-white rounded-xl px-4 py-2 text-sm font-bold"
           style={{ background: '#16a34a' }}>
           + Nuevo producto
         </button>
@@ -175,10 +176,10 @@ export default function ProductosPage() {
         {loading ? (
           <div className="text-center py-20 text-[#9ca3af]">Cargando productos...</div>
         ) : (
-          <div className="space-y-3">
+          <FadeIn className="space-y-3">
             {products.map(p => (
               <div key={p.id}
-                className={cardCls + ' p-4 transition-all hover:bg-[var(--surface-2)]'}
+                className={cardCls + ' cult-card p-4'}
                 style={{ opacity: p.active ? 1 : 0.55 }}>
                 <div className="flex items-center gap-4">
                   {/* Orden */}
@@ -192,7 +193,7 @@ export default function ProductosPage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-bold text-[#1f2937]">{p.name}</p>
                       <span className="text-xs px-2 py-0.5 rounded-full"
-                        style={{ background: 'var(--surface-3)', color: '#6b7280' }}>
+                        style={{ background: '#f3f4f6', color: '#6b7280' }}>
                         por {p.unit}
                       </span>
                       {p.has_empty_return && (
@@ -213,7 +214,7 @@ export default function ProductosPage() {
                     <span className="text-[#9ca3af] text-sm">$</span>
                     <input
                       type="number"
-                      className="w-28 rounded-xl px-3 py-2 text-sm font-bold text-center bg-[var(--surface-3)] border border-[#e5e7eb] focus:outline-none focus:border-[#0A5C8A] transition-colors"
+                      className="w-28 rounded-xl px-3 py-2 text-sm font-bold text-center bg-[#f9fafb] border border-[#e5e7eb] focus:outline-none focus:border-[#0A5C8A] transition-colors"
                       style={{ color: '#0A5C8A' }}
                       defaultValue={Number(p.price)}
                       onBlur={e => {
@@ -233,7 +234,7 @@ export default function ProductosPage() {
                   {/* Acciones */}
                   <div className="flex gap-2 flex-shrink-0">
                     <button onClick={() => openEdit(p)}
-                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[var(--surface-2)]"
+                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[#f3f4f6]"
                       style={{ color: '#0A5C8A' }}>
                       Editar
                     </button>
@@ -258,7 +259,7 @@ export default function ProductosPage() {
                 </button>
               </div>
             )}
-          </div>
+          </FadeIn>
         )}
       </div>
 
