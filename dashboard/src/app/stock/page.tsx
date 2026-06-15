@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Sidebar from '@/components/Sidebar'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -98,7 +99,7 @@ export default function StockPage() {
   const lowStock   = products.filter(p => (p.stock_quantity ?? 0) <= STOCK_MIN)
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50">
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0f1117' }}>
       <div className="text-center">
         <span className="text-5xl">📦</span>
         <p className="text-gray-400 mt-3">Cargando stock...</p>
@@ -107,22 +108,25 @@ export default function StockPage() {
   )
 
   return (
-    <div className="min-h-screen" style={{ background: '#F0F7FC' }}>
+    <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
 
-      {/* NAVBAR */}
-      <nav className="text-white px-6 py-4 flex items-center justify-between shadow-lg"
-        style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
+      <Sidebar />
+
+      <div style={{ flex: 1, height: '100vh', overflowY: 'auto' }}>
+
+      {/* HEADER */}
+      <nav className="px-6 py-4 flex items-center justify-between sticky top-0 z-30"
+        style={{ background: '#151b27', borderBottom: '1px solid #1e2d40' }}>
         <div className="flex items-center gap-3">
-          <button onClick={() => router.push('/')}
-            className="text-blue-200 hover:text-white text-sm mr-2">← Volver</button>
           <span className="text-2xl">📦</span>
           <div>
-            <h1 className="font-bold text-lg">Stock Interno</h1>
-            <p className="text-blue-200 text-xs">Control de inventario · TROMEN</p>
+            <h1 className="font-bold text-lg" style={{ color: '#f1f5f9' }}>Stock Interno</h1>
+            <p className="text-xs" style={{ color: '#64748b' }}>Control de inventario · TROMEN</p>
           </div>
         </div>
         <button onClick={loadData}
-          className="bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 text-sm font-semibold transition-all">
+          className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all"
+          style={{ background: 'rgba(56,189,248,0.14)', color: '#38bdf8' }}>
           ↻ Actualizar
         </button>
       </nav>
@@ -400,6 +404,7 @@ export default function StockPage() {
             </table>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )
