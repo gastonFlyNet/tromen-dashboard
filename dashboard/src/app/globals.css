@@ -118,3 +118,44 @@ body {
   50% { opacity: 1; transform: scale(1.2); }
 }
 }
+
+
+/* ===== Cult UI - Efectos (CSS puro) ===== */
+
+/* Botón con micro-interacción: se hunde al tocar + brillo que cruza */
+.cult-btn {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.12s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+.cult-btn:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+.cult-btn:active {
+  transform: scale(0.96);
+}
+.cult-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+.cult-btn:hover::after {
+  left: 125%;
+}
+
+/* Tarjeta que se eleva al pasar el mouse */
+.cult-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cult-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+}

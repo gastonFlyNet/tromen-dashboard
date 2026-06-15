@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
+import CountUp from '@/components/CountUp'
+import FadeIn from '@/components/FadeIn'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -124,7 +126,7 @@ export default function ClientesPage() {
   )
 
   const inputCls =
-    'w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-[var(--surface-3)] ' +
+    'w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-[#f9fafb] ' +
     'border border-[#e5e7eb] text-[#1f2937] placeholder-[#9ca3af] ' +
     'focus:outline-none focus:border-[#0A5C8A] transition-colors'
   const labelCls = 'text-xs font-semibold text-[#6b7280] uppercase tracking-wide'
@@ -155,7 +157,7 @@ export default function ClientesPage() {
           </div>
         </div>
         <button onClick={openNew}
-          className="text-white rounded-xl px-4 py-2 text-sm font-bold transition-all hover:brightness-110"
+          className="cult-btn text-white rounded-xl px-4 py-2 text-sm font-bold"
           style={{ background: '#16a34a' }}>
           + Nuevo cliente
         </button>
@@ -173,19 +175,19 @@ export default function ClientesPage() {
         </div>
 
         {/* STATS */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <FadeIn className="grid grid-cols-3 gap-3 mb-6">
           {([
             ['Total clientes', clients.length, '👥', '#0A5C8A'],
             ['Con GPS', clients.filter(c => c.latitude && c.longitude).length, '📍', '#16a34a'],
             ['Con saldo', clients.filter(c => Number(c.balance ?? c.current_balance) > 0).length, '💰', '#d97706'],
           ] as const).map(([l, v, e, c]) => (
-            <div key={l} className={cardCls + ' p-4 text-center'}>
+            <div key={l} className={cardCls + ' cult-card p-4 text-center'}>
               <p className="text-2xl">{e}</p>
-              <p className="text-2xl font-bold mt-1" style={{ color: c }}>{v}</p>
+              <p className="text-2xl font-bold mt-1" style={{ color: c }}><CountUp end={v} /></p>
               <p className="text-xs text-[#9ca3af] mt-1">{l}</p>
             </div>
           ))}
-        </div>
+        </FadeIn>
 
         {/* LISTA */}
         {loading ? (
@@ -209,7 +211,7 @@ export default function ClientesPage() {
               const balance = Number(c.balance ?? c.current_balance)
               return (
                 <div key={c.id}
-                  className={cardCls + ' p-4 flex items-start gap-4 cursor-pointer transition-colors hover:bg-[var(--surface-2)] hover:border-[#d1d5db]'}
+                  className={cardCls + ' cult-card p-4 flex items-start gap-4 cursor-pointer hover:border-[#d1d5db]'}
                   onClick={() => router.push(`/clientes/${c.id}`)}>
                   <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
                     style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
@@ -245,7 +247,7 @@ export default function ClientesPage() {
                   </div>
                   <div className="flex gap-2 flex-shrink-0">
                     <button onClick={(e) => { e.stopPropagation(); openEdit(c) }}
-                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[var(--surface-2)]"
+                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[#f3f4f6]"
                       style={{ color: '#0A5C8A' }}>
                       Editar
                     </button>
