@@ -1,6 +1,8 @@
 'use client'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import CountUp from '@/components/CountUp'
+import FadeIn from '@/components/FadeIn'
 import Map, { Marker } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { dashboardApi, gpsApi } from '@/lib/api'
@@ -44,7 +46,7 @@ interface Position {
   user_id: string; repartidor: string; latitude: number; longitude: number
   speed: number; recorded_at: string; route_status: string
 }
-interface Alert { overdue_clients: number; stopped_routes: number; pending_closings: number }
+interface Alert { overdue_clients: number; stopped_routes: number; pending_closings: number; out_of_zone: number; out_of_zone_names?: string[]; paused_routes?: number; paused_routes_names?: string[] }
 interface Product { id: string; name: string; price: number }
 interface Client { id: string; name: string; address: string; phone: string; balance: number }
 
@@ -77,7 +79,7 @@ function StatCard({ label, value, sub, color, icon }: {
   label: string; value: string | number; sub?: string; color?: string; icon: string
 }) {
   return (
-    <div style={{ background: D.surface, border: `1px solid ${D.border}`, borderRadius: 12, padding: '14px 16px' }}>
+    <div className="cult-card" style={{ background: D.surface, border: `1px solid ${D.border}`, borderRadius: 12, padding: '14px 16px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
           <p style={{ fontSize: 10, fontWeight: 600, color: D.muted, textTransform: 'uppercase', letterSpacing: '0.8px' }}>{label}</p>
@@ -365,6 +367,7 @@ export default function Dashboard() {
   const [lastUpdate, setLastUpdate]   = useState<Date>(new Date())
   const [selectedRep, setSelectedRep] = useState<string | null>(null)
   const [showVentaDeposito, setShowVentaDeposito] = useState(false)
+  const [fabOpen, setFabOpen]         = useState(false)
   const [ventaOk, setVentaOk]         = useState(false)
   const intervalRef = useRef<NodeJS.Timeout>()
 
@@ -479,19 +482,27 @@ export default function Dashboard() {
       <div style={{ flex: 1, padding: '20px 24px', maxWidth: 1400, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', height: '100vh' }}>
 
         {/* ALERTAS */}
-        {alerts && (alerts.overdue_clients > 0 || alerts.stopped_routes > 0) && (
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {alerts && (alerts.overdue_clients > 0 || alerts.stopped_routes > 0 || (alerts.out_of_zone ?? 0) > 0) && (
+          <FadeIn style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {alerts.overdue_clients > 0 && (
-              <div style={{ padding: '6px 12px', background: '#fb923c15', border: '1px solid #fb923c30', borderRadius: 8, fontSize: 11, fontWeight: 600, color: '#fb923c' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: '#fb923c22', border: '1px solid #fb923c55', borderRadius: 10, fontSize: 12, fontWeight: 700, color: '#fb923c' }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fb923c', animation: 'pulse 1.5s infinite', flexShrink: 0 }} />
                 ⚠️ {alerts.overdue_clients} cliente(s) con saldo vencido
               </div>
             )}
             {alerts.stopped_routes > 0 && (
-              <div style={{ padding: '6px 12px', background: '#f8717115', border: '1px solid #f8717130', borderRadius: 8, fontSize: 11, fontWeight: 600, color: '#f87171' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: '#f8717122', border: '1px solid #f8717155', borderRadius: 10, fontSize: 12, fontWeight: 700, color: '#f87171' }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f87171', animation: 'pulse 1.5s infinite', flexShrink: 0 }} />
                 🛑 {alerts.stopped_routes} ruta(s) sin movimiento GPS
               </div>
             )}
-          </div>
+            {(alerts.out_of_zone ?? 0) > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: '#38bdf822', border: '1px solid #38bdf855', borderRadius: 10, fontSize: 12, fontWeight: 700, color: '#38bdf8' }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#38bdf8', animation: 'pulse 1.5s infinite', flexShrink: 0 }} />
+                📍 {alerts.out_of_zone} repartidor(es) fuera de zona
+              </div>
+            )}
+          </FadeIn>
         )}
 
         {/* STAT CARDS */}
@@ -650,6 +661,56 @@ export default function Dashboard() {
           BYF Soluciones · TROMEN · Panel Administrativo · Se actualiza cada 30 segundos
         </p>
       </div>
+
+      {/* BOTÓN FLOTANTE (FAB) */}
+      <div style={{ position: 'fixed', bottom: 28, right: 28, zIndex: 60, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 12 }}>
+
+        {/* Panel de alertas con detalle (arriba de las acciones) */}
+        {fabOpen && ((alerts?.out_of_zone_names?.length ?? 0) > 0 || (alerts?.paused_routes_names?.length ?? 0) > 0) && (
+          <FadeIn style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', maxWidth: 280 }}>
+            {(alerts?.out_of_zone_names ?? []).map((nombre, i) => (
+              <div key={'oz' + i} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#38bdf8', color: '#0f1117', borderRadius: 12, padding: '9px 14px', fontSize: 12, fontWeight: 700, boxShadow: '0 4px 14px rgba(0,0,0,0.3)' }}>
+                📍 {nombre} fuera de zona de reparto
+              </div>
+            ))}
+            {(alerts?.paused_routes_names ?? []).map((nombre, i) => (
+              <div key={'pr' + i} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fbbf24', color: '#0f1117', borderRadius: 12, padding: '9px 14px', fontSize: 12, fontWeight: 700, boxShadow: '0 4px 14px rgba(0,0,0,0.3)' }}>
+                ⏸️ {nombre} pausó su ruta
+              </div>
+            ))}
+          </FadeIn>
+        )}
+
+        {/* Acciones que se despliegan */}
+        {fabOpen && (
+          <FadeIn style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-end' }}>
+            <button onClick={() => { router.push('/rutas/nueva'); setFabOpen(false) }} className="cult-btn"
+              style={{ display: 'flex', alignItems: 'center', gap: 8, background: D.blue, color: '#fff', borderRadius: 30, padding: '10px 18px', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(0,0,0,0.3)' }}>
+              🚚 Nueva ruta
+            </button>
+            <button onClick={() => { setShowVentaDeposito(true); setFabOpen(false) }} className="cult-btn"
+              style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f97316', color: '#fff', borderRadius: 30, padding: '10px 18px', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(0,0,0,0.3)' }}>
+              🏪 Venta depósito
+            </button>
+            <button onClick={() => { router.push('/stock'); setFabOpen(false) }} className="cult-btn"
+              style={{ display: 'flex', alignItems: 'center', gap: 8, background: D.surface2, color: D.text, borderRadius: 30, padding: '10px 18px', fontSize: 13, fontWeight: 700, border: `1px solid ${D.border}`, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(0,0,0,0.3)' }}>
+              📊 Stock
+            </button>
+          </FadeIn>
+        )}
+
+        {/* Botón principal redondo */}
+        <button onClick={() => setFabOpen(o => !o)}
+          style={{ position: 'relative', width: 60, height: 60, borderRadius: '50%', background: D.accent, color: '#0f1117', fontSize: 28, fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 20px rgba(56,189,248,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: fabOpen ? 'rotate(45deg)' : 'rotate(0deg)', transition: 'transform 0.25s ease', overflow: 'visible' }}>
+          +
+          {/* Badge de notificaciones */}
+          {alerts && ((alerts.out_of_zone ?? 0) + (alerts.paused_routes ?? 0)) > 0 && !fabOpen && (
+            <span style={{ position: 'absolute', top: -4, right: -4, minWidth: 24, height: 24, padding: '0 6px', borderRadius: 12, background: '#ef4444', color: '#fff', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #0f1117', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' }}>
+              {(alerts.out_of_zone ?? 0) + (alerts.paused_routes ?? 0)}
+            </span>
+          )}
+        </button>
+      </div>
     </div>
   )
 }
@@ -702,6 +763,7 @@ function ClientBalances() {
           </div>
         ))
       }
+
     </div>
   )
 }
