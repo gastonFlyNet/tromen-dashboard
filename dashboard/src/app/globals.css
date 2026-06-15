@@ -159,3 +159,11 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 12px 28px rgba(0,0,0,0.15);
 }
+
+/* Fila de lista: se desliza a la derecha + resalta al hover */
+.cult-row {
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.cult-row:hover {
+  transform: translateX(4px);
+}

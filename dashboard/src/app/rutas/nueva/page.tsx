@@ -164,7 +164,7 @@ export default function NuevaRutaPage() {
           </div>
         </div>
         <button onClick={handleCreate} disabled={saving || selected.length === 0 || !assignedTo}
-          className="text-white rounded-xl px-5 py-2 text-sm font-bold transition-all hover:brightness-110 disabled:opacity-40"
+          className="cult-btn text-white rounded-xl px-5 py-2 text-sm font-bold disabled:opacity-40"
           style={{ background: '#16a34a' }}>
           {saving ? 'Creando...' : `✓ Crear ruta (${selected.length})`}
         </button>
@@ -184,7 +184,7 @@ export default function NuevaRutaPage() {
           <div className="space-y-4">
 
             {/* Configuración */}
-            <div className={cardCls + ' p-5'}>
+            <div className={cardCls + ' cult-card p-5'}>
               <h3 className="font-bold text-[#1f2937] mb-4">⚙️ Configuración de la ruta</h3>
               <div className="space-y-4">
 
@@ -250,7 +250,7 @@ export default function NuevaRutaPage() {
             </div>
 
             {/* Lista clientes seleccionados */}
-            <div className={cardCls + ' overflow-hidden'}>
+            <div className={cardCls + ' cult-card overflow-hidden'}>
               <div className="px-5 py-4 border-b border-[#e5e7eb] flex items-center justify-between">
                 <h3 className="font-bold text-[#1f2937]">
                   📋 Paradas de la ruta
@@ -324,7 +324,7 @@ export default function NuevaRutaPage() {
                 return (
                   <button key={c.id}
                     onClick={() => toggleClient(c)}
-                    className="w-full text-left p-4 transition-colors flex items-center gap-3 hover:bg-[#f3f4f6]">
+                    className="cult-row w-full text-left p-4 flex items-center gap-3 hover:bg-[#f3f4f6]">
                     <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
                       style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
                       {c.name?.charAt(0).toUpperCase()}
@@ -355,7 +355,7 @@ export default function NuevaRutaPage() {
         {/* BOTON CREAR móvil */}
         <div className="mt-6 lg:hidden">
           <button onClick={handleCreate} disabled={saving || selected.length === 0 || !assignedTo}
-            className="w-full text-white rounded-xl py-4 text-base font-bold transition-all hover:brightness-110 disabled:opacity-40"
+            className="cult-btn w-full text-white rounded-xl py-4 text-base font-bold disabled:opacity-40"
             style={{ background: '#16a34a' }}>
             {saving ? 'Creando ruta...' : `✓ Crear ruta (${selected.length} clientes)`}
           </button>
