@@ -119,11 +119,11 @@ export default function ProductosPage() {
   // ---- estilos reutilizables (tokens del design system) ----
   const inputCls =
     'w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-[var(--surface-3)] ' +
-    'border border-[var(--border)] text-[var(--text)] placeholder-[var(--text-faint)] ' +
-    'focus:outline-none focus:border-[var(--primary)] transition-colors'
-  const labelCls = 'text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide'
+    'border border-[#e5e7eb] text-[#1f2937] placeholder-[#9ca3af] ' +
+    'focus:outline-none focus:border-[#0A5C8A] transition-colors'
+  const labelCls = 'text-xs font-semibold text-[#6b7280] uppercase tracking-wide'
   const cardCls =
-    'rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-sm)]'
+    'rounded-2xl bg-[#ffffff] border border-[#e5e7eb] shadow-[0 1px 3px rgba(0,0,0,0.1)]'
 
   return (
     <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
@@ -153,18 +153,18 @@ export default function ProductosPage() {
 
         {error && (
           <div className="rounded-xl p-3 text-sm mb-4"
-            style={{ background: 'var(--danger-soft)', color: 'var(--danger)', border: '1px solid var(--danger)' }}>
+            style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #dc2626' }}>
             {error}
           </div>
         )}
 
         {/* INFO */}
         <div className="rounded-xl p-4 mb-6 flex items-start gap-3"
-          style={{ background: 'var(--primary-soft)', border: '1px solid var(--border)' }}>
+          style={{ background: '#e0f2fe', border: '1px solid #e5e7eb' }}>
           <span className="text-2xl">💡</span>
           <div>
-            <p className="font-semibold text-sm" style={{ color: 'var(--text)' }}>Precios que ve el repartidor</p>
-            <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+            <p className="font-semibold text-sm" style={{ color: '#1f2937' }}>Precios que ve el repartidor</p>
+            <p className="text-xs mt-1" style={{ color: '#6b7280' }}>
               Estos precios aparecen en la app del repartidor al registrar una entrega.
               Podés editarlos en cualquier momento y se actualizan automáticamente.
             </p>
@@ -173,7 +173,7 @@ export default function ProductosPage() {
 
         {/* LISTA */}
         {loading ? (
-          <div className="text-center py-20 text-[var(--text-faint)]">Cargando productos...</div>
+          <div className="text-center py-20 text-[#9ca3af]">Cargando productos...</div>
         ) : (
           <div className="space-y-3">
             {products.map(p => (
@@ -183,38 +183,38 @@ export default function ProductosPage() {
                 <div className="flex items-center gap-4">
                   {/* Orden */}
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                    style={{ background: 'var(--primary-soft)', color: 'var(--primary)' }}>
+                    style={{ background: '#e0f2fe', color: '#0A5C8A' }}>
                     {p.sort_order}
                   </div>
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-bold text-[var(--text)]">{p.name}</p>
+                      <p className="font-bold text-[#1f2937]">{p.name}</p>
                       <span className="text-xs px-2 py-0.5 rounded-full"
-                        style={{ background: 'var(--surface-3)', color: 'var(--text-muted)' }}>
+                        style={{ background: 'var(--surface-3)', color: '#6b7280' }}>
                         por {p.unit}
                       </span>
                       {p.has_empty_return && (
                         <span className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: 'var(--warning-soft)', color: 'var(--warning)' }}>
+                          style={{ background: '#fef3c7', color: '#d97706' }}>
                           🫙 devuelve envase
                         </span>
                       )}
                       {!p.active && (
                         <span className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: 'var(--danger-soft)', color: 'var(--danger)' }}>Inactivo</span>
+                          style={{ background: '#fee2e2', color: '#dc2626' }}>Inactivo</span>
                       )}
                     </div>
                   </div>
 
                   {/* Precio editable rápido */}
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-[var(--text-faint)] text-sm">$</span>
+                    <span className="text-[#9ca3af] text-sm">$</span>
                     <input
                       type="number"
-                      className="w-28 rounded-xl px-3 py-2 text-sm font-bold text-center bg-[var(--surface-3)] border border-[var(--border)] focus:outline-none focus:border-[var(--primary)] transition-colors"
-                      style={{ color: 'var(--primary)' }}
+                      className="w-28 rounded-xl px-3 py-2 text-sm font-bold text-center bg-[var(--surface-3)] border border-[#e5e7eb] focus:outline-none focus:border-[#0A5C8A] transition-colors"
+                      style={{ color: '#0A5C8A' }}
                       defaultValue={Number(p.price)}
                       onBlur={e => {
                         if (e.target.value !== String(Number(p.price))) {
@@ -234,12 +234,12 @@ export default function ProductosPage() {
                   <div className="flex gap-2 flex-shrink-0">
                     <button onClick={() => openEdit(p)}
                       className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[var(--surface-2)]"
-                      style={{ color: 'var(--primary)' }}>
+                      style={{ color: '#0A5C8A' }}>
                       Editar
                     </button>
                     <button onClick={() => handleToggleActive(p)}
                       className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:brightness-125"
-                      style={{ color: p.active ? 'var(--danger)' : 'var(--success)' }}>
+                      style={{ color: p.active ? '#dc2626' : '#16a34a' }}>
                       {p.active ? 'Desactivar' : 'Activar'}
                     </button>
                   </div>
@@ -248,12 +248,12 @@ export default function ProductosPage() {
             ))}
 
             {products.length === 0 && (
-              <div className="text-center py-20 text-[var(--text-faint)]">
+              <div className="text-center py-20 text-[#9ca3af]">
                 <p className="text-4xl mb-3">🛒</p>
                 <p>No hay productos cargados</p>
                 <button onClick={openNew}
                   className="mt-4 text-white rounded-xl px-6 py-2 text-sm font-bold"
-                  style={{ background: 'var(--primary)' }}>
+                  style={{ background: '#0A5C8A' }}>
                   + Agregar primer producto
                 </button>
               </div>
