@@ -200,13 +200,13 @@ export default function GeocercasPage() {
         <div className="flex items-center gap-3">
           {drawMode === 'idle' && (
             <button onClick={() => { cancelDraw(); setDrawMode('circle') }}
-              className="bg-green-500 hover:bg-green-600 text-white rounded-xl px-4 py-2 text-sm font-bold transition-all">
+              className="cult-btn bg-green-500 text-white rounded-xl px-4 py-2 text-sm font-bold">
               ✏️ Dibujar geocerca
             </button>
           )}
           {drawMode !== 'idle' && (
             <button onClick={cancelDraw}
-              className="bg-red-500 hover:bg-red-600 text-white rounded-xl px-4 py-2 text-sm font-bold transition-all">
+              className="cult-btn bg-red-500 text-white rounded-xl px-4 py-2 text-sm font-bold">
               ✕ Cancelar
             </button>
           )}
@@ -390,7 +390,7 @@ export default function GeocercasPage() {
               const tipo = getTipo(g.type)
               return (
                 <div key={g.id}
-                  className={`rounded-xl p-3 mb-2 border transition-all ${g.active ? 'bg-white border-gray-100' : 'bg-gray-50 border-gray-100 opacity-60'}`}>
+                  className={`cult-card rounded-xl p-3 mb-2 border ${g.active ? 'bg-white border-gray-100' : 'bg-gray-50 border-gray-100 opacity-60'}`}>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full flex-shrink-0"

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
+import FadeIn from '@/components/FadeIn'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -243,7 +244,7 @@ export default function PlantillasPage() {
             <p style={{ fontSize: 11, color: D.muted, margin: 0 }}>Rutas fijas por día de la semana</p>
           </div>
         </div>
-        <button onClick={openNew}
+        <button onClick={openNew} className="cult-btn"
           style={{ background: '#16a34a', color: '#fff', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
           + Nueva plantilla
         </button>
@@ -286,9 +287,9 @@ export default function PlantillasPage() {
             </button>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <FadeIn style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {templates.map(t => (
-              <div key={t.id} style={{ background: D.surface, border: `1px solid ${D.border}`, borderRadius: 14, padding: 16 }}>
+              <div key={t.id} className="cult-card" style={{ background: D.surface, border: `1px solid ${D.border}`, borderRadius: 14, padding: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                   <div style={{ width: 48, height: 48, borderRadius: 12, background: `${D.accent}18`, color: D.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0, textAlign: 'center', lineHeight: 1.1 }}>
                     {weekdayLabel(t.weekday).slice(0, 3)}
@@ -302,7 +303,7 @@ export default function PlantillasPage() {
                     </p>
                   </div>
                   <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                    <button onClick={() => { setGenerateConfirm(t); setGenerateDate(new Date().toISOString().slice(0, 10)) }}
+                    <button onClick={() => { setGenerateConfirm(t); setGenerateDate(new Date().toISOString().slice(0, 10)) }} className="cult-btn"
                       style={{ background: '#16a34a', color: '#fff', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
                       ⚡ Generar ruta
                     </button>
@@ -318,7 +319,7 @@ export default function PlantillasPage() {
                 </div>
               </div>
             ))}
-          </div>
+          </FadeIn>
         )}
       </div>
 
