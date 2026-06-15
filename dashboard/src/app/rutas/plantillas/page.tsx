@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Sidebar from '@/components/Sidebar'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -228,18 +229,18 @@ export default function PlantillasPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: D.bg }}>
+    <div style={{ minHeight: '100vh', background: D.bg, display: 'flex', flexDirection: 'row' }}>
 
-      <nav style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
+      <Sidebar />
+
+      <div style={{ flex: 1, height: '100vh', overflowY: 'auto' }}>
+
+      <nav style={{ background: D.surface, borderBottom: `1px solid ${D.border}`, padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => router.push('/')}
-            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.8)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
-            ← Volver
-          </button>
           <span style={{ fontSize: 22 }}>📋</span>
           <div>
-            <h1 style={{ fontSize: 17, fontWeight: 700, color: '#fff', margin: 0 }}>Plantillas de ruta</h1>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: 0 }}>Rutas fijas por día de la semana</p>
+            <h1 style={{ fontSize: 17, fontWeight: 700, color: D.text, margin: 0 }}>Plantillas de ruta</h1>
+            <p style={{ fontSize: 11, color: D.muted, margin: 0 }}>Rutas fijas por día de la semana</p>
           </div>
         </div>
         <button onClick={openNew}
@@ -508,6 +509,7 @@ export default function PlantillasPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }
