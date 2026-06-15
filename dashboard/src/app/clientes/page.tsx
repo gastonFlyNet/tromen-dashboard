@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Sidebar from '@/components/Sidebar'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -124,11 +125,11 @@ export default function ClientesPage() {
 
   const inputCls =
     'w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-[var(--surface-3)] ' +
-    'border border-[var(--border)] text-[var(--text)] placeholder-[var(--text-faint)] ' +
-    'focus:outline-none focus:border-[var(--primary)] transition-colors'
-  const labelCls = 'text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide'
+    'border border-[#e5e7eb] text-[#1f2937] placeholder-[#9ca3af] ' +
+    'focus:outline-none focus:border-[#0A5C8A] transition-colors'
+  const labelCls = 'text-xs font-semibold text-[#6b7280] uppercase tracking-wide'
   const cardCls =
-    'rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-sm)]'
+    'rounded-2xl bg-[#ffffff] border border-[#e5e7eb] shadow-[0 1px 3px rgba(0,0,0,0.1)]'
 
   // ---- estilos claros para los modales ----
   const modalInputCls =
@@ -137,23 +138,25 @@ export default function ClientesPage() {
   const modalLabelCls = 'text-xs font-semibold text-gray-500 uppercase tracking-wide'
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
+    <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
 
-      {/* NAVBAR */}
-      <nav className="px-6 py-4 flex items-center justify-between sticky top-0 z-30 border-b border-[var(--border)]"
-        style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)', boxShadow: 'var(--shadow)' }}>
+      <Sidebar />
+
+      <div style={{ flex: 1, height: '100vh', overflowY: 'auto' }}>
+
+      {/* HEADER */}
+      <nav className="px-6 py-4 flex items-center justify-between sticky top-0 z-30"
+        style={{ background: '#151b27', borderBottom: '1px solid #1e2d40' }}>
         <div className="flex items-center gap-3">
-          <button onClick={() => router.push('/')}
-            className="text-white/70 hover:text-white text-sm mr-2 transition-colors">← Volver</button>
           <span className="text-2xl">👥</span>
           <div>
-            <h1 className="font-bold text-lg text-white">Clientes</h1>
-            <p className="text-white/60 text-xs">TROMEN · Catriel</p>
+            <h1 className="font-bold text-lg" style={{ color: '#f1f5f9' }}>Clientes</h1>
+            <p className="text-xs" style={{ color: '#64748b' }}>TROMEN · Catriel</p>
           </div>
         </div>
         <button onClick={openNew}
           className="text-white rounded-xl px-4 py-2 text-sm font-bold transition-all hover:brightness-110"
-          style={{ background: 'var(--success)' }}>
+          style={{ background: '#16a34a' }}>
           + Nuevo cliente
         </button>
       </nav>
@@ -163,7 +166,7 @@ export default function ClientesPage() {
         {/* BUSCADOR */}
         <div className="mb-5">
           <input
-            className={inputCls + ' !mt-0 py-3 shadow-[var(--shadow-sm)]'}
+            className={inputCls + ' !mt-0 py-3 shadow-[0 1px 3px rgba(0,0,0,0.1)]'}
             placeholder="🔍 Buscar por nombre, dirección o zona..."
             value={search} onChange={e => setSearch(e.target.value)}
           />
@@ -172,29 +175,29 @@ export default function ClientesPage() {
         {/* STATS */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           {([
-            ['Total clientes', clients.length, '👥', 'var(--primary)'],
-            ['Con GPS', clients.filter(c => c.latitude && c.longitude).length, '📍', 'var(--success)'],
-            ['Con saldo', clients.filter(c => Number(c.balance ?? c.current_balance) > 0).length, '💰', 'var(--warning)'],
+            ['Total clientes', clients.length, '👥', '#0A5C8A'],
+            ['Con GPS', clients.filter(c => c.latitude && c.longitude).length, '📍', '#16a34a'],
+            ['Con saldo', clients.filter(c => Number(c.balance ?? c.current_balance) > 0).length, '💰', '#d97706'],
           ] as const).map(([l, v, e, c]) => (
             <div key={l} className={cardCls + ' p-4 text-center'}>
               <p className="text-2xl">{e}</p>
               <p className="text-2xl font-bold mt-1" style={{ color: c }}>{v}</p>
-              <p className="text-xs text-[var(--text-faint)] mt-1">{l}</p>
+              <p className="text-xs text-[#9ca3af] mt-1">{l}</p>
             </div>
           ))}
         </div>
 
         {/* LISTA */}
         {loading ? (
-          <div className="text-center py-20 text-[var(--text-faint)]">Cargando clientes...</div>
+          <div className="text-center py-20 text-[#9ca3af]">Cargando clientes...</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-[var(--text-faint)]">
+          <div className="text-center py-20 text-[#9ca3af]">
             <p className="text-4xl mb-3">👥</p>
             <p>{search ? 'Sin resultados para esa búsqueda' : 'No hay clientes cargados'}</p>
             {!search && (
               <button onClick={openNew}
                 className="mt-4 text-white rounded-xl px-6 py-2 text-sm font-bold"
-                style={{ background: 'var(--primary)' }}>
+                style={{ background: '#0A5C8A' }}>
                 + Agregar primer cliente
               </button>
             )}
@@ -206,7 +209,7 @@ export default function ClientesPage() {
               const balance = Number(c.balance ?? c.current_balance)
               return (
                 <div key={c.id}
-                  className={cardCls + ' p-4 flex items-start gap-4 cursor-pointer transition-colors hover:bg-[var(--surface-2)] hover:border-[var(--border-strong)]'}
+                  className={cardCls + ' p-4 flex items-start gap-4 cursor-pointer transition-colors hover:bg-[var(--surface-2)] hover:border-[#d1d5db]'}
                   onClick={() => router.push(`/clientes/${c.id}`)}>
                   <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
                     style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
@@ -214,28 +217,28 @@ export default function ClientesPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-bold text-[var(--text)]">{c.name}</p>
+                      <p className="font-bold text-[#1f2937]">{c.name}</p>
                       {c.zone && (
                         <span className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: 'var(--primary-soft)', color: 'var(--primary)' }}>{c.zone}</span>
+                          style={{ background: '#e0f2fe', color: '#0A5C8A' }}>{c.zone}</span>
                       )}
                       {hasGps
                         ? <span className="text-xs px-2 py-0.5 rounded-full"
-                            style={{ background: 'var(--success-soft)', color: 'var(--success)' }}>📍 GPS OK</span>
+                            style={{ background: '#dcfce7', color: '#16a34a' }}>📍 GPS OK</span>
                         : <span className="text-xs px-2 py-0.5 rounded-full"
-                            style={{ background: 'var(--danger-soft)', color: 'var(--danger)' }}>Sin GPS</span>
+                            style={{ background: '#fee2e2', color: '#dc2626' }}>Sin GPS</span>
                       }
                       {balance > 0 && (
                         <span className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: 'var(--warning-soft)', color: 'var(--warning)' }}>
+                          style={{ background: '#fef3c7', color: '#d97706' }}>
                           💰 ${balance.toLocaleString('es-AR')}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-[var(--text-muted)] mt-1">📍 {c.address}</p>
-                    {c.phone && <p className="text-xs text-[var(--text-faint)] mt-0.5">📞 {c.phone}</p>}
+                    <p className="text-sm text-[#6b7280] mt-1">📍 {c.address}</p>
+                    {c.phone && <p className="text-xs text-[#9ca3af] mt-0.5">📞 {c.phone}</p>}
                     {hasGps && (
-                      <p className="text-xs text-[var(--text-faint)] mt-0.5">
+                      <p className="text-xs text-[#9ca3af] mt-0.5">
                         {Number(c.latitude).toFixed(5)}, {Number(c.longitude).toFixed(5)}
                       </p>
                     )}
@@ -243,12 +246,12 @@ export default function ClientesPage() {
                   <div className="flex gap-2 flex-shrink-0">
                     <button onClick={(e) => { e.stopPropagation(); openEdit(c) }}
                       className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[var(--surface-2)]"
-                      style={{ color: 'var(--primary)' }}>
+                      style={{ color: '#0A5C8A' }}>
                       Editar
                     </button>
                     <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(c.id) }}
-                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[var(--danger-soft)]"
-                      style={{ color: 'var(--danger)' }}>
+                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[#fee2e2]"
+                      style={{ color: '#dc2626' }}>
                       Borrar
                     </button>
                   </div>
@@ -379,6 +382,7 @@ export default function ClientesPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }
