@@ -1,6 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import Sidebar from '@/components/Sidebar'
+import FadeIn from '@/components/FadeIn'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -107,36 +109,46 @@ export default function ClienteDetallePage() {
   const totalNoEntregas = deliveries.filter(d => d.status === 'no_entregado').length
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#F0F7FC' }}>
-      <div className="text-center">
-        <div className="text-4xl mb-4">💧</div>
-        <p className="text-gray-400">Cargando historial...</p>
+    <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
+      <Sidebar />
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="text-center">
+          <div className="animate-spin" style={{ width: 40, height: 40, border: '3px solid #1e2d40', borderTopColor: '#38bdf8', borderRadius: '50%', margin: '0 auto' }} />
+          <p style={{ color: '#64748b', marginTop: 16, fontSize: 14 }}>Cargando historial...</p>
+        </div>
       </div>
     </div>
   )
 
   if (error) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#F0F7FC' }}>
-      <div className="text-center">
-        <p className="text-red-500">{error}</p>
-        <button onClick={() => router.back()} className="mt-4 text-blue-600">← Volver</button>
+    <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
+      <Sidebar />
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="text-center">
+          <p style={{ color: '#f87171' }}>{error}</p>
+          <button onClick={() => router.push('/clientes')} style={{ marginTop: 16, color: '#38bdf8', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>← Clientes</button>
+        </div>
       </div>
     </div>
   )
 
   return (
-    <div className="min-h-screen" style={{ background: '#F0F7FC' }}>
+    <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
 
-      {/* NAVBAR */}
-      <nav className="text-white px-6 py-4 flex items-center justify-between shadow-lg"
-        style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
+      <Sidebar />
+
+      <div style={{ flex: 1, height: '100vh', overflowY: 'auto' }}>
+
+      {/* HEADER */}
+      <nav className="px-6 py-4 flex items-center justify-between sticky top-0 z-30"
+        style={{ background: '#151b27', borderBottom: '1px solid #1e2d40' }}>
         <div className="flex items-center gap-3">
           <button onClick={() => router.push('/clientes')}
-            className="text-blue-200 hover:text-white text-sm mr-2">← Clientes</button>
+            style={{ color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}>← Clientes</button>
           <span className="text-2xl">👤</span>
           <div>
-            <h1 className="font-bold text-lg">{client?.name}</h1>
-            <p className="text-blue-200 text-xs">{client?.address}</p>
+            <h1 className="font-bold text-lg" style={{ color: '#f1f5f9' }}>{client?.name}</h1>
+            <p className="text-xs" style={{ color: '#64748b' }}>{client?.address}</p>
           </div>
         </div>
       </nav>
@@ -187,19 +199,19 @@ export default function ClienteDetallePage() {
         </div>
 
         {/* ESTADÍSTICAS */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <FadeIn className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'Total cobrado', value: `$ ${totalCobrado.toLocaleString('es-AR')}`, color: '#1DB954', emoji: '💰' },
             { label: 'Total fiado',   value: `$ ${totalFiado.toLocaleString('es-AR')}`,   color: '#E67E22', emoji: '📒' },
             { label: 'Entregas',      value: totalEntregas,                                color: '#0A5C8A', emoji: '✅' },
             { label: 'No entregadas', value: totalNoEntregas,                              color: '#C0392B', emoji: '❌' },
           ].map(stat => (
-            <div key={stat.label} className="bg-white rounded-2xl p-4 shadow-sm border border-blue-50">
+            <div key={stat.label} className="cult-card bg-white rounded-2xl p-4 shadow-sm border border-blue-50">
               <p className="text-xs text-gray-400 uppercase font-semibold">{stat.label}</p>
               <p className="text-xl font-bold mt-1" style={{ color: stat.color }}>{stat.value}</p>
             </div>
           ))}
-        </div>
+        </FadeIn>
 
         {/* HISTORIAL */}
         <div className="bg-white rounded-2xl shadow-sm border border-blue-50 overflow-hidden">
@@ -371,6 +383,7 @@ export default function ClienteDetallePage() {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   )
