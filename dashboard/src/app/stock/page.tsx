@@ -2,6 +2,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
+import CountUp from '@/components/CountUp'
+import FadeIn from '@/components/FadeIn'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -125,7 +127,7 @@ export default function StockPage() {
           </div>
         </div>
         <button onClick={loadData}
-          className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all"
+          className="cult-btn rounded-lg px-3 py-1.5 text-sm font-semibold"
           style={{ background: 'rgba(56,189,248,0.14)', color: '#38bdf8' }}>
           ↻ Actualizar
         </button>
@@ -134,30 +136,30 @@ export default function StockPage() {
       <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
 
         {/* STATS */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
+        <FadeIn className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="cult-card bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total en stock</p>
-            <p className="text-3xl font-bold mt-1" style={{ color: '#0A5C8A' }}>{totalStock}</p>
+            <p className="text-3xl font-bold mt-1" style={{ color: '#0A5C8A' }}><CountUp end={totalStock} /></p>
             <p className="text-xs text-gray-400 mt-1">unidades totales</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
+          <div className="cult-card bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Productos</p>
-            <p className="text-3xl font-bold mt-1" style={{ color: '#1A7A4A' }}>{products.length}</p>
+            <p className="text-3xl font-bold mt-1" style={{ color: '#1A7A4A' }}><CountUp end={products.length} /></p>
             <p className="text-xs text-gray-400 mt-1">en catálogo activo</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
+          <div className="cult-card bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Stock bajo</p>
             <p className="text-3xl font-bold mt-1" style={{ color: lowStock.length > 0 ? '#C0392B' : '#1A7A4A' }}>
-              {lowStock.length}
+              <CountUp end={lowStock.length} />
             </p>
             <p className="text-xs text-gray-400 mt-1">productos con poco stock</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
+          <div className="cult-card bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Movimientos</p>
-            <p className="text-3xl font-bold mt-1" style={{ color: '#0A5C8A' }}>{history.length}</p>
+            <p className="text-3xl font-bold mt-1" style={{ color: '#0A5C8A' }}><CountUp end={history.length} /></p>
             <p className="text-xs text-gray-400 mt-1">registrados en total</p>
           </div>
-        </div>
+        </FadeIn>
 
         {/* ALERTA STOCK BAJO */}
         {lowStock.length > 0 && (
@@ -227,7 +229,7 @@ export default function StockPage() {
               {/* Tipo */}
               <div className="grid grid-cols-2 gap-2">
                 <button onClick={() => setMovType('entrada')}
-                  className="py-2.5 rounded-xl text-sm font-bold transition-all"
+                  className="cult-btn py-2.5 rounded-xl text-sm font-bold"
                   style={{
                     background: movType === 'entrada' ? '#1A7A4A' : '#F0F7FC',
                     color: movType === 'entrada' ? 'white' : '#6b7280'
@@ -235,7 +237,7 @@ export default function StockPage() {
                   ⬆️ Entrada
                 </button>
                 <button onClick={() => setMovType('salida')}
-                  className="py-2.5 rounded-xl text-sm font-bold transition-all"
+                  className="cult-btn py-2.5 rounded-xl text-sm font-bold"
                   style={{
                     background: movType === 'salida' ? '#C0392B' : '#F0F7FC',
                     color: movType === 'salida' ? 'white' : '#6b7280'
@@ -331,7 +333,7 @@ export default function StockPage() {
               )}
 
               <button onClick={handleMovement} disabled={saving}
-                className="w-full py-3 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-40"
+                className="cult-btn w-full py-3 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-40"
                 style={{ background: movType === 'entrada' ? '#1A7A4A' : '#C0392B' }}>
                 {saving ? 'Guardando...' : `Registrar ${movType}`}
               </button>
