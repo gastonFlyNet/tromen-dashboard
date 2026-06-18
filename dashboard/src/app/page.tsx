@@ -462,6 +462,7 @@ export default function Dashboard() {
         </div>
         <nav style={{ flex: 1, padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto' }}>
           <button style={sideBtnStyle()} onClick={() => router.push('/clientes')}>👥 Clientes</button>
+          <button style={sideBtnStyle()} onClick={() => router.push('/repartidores')}>🚚 Repartidores</button>
           <button style={sideBtnStyle()} onClick={() => router.push('/productos')}>📦 Productos</button>
           <button style={sideBtnStyle()} onClick={() => router.push('/stock')}>📊 Stock</button>
           <button style={sideBtnStyle()} onClick={() => router.push('/geocercas')}>🗺️ Geocercas</button>
@@ -531,7 +532,7 @@ export default function Dashboard() {
                 style={{ width: '100%', height: '100%' }}
                 mapStyle="mapbox://styles/mapbox/dark-v11">
                 {positions.map(pos => (
-                  <Marker key={pos.user_id} longitude={pos.longitude} latitude={pos.latitude}>
+                  <Marker key={pos.user_id} longitude={Number(pos.longitude)} latitude={Number(pos.latitude)}>
                     <div style={{ position: 'relative', cursor: 'pointer' }}
                       onClick={() => setSelectedRep(selectedRep === pos.user_id ? null : pos.user_id)}>
                       <div style={{ width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: '2px solid #1e2d40', background: STATUS_COLOR[pos.route_status] + '33', boxShadow: `0 0 12px ${STATUS_COLOR[pos.route_status]}66` }}>

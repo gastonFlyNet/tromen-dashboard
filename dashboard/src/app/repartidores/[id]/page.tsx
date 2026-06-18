@@ -3,6 +3,8 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Map, { Marker, Source, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import Sidebar from '@/components/Sidebar'
+import FadeIn from '@/components/FadeIn'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
@@ -19,6 +21,21 @@ async function apiFetch(path: string, options?: RequestInit) {
   })
   if (!res.ok) throw new Error(await res.text())
   return res.json()
+}
+
+function calcularKm(points) {
+  if (points.length < 2) return 0
+  const R = 6371
+  let total = 0
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1], b = points[i]
+    const dLat = (b.lat - a.lat) * Math.PI / 180
+    const dLng = (b.lng - a.lng) * Math.PI / 180
+    const lat1 = a.lat * Math.PI / 180, lat2 = b.lat * Math.PI / 180
+    const x = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2
+    total += R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x))
+  }
+  return total
 }
 
 export default function RepartidorPage() {
@@ -84,41 +101,52 @@ export default function RepartidorPage() {
     try {
       const gps = await apiFetch(`/api/gps/track/${routeId}`)
       const pts = Array.isArray(gps) ? gps : gps.points ?? []
-      setTrackPoints(pts.map((p: any) => ({ lat: p.latitude, lng: p.longitude })))
+      setTrackPoints(pts.map((p: any) => ({ lat: Number(p.latitude), lng: Number(p.longitude) })))
     } catch {} finally { setLoadingTrack(false) }
   }
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50">
-      <div className="text-center">
-        <span className="text-5xl">💧</span>
-        <p className="text-gray-400 mt-3">Cargando repartidor...</p>
+    <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
+      <Sidebar />
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="text-center">
+          <div className="animate-spin" style={{ width: 40, height: 40, border: '3px solid #1e2d40', borderTopColor: '#38bdf8', borderRadius: '50%', margin: '0 auto' }} />
+          <p style={{ color: '#64748b', marginTop: 16, fontSize: 14 }}>Cargando repartidor...</p>
+        </div>
       </div>
     </div>
   )
 
   if (!user) return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50">
-      <p className="text-gray-500">Repartidor no encontrado</p>
+    <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
+      <Sidebar />
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: '#64748b' }}>Repartidor no encontrado</p>
+      </div>
     </div>
   )
 
   const centerLat = trackPoints.length > 0 ? trackPoints[Math.floor(trackPoints.length / 2)].lat : -37.879
   const centerLng = trackPoints.length > 0 ? trackPoints[Math.floor(trackPoints.length / 2)].lng : -67.799
+  const kmRecorridos = calcularKm(trackPoints)
 
   return (
-    <div className="min-h-screen" style={{ background: '#F0F7FC' }}>
+    <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
 
-      {/* NAVBAR */}
-      <nav className="text-white px-6 py-4 flex items-center justify-between shadow-lg"
-        style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
+      <Sidebar />
+
+      <div style={{ flex: 1, height: '100vh', overflowY: 'auto' }}>
+
+      {/* HEADER */}
+      <nav className="px-6 py-4 flex items-center justify-between sticky top-0 z-30"
+        style={{ background: '#151b27', borderBottom: '1px solid #1e2d40' }}>
         <div className="flex items-center gap-3">
-          <button onClick={() => router.push('/')}
-            className="text-blue-200 hover:text-white text-sm mr-2">← Volver</button>
+          <button onClick={() => router.push('/repartidores')}
+            style={{ color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}>← Repartidores</button>
           <span className="text-2xl">🚚</span>
           <div>
-            <h1 className="font-bold text-lg">{user.name}</h1>
-            <p className="text-blue-200 text-xs capitalize">{user.role}</p>
+            <h1 className="font-bold text-lg" style={{ color: '#f1f5f9' }}>{user.name}</h1>
+            <p className="text-xs capitalize" style={{ color: '#64748b' }}>{user.role}</p>
           </div>
         </div>
       </nav>
@@ -216,7 +244,7 @@ export default function RepartidorPage() {
               {selectedDate && (
                 <span className="text-xs text-gray-400">
                   {new Date(selectedDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' })}
-                  {' · '}{trackPoints.length} puntos GPS
+                  {' · '}{trackPoints.length} puntos{kmRecorridos > 0 ? ` · ${kmRecorridos.toFixed(2)} km` : ''}
                 </span>
               )}
             </div>
@@ -270,6 +298,7 @@ export default function RepartidorPage() {
             )}
           </div>
         </div>
+      </div>
       </div>
     </div>
   )

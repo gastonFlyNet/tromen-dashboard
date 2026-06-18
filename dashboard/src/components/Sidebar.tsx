@@ -8,12 +8,13 @@ const D = {
 }
 
 const NAV_ITEMS = [
-  { label: '🏠 Inicio',     path: '/' },
-  { label: '👥 Clientes',   path: '/clientes' },
-  { label: '📦 Productos',  path: '/productos' },
-  { label: '📊 Stock',      path: '/stock' },
-  { label: '🗺️ Geocercas', path: '/geocercas' },
-  { label: '📋 Plantillas', path: '/rutas/plantillas' },
+  { label: '🏠 Inicio',       path: '/' },
+  { label: '👥 Clientes',     path: '/clientes' },
+  { label: '🚚 Repartidores', path: '/repartidores' },
+  { label: '📦 Productos',    path: '/productos' },
+  { label: '📊 Stock',        path: '/stock' },
+  { label: '🗺️ Geocercas',    path: '/geocercas' },
+  { label: '📋 Plantillas',   path: '/rutas/plantillas' },
 ]
 
 export default function Sidebar() {
