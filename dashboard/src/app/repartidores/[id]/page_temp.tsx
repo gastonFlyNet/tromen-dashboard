@@ -107,7 +107,7 @@ export default function RepartidorPage() {
 
   // Parte el recorrido en tramos consecutivos del mismo estado, para colorear cada uno
   const ESTADO_COLOR: Record<string, string> = {
-    con_ruta: '#16a34a', pausa: '#9ca3af', sin_ruta: '#ef4444',
+    con_ruta: '#16a34a', pausa: '#fbbf24', sin_ruta: '#9ca3af',
   }
   const segmentos: { estado: string, coords: [number, number][] }[] = []
   for (let i = 0; i < trackPoints.length; i++) {
@@ -323,10 +323,10 @@ export default function RepartidorPage() {
                   <span style={{ width: 14, height: 4, background: '#16a34a', borderRadius: 2, display: 'inline-block' }} /> Con ruta
                 </span>
                 <span className="flex items-center gap-1.5 text-xs text-gray-600">
-                  <span style={{ width: 14, height: 4, background: '#9ca3af', borderRadius: 2, display: 'inline-block' }} /> Pausada
+                  <span style={{ width: 14, height: 4, background: '#fbbf24', borderRadius: 2, display: 'inline-block' }} /> En pausa
                 </span>
                 <span className="flex items-center gap-1.5 text-xs text-gray-600">
-                  <span style={{ width: 14, height: 4, background: '#ef4444', borderRadius: 2, display: 'inline-block' }} /> Sin ruta
+                  <span style={{ width: 14, height: 4, background: '#9ca3af', borderRadius: 2, display: 'inline-block' }} /> Sin ruta
                 </span>
               </div>
             )}

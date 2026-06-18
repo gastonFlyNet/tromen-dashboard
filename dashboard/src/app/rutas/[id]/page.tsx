@@ -55,7 +55,7 @@ export default function RutaDetallePage() {
   })
   const [savingNewClient, setSavingNewClient]   = useState(false)
   const intervalRef = useRef<NodeJS.Timeout>()
-  const [trackPoints, setTrackPoints] = useState<{lat: number, lng: number}[]>([])
+  const [trackPoints, setTrackPoints] = useState<{lat: number, lng: number, estado?: string}[]>([])
   const loadRoute = useCallback(async () => {
     try {
       const data = await apiFetch(`/api/routes/${routeId}`)
@@ -78,11 +78,18 @@ export default function RutaDetallePage() {
     Promise.all([loadRoute(), loadPosition()]).then(async () => {
       try {
         const token = localStorage.getItem('tromen_token')
-        const gps = await fetch(`${API_URL}/api/gps/track/${routeId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }).then(r => r.json())
-        const pts = Array.isArray(gps) ? gps : gps.points ?? []
-        setTrackPoints(pts.map((p: any) => ({ lat: p.latitude, lng: p.longitude })))
+        const rData = await apiFetch(`/api/routes/${routeId}`)
+        const rt = rData.route ?? rData
+        const uId = rt?.user_id
+        const rDate = rt?.route_date ? new Date(rt.route_date).toISOString().slice(0,10) : null
+        let pts: any[] = []
+        if (uId && rDate) {
+          const gps = await fetch(`${API_URL}/api/gps/day-track/${uId}?date=${rDate}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }).then(r => r.json())
+          pts = Array.isArray(gps) ? gps : gps.points ?? []
+        }
+        setTrackPoints(pts.map((p: any) => ({ lat: Number(p.lat ?? p.latitude), lng: Number(p.lng ?? p.longitude), estado: p.estado })))
       } catch {}
     }).finally(() => setLoading(false))
     intervalRef.current = setInterval(() => { loadRoute(); loadPosition() }, 15000)
@@ -192,6 +199,25 @@ export default function RutaDetallePage() {
   )
 
   const deliveries   = route.deliveries ?? []
+
+  // Recorrido partido en tramos por estado, para colorear
+  const ESTADO_COLOR: Record<string, string> = {
+    con_ruta: '#16a34a', pausa: '#9ca3af', sin_ruta: '#ef4444',
+  }
+  const segmentos: { estado: string, coords: [number, number][] }[] = []
+  for (let i = 0; i < trackPoints.length; i++) {
+    const p = trackPoints[i]
+    const estado = p.estado ?? 'sin_ruta'
+    const last = segmentos[segmentos.length - 1]
+    if (last && last.estado === estado) {
+      last.coords.push([p.lng, p.lat])
+    } else {
+      const startCoords: [number, number][] = []
+      if (i > 0) startCoords.push([trackPoints[i-1].lng, trackPoints[i-1].lat])
+      startCoords.push([p.lng, p.lat])
+      segmentos.push({ estado, coords: startCoords })
+    }
+  }
   const pending      = deliveries.filter((d: any) => d.status === 'pendiente')
   const done         = deliveries.filter((d: any) => d.status !== 'pendiente')
   const total        = deliveries.length
@@ -313,17 +339,18 @@ export default function RutaDetallePage() {
                       cursor: 'pointer' }}>✓</div>
                   </Marker>
                 ))}
-                {trackPoints.length >= 2 && (
+                {segmentos.length > 0 && (
                   <Source id="route-track" type="geojson" data={{
-                    type: 'Feature',
-                    geometry: {
-                      type: 'LineString',
-                      coordinates: trackPoints.map(p => [p.lng, p.lat])
-                    }
+                    type: 'FeatureCollection',
+                    features: segmentos.filter(s => s.coords.length >= 2).map(seg => ({
+                      type: 'Feature',
+                      properties: { color: ESTADO_COLOR[seg.estado] ?? '#0A5C8A' },
+                      geometry: { type: 'LineString', coordinates: seg.coords },
+                    }))
                   }}>
                     <Layer id="route-track-line" type="line"
                       layout={{ 'line-join': 'round', 'line-cap': 'round' }}
-                      paint={{ 'line-color': '#0A5C8A', 'line-width': 4, 'line-opacity': 0.8 }}
+                      paint={{ 'line-color': ['get', 'color'], 'line-width': 4, 'line-opacity': 0.9 }}
                     />
                   </Source>
                 )}
@@ -332,6 +359,19 @@ export default function RutaDetallePage() {
             {!position && (
               <div className="px-5 py-3 text-center text-gray-400 text-xs border-t border-slate-800">
                 Sin posicion GPS — el repartidor debe tener la ruta iniciada
+              </div>
+            )}
+            {trackPoints.length > 0 && (
+              <div className="px-5 py-3 border-t border-slate-800 flex items-center gap-4 flex-wrap">
+                <span className="flex items-center gap-1.5 text-xs" style={{ color: '#94a3b8' }}>
+                  <span style={{ width: 14, height: 4, background: '#16a34a', borderRadius: 2, display: 'inline-block' }} /> Con ruta
+                </span>
+                <span className="flex items-center gap-1.5 text-xs" style={{ color: '#94a3b8' }}>
+                  <span style={{ width: 14, height: 4, background: '#9ca3af', borderRadius: 2, display: 'inline-block' }} /> Pausada
+                </span>
+                <span className="flex items-center gap-1.5 text-xs" style={{ color: '#94a3b8' }}>
+                  <span style={{ width: 14, height: 4, background: '#ef4444', borderRadius: 2, display: 'inline-block' }} /> Sin ruta
+                </span>
               </div>
             )}
           </div>
