@@ -23,7 +23,7 @@ async function apiFetch(path: string, options?: RequestInit) {
   return res.json()
 }
 
-function calcularKm(points) {
+function calcularKm(points: {lat: number, lng: number}[]): number {
   if (points.length < 2) return 0
   const R = 6371
   let total = 0
