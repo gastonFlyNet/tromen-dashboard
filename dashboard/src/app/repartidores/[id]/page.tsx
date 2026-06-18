@@ -49,7 +49,7 @@ export default function RepartidorPage() {
   const [savedOk, setSavedOk]         = useState(false)
   const [routes, setRoutes]           = useState<any[]>([])
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
-  const [trackPoints, setTrackPoints] = useState<{lat: number, lng: number}[]>([])
+  const [trackPoints, setTrackPoints] = useState<{lat: number, lng: number, estado?: string}[]>([])
   const [loadingTrack, setLoadingTrack] = useState(false)
   const [loading, setLoading]         = useState(true)
 
@@ -94,15 +94,35 @@ export default function RepartidorPage() {
     } finally { setSaving(false) }
   }
 
-  const loadTrack = async (date: string, routeId: string) => {
+  const loadTrack = async (date: string, _routeId: string) => {
     setSelectedDate(date)
     setTrackPoints([])
     setLoadingTrack(true)
     try {
-      const gps = await apiFetch(`/api/gps/track/${routeId}`)
+      const gps = await apiFetch(`/api/gps/day-track/${userId}?date=${date}`)
       const pts = Array.isArray(gps) ? gps : gps.points ?? []
-      setTrackPoints(pts.map((p: any) => ({ lat: Number(p.latitude), lng: Number(p.longitude) })))
+      setTrackPoints(pts.map((p: any) => ({ lat: Number(p.lat), lng: Number(p.lng), estado: p.estado })))
     } catch {} finally { setLoadingTrack(false) }
+  }
+
+  // Parte el recorrido en tramos consecutivos del mismo estado, para colorear cada uno
+  const ESTADO_COLOR: Record<string, string> = {
+    con_ruta: '#16a34a', pausa: '#fbbf24', sin_ruta: '#9ca3af',
+  }
+  const segmentos: { estado: string, coords: [number, number][] }[] = []
+  for (let i = 0; i < trackPoints.length; i++) {
+    const p = trackPoints[i]
+    const estado = p.estado ?? 'sin_ruta'
+    const last = segmentos[segmentos.length - 1]
+    if (last && last.estado === estado) {
+      last.coords.push([p.lng, p.lat])
+    } else {
+      // arranca un tramo nuevo; lo conecto con el punto anterior para que no queden huecos
+      const startCoords: [number, number][] = []
+      if (i > 0) startCoords.push([trackPoints[i-1].lng, trackPoints[i-1].lat])
+      startCoords.push([p.lng, p.lat])
+      segmentos.push({ estado, coords: startCoords })
+    }
   }
 
   if (loading) return (
@@ -260,20 +280,17 @@ export default function RepartidorPage() {
                   style={{ width: '100%', height: '100%' }}
                   mapStyle="mapbox://styles/mapbox/streets-v12"
                 >
-                  {trackPoints.length >= 2 && (
-                    <Source id="rep-track" type="geojson" data={{
+                  {segmentos.map((seg, idx) => seg.coords.length >= 2 && (
+                    <Source key={idx} id={`seg-${idx}`} type="geojson" data={{
                       type: 'Feature',
-                      geometry: {
-                        type: 'LineString',
-                        coordinates: trackPoints.map(p => [p.lng, p.lat])
-                      }
+                      geometry: { type: 'LineString', coordinates: seg.coords }
                     }}>
-                      <Layer id="rep-track-line" type="line"
+                      <Layer id={`seg-line-${idx}`} type="line"
                         layout={{ 'line-join': 'round', 'line-cap': 'round' }}
-                        paint={{ 'line-color': '#3B82F6', 'line-width': 4, 'line-opacity': 0.85 }}
+                        paint={{ 'line-color': ESTADO_COLOR[seg.estado] ?? '#3B82F6', 'line-width': 4, 'line-opacity': 0.9 }}
                       />
                     </Source>
-                  )}
+                  ))}
                   {trackPoints.length > 0 && (
                     <Marker latitude={trackPoints[0].lat} longitude={trackPoints[0].lng}>
                       <div style={{ width: 28, height: 28, borderRadius: 14, background: '#10B981',
@@ -294,6 +311,19 @@ export default function RepartidorPage() {
             {!selectedDate && (
               <div className="px-5 py-3 text-center text-gray-400 text-xs border-t border-gray-100">
                 Seleccioná una ruta del historial para ver el recorrido
+              </div>
+            )}
+            {selectedDate && trackPoints.length > 0 && (
+              <div className="px-5 py-3 border-t border-gray-100 flex items-center gap-4 flex-wrap">
+                <span className="flex items-center gap-1.5 text-xs text-gray-600">
+                  <span style={{ width: 14, height: 4, background: '#16a34a', borderRadius: 2, display: 'inline-block' }} /> Con ruta
+                </span>
+                <span className="flex items-center gap-1.5 text-xs text-gray-600">
+                  <span style={{ width: 14, height: 4, background: '#fbbf24', borderRadius: 2, display: 'inline-block' }} /> En pausa
+                </span>
+                <span className="flex items-center gap-1.5 text-xs text-gray-600">
+                  <span style={{ width: 14, height: 4, background: '#9ca3af', borderRadius: 2, display: 'inline-block' }} /> Sin ruta
+                </span>
               </div>
             )}
           </div>
