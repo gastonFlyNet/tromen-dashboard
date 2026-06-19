@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import CountUp from '@/components/CountUp'
 import FadeIn from '@/components/FadeIn'
-import Map, { Marker } from 'react-map-gl'
+import Map, { Marker, Source, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { dashboardApi, gpsApi } from '@/lib/api'
 import { formatDistanceToNow } from 'date-fns'
@@ -366,6 +366,40 @@ export default function Dashboard() {
   const [loading, setLoading]         = useState(true)
   const [lastUpdate, setLastUpdate]   = useState<Date>(new Date())
   const [selectedRep, setSelectedRep] = useState<string | null>(null)
+  const [repTrack, setRepTrack] = useState<{lat: number, lng: number, estado?: string}[]>([])
+
+  // Carga (o limpia) el recorrido del día de un repartidor para dibujarlo en el mapa
+  const toggleRepTrack = async (userId: string) => {
+    if (selectedRep === userId) { setSelectedRep(null); setRepTrack([]); return }
+    setSelectedRep(userId)
+    setRepTrack([])
+    try {
+      const token = localStorage.getItem('tromen_token')
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'}/api/gps/day-track/${userId}?date=${new Date().toISOString().slice(0,10)}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const d = await res.json()
+      const pts = d?.points ?? (Array.isArray(d) ? d : [])
+      setRepTrack(pts.map((p: any) => ({ lat: Number(p.lat), lng: Number(p.lng), estado: p.estado })))
+    } catch { setRepTrack([]) }
+  }
+
+  // Segmentos del track por estado (para colorear)
+  const REP_ESTADO_COLOR: Record<string, string> = { con_ruta: '#16a34a', pausa: '#9ca3af', sin_ruta: '#ef4444' }
+  const repSegmentos: { estado: string, coords: [number, number][] }[] = []
+  for (let i = 0; i < repTrack.length; i++) {
+    const p = repTrack[i]
+    const estado = p.estado ?? 'sin_ruta'
+    const last = repSegmentos[repSegmentos.length - 1]
+    if (last && last.estado === estado) {
+      last.coords.push([p.lng, p.lat])
+    } else {
+      const sc: [number, number][] = []
+      if (i > 0) sc.push([repTrack[i-1].lng, repTrack[i-1].lat])
+      sc.push([p.lng, p.lat])
+      repSegmentos.push({ estado, coords: sc })
+    }
+  }
   const [showVentaDeposito, setShowVentaDeposito] = useState(false)
   const [fabOpen, setFabOpen]         = useState(false)
   const [ventaOk, setVentaOk]         = useState(false)
@@ -534,7 +568,7 @@ export default function Dashboard() {
                 {positions.map(pos => (
                   <Marker key={pos.user_id} longitude={Number(pos.longitude)} latitude={Number(pos.latitude)}>
                     <div style={{ position: 'relative', cursor: 'pointer' }}
-                      onClick={() => setSelectedRep(selectedRep === pos.user_id ? null : pos.user_id)}>
+                      onClick={() => toggleRepTrack(pos.user_id)}>
                       <div style={{ width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: '2px solid #1e2d40', background: STATUS_COLOR[pos.route_status] + '33', boxShadow: `0 0 12px ${STATUS_COLOR[pos.route_status]}66` }}>
                         🚚
                       </div>
@@ -550,6 +584,21 @@ export default function Dashboard() {
                     </div>
                   </Marker>
                 ))}
+                {repSegmentos.length > 0 && (
+                  <Source id="home-rep-track" type="geojson" data={{
+                    type: 'FeatureCollection',
+                    features: repSegmentos.filter(s => s.coords.length >= 2).map(seg => ({
+                      type: 'Feature',
+                      properties: { color: REP_ESTADO_COLOR[seg.estado] ?? '#38bdf8' },
+                      geometry: { type: 'LineString', coordinates: seg.coords },
+                    }))
+                  }}>
+                    <Layer id="home-rep-track-line" type="line"
+                      layout={{ 'line-join': 'round', 'line-cap': 'round' }}
+                      paint={{ 'line-color': ['get', 'color'], 'line-width': 4, 'line-opacity': 0.9 }}
+                    />
+                  </Source>
+                )}
               </Map>
             </div>
             {positions.length === 0 && (
@@ -591,8 +640,9 @@ export default function Dashboard() {
                   : repartidores.map(r => {
                     const repPct = r.total_deliveries > 0 ? Math.round(((r.delivered ?? 0) / r.total_deliveries) * 100) : 0
                     return (
-                      <div key={r.user_id} style={{ padding: '12px 14px', borderBottom: `1px solid ${D.border}`, cursor: 'pointer' }}
-                        onClick={() => router.push(`/rutas/${r.route_id}`)}>
+                      <div key={r.user_id} style={{ padding: '12px 14px', borderBottom: `1px solid ${D.border}`, cursor: 'pointer',
+                        background: selectedRep === r.user_id ? `${D.accent}14` : 'transparent' }}
+                        onClick={() => toggleRepTrack(r.user_id)}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                           <div>
                             <p style={{ fontSize: 12, fontWeight: 700, color: D.text }}>{r.repartidor}</p>
