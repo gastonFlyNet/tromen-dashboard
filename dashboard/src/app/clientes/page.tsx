@@ -23,7 +23,7 @@ async function apiFetch(path: string, options?: RequestInit) {
 
 const EMPTY_CLIENT = {
   name: '', address: '', zone: '', phone: '', email: '',
-  latitude: '', longitude: '', balance: '0', notes: '',
+  latitude: '', longitude: '', balance: '0', notes: '', remito: false,
 }
 
 export default function ClientesPage() {
@@ -66,7 +66,7 @@ export default function ClientesPage() {
       name: c.name ?? '', address: c.address ?? '', zone: c.zone ?? '',
       phone: c.phone ?? '', email: c.email ?? '',
       latitude: c.latitude ?? '', longitude: c.longitude ?? '',
-      balance: c.balance ?? '0', notes: c.notes ?? '',
+      balance: c.balance ?? '0', notes: c.notes ?? '', remito: c.remito ?? false,
     })
     setError('')
     setShowModal(true)
@@ -220,6 +220,10 @@ export default function ClientesPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-bold text-[#1f2937]">{c.name}</p>
+                      {c.remito && (
+                        <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                          style={{ background: '#fef3c7', color: '#b45309' }}>📄 Remito</span>
+                      )}
                       {c.zone && (
                         <span className="text-xs px-2 py-0.5 rounded-full"
                           style={{ background: '#e0f2fe', color: '#0A5C8A' }}>{c.zone}</span>
@@ -344,6 +348,17 @@ export default function ClientesPage() {
                   value={form.notes}
                   onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
               </div>
+
+              <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl"
+                style={{ background: form.remito ? '#eff6ff' : '#f9fafb', border: '1px solid ' + (form.remito ? '#93c5fd' : '#e5e7eb') }}>
+                <input type="checkbox" checked={form.remito}
+                  onChange={e => setForm(f => ({ ...f, remito: e.target.checked }))}
+                  style={{ width: 18, height: 18, accentColor: '#0A5C8A' }} />
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>📄 Factura con remito</p>
+                  <p className="text-xs" style={{ color: '#6b7280' }}>Este cliente se factura de forma diferente</p>
+                </div>
+              </label>
             </div>
             <div className="p-6 border-t border-gray-100 flex gap-3 sticky bottom-0 bg-white">
               <button onClick={() => setShowModal(false)}
