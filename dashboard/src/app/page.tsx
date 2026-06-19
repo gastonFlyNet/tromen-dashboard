@@ -497,6 +497,7 @@ export default function Dashboard() {
         <nav style={{ flex: 1, padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto' }}>
           <button style={sideBtnStyle()} onClick={() => router.push('/clientes')}>👥 Clientes</button>
           <button style={sideBtnStyle()} onClick={() => router.push('/repartidores')}>🚚 Repartidores</button>
+          <button style={sideBtnStyle()} onClick={() => router.push('/resumen')}>📊 Resumen</button>
           <button style={sideBtnStyle()} onClick={() => router.push('/productos')}>📦 Productos</button>
           <button style={sideBtnStyle()} onClick={() => router.push('/stock')}>📊 Stock</button>
           <button style={sideBtnStyle()} onClick={() => router.push('/geocercas')}>🗺️ Geocercas</button>
