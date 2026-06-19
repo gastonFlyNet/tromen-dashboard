@@ -245,7 +245,7 @@ export default function RutaDetallePage() {
             <h1 className="font-bold text-lg">{route.user_name ?? route.repartidor ?? 'Repartidor'}</h1>
             <p className="text-blue-200 text-xs capitalize">
               Ruta del {new Date(route.route_date).toLocaleDateString('es-AR', {
-                weekday: 'long', day: 'numeric', month: 'long'
+                weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC'
               })}
             </p>
           </div>

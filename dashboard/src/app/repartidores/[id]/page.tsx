@@ -226,7 +226,7 @@ export default function RepartidorPage() {
                 ? <p className="text-center text-gray-400 py-12 text-sm">Sin rutas registradas</p>
                 : routes.map((r: any) => {
                   const date = new Date(r.date).toLocaleDateString('es-AR', {
-                    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+                    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'
                   })
                   const deliveries = r.deliveries ?? []
                   const done = deliveries.filter((d: any) => d.status !== 'pendiente').length
@@ -263,7 +263,7 @@ export default function RepartidorPage() {
               <h3 className="font-bold text-gray-700">🗺️ Track del día</h3>
               {selectedDate && (
                 <span className="text-xs text-gray-400">
-                  {new Date(selectedDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' })}
+                  {new Date(selectedDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', timeZone: 'UTC' })}
                   {' · '}{trackPoints.length} puntos{kmRecorridos > 0 ? ` · ${kmRecorridos.toFixed(2)} km` : ''}
                 </span>
               )}
