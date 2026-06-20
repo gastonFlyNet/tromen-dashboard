@@ -498,6 +498,7 @@ export default function Dashboard() {
           <button style={sideBtnStyle()} onClick={() => router.push('/clientes')}>👥 Clientes</button>
           <button style={sideBtnStyle()} onClick={() => router.push('/repartidores')}>🚚 Repartidores</button>
           <button style={sideBtnStyle()} onClick={() => router.push('/resumen')}>📊 Resumen</button>
+          <button style={sideBtnStyle()} onClick={() => router.push('/bidones')}>🪣 Bidones</button>
           <button style={sideBtnStyle()} onClick={() => router.push('/productos')}>📦 Productos</button>
           <button style={sideBtnStyle()} onClick={() => router.push('/stock')}>📊 Stock</button>
           <button style={sideBtnStyle()} onClick={() => router.push('/geocercas')}>🗺️ Geocercas</button>

@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { label: '👥 Clientes',     path: '/clientes' },
   { label: '🚚 Repartidores', path: '/repartidores' },
   { label: '📊 Resumen',      path: '/resumen' },
+  { label: '🪣 Bidones',      path: '/bidones' },
   { label: '📦 Productos',    path: '/productos' },
   { label: '📊 Stock',        path: '/stock' },
   { label: '🗺️ Geocercas',    path: '/geocercas' },
