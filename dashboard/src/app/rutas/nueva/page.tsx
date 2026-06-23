@@ -30,6 +30,7 @@ export default function NuevaRutaPage() {
   const [assignedTo, setAssignedTo]     = useState('')
   const [selectedGeofences, setSelectedGeofences] = useState<string[]>([])
   const [routeDate, setRouteDate]       = useState(new Date().toISOString().slice(0, 10))
+  const [cashStart, setCashStart]       = useState('')
   const [saving, setSaving]             = useState(false)
   const [error, setError]               = useState('')
   const [success, setSuccess]           = useState(false)
@@ -91,6 +92,7 @@ export default function NuevaRutaPage() {
         body: JSON.stringify({
           user_id: assignedTo,
           route_date: routeDate,
+          cash_start: cashStart ? Number(cashStart) : 0,
           stops,
         }),
       })
@@ -207,6 +209,13 @@ export default function NuevaRutaPage() {
                   <input type="date" className={inputCls}
                     value={routeDate}
                     onChange={e => setRouteDate(e.target.value)} />
+                </div>
+                <div>
+                  <label className={labelCls}>Dinero de salida ($)</label>
+                  <input type="number" className={inputCls}
+                    placeholder="Efectivo con el que sale (opcional)"
+                    value={cashStart}
+                    onChange={e => setCashStart(e.target.value)} />
                 </div>
 
                 {/* Geocercas */}

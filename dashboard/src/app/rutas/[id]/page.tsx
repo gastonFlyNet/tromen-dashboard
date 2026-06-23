@@ -272,6 +272,24 @@ export default function RutaDetallePage() {
       </nav>
 
       <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+        {/* Cuadre de caja por ruta */}
+        <div className="rounded-2xl p-5" style={{ background: "#1a1d27", border: "1px solid #2a2e3a" }}>
+          <p className="text-sm font-bold mb-4" style={{ color: "#38bdf8" }}>Cuadre de caja</p>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <p className="text-[11px] uppercase tracking-wide mb-1" style={{ color: "#8b92a5" }}>Salio con</p>
+              <p className="font-bold text-xl" style={{ color: "#e5e7eb" }}>$ {Number(route.cash_start ?? 0).toLocaleString("es-AR")}</p>
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-wide mb-1" style={{ color: "#8b92a5" }}>Cobro efectivo</p>
+              <p className="font-bold text-xl" style={{ color: "#e5e7eb" }}>$ {Number(route.efectivo_cobrado ?? 0).toLocaleString("es-AR")}</p>
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-wide mb-1" style={{ color: "#8b92a5" }}>Esperado en caja</p>
+              <p className="font-bold text-xl" style={{ color: "#34d399" }}>$ {Number(route.efectivo_esperado ?? 0).toLocaleString("es-AR")}</p>
+            </div>
+          </div>
+        </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
