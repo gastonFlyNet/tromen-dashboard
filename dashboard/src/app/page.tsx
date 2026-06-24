@@ -542,6 +542,17 @@ export default function Dashboard() {
           </FadeIn>
         )}
 
+        {/* SALUDO + MI CUENTA */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+          <p style={{ fontSize: 15, fontWeight: 700, color: D.text }}>
+            👋 Hola, {user?.name ?? ''}
+          </p>
+          <button onClick={() => router.push('/cuenta')}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', border: `1px solid ${D.border2}`, background: D.surface2, color: D.text }}>
+            🔑 Mi cuenta
+          </button>
+        </div>
+
         {/* STAT CARDS */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
           <StatCard label="Rutas activas"   value={summary?.routes_active ?? 0}  icon="🚚" color={D.accent} />
