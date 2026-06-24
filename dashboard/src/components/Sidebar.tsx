@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { label: '📊 Stock',        path: '/stock' },
   { label: '🗺️ Geocercas',    path: '/geocercas' },
   { label: '📋 Plantillas',   path: '/rutas/plantillas' },
+  { label: '🔑 Mi cuenta',    path: '/cuenta' },
 ]
 
 export default function Sidebar() {
