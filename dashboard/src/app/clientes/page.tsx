@@ -44,6 +44,24 @@ export default function ClientesPage() {
     loadClients()
   }, [])
 
+  const exportarExcel = async () => {
+    const XLSX = (window as any).XLSX || await new Promise<any>((resolve, reject) => {
+      const sc = document.createElement('script')
+      sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+      sc.onload = () => resolve((window as any).XLSX)
+      sc.onerror = reject
+      document.body.appendChild(sc)
+    })
+    const filas = clients.map((c: any) => ({
+      id: c.id, nombre: c.name ?? '', direccion: c.address ?? '',
+      telefono: c.phone ?? '', zona: c.zone ?? c.trade_name ?? '',
+      deuda: c.balance ?? 0, saldo_a_favor: c.credit_balance ?? 0,
+    }))
+    const ws = XLSX.utils.json_to_sheet(filas)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Clientes')
+    XLSX.writeFile(wb, 'clientes_tromen.xlsx')
+  }
   const loadClients = async () => {
     setLoading(true)
     try {
@@ -156,11 +174,18 @@ export default function ClientesPage() {
             <p className="text-xs" style={{ color: '#64748b' }}>TROMEN · Catriel</p>
           </div>
         </div>
-        <button onClick={openNew}
-          className="cult-btn text-white rounded-xl px-4 py-2 text-sm font-bold"
-          style={{ background: '#16a34a' }}>
-          + Nuevo cliente
-        </button>
+        <div className="flex gap-2">
+          <button onClick={exportarExcel}
+            className="cult-btn text-white rounded-xl px-4 py-2 text-sm font-bold"
+            style={{ background: '#0A5C8A' }}>
+            Exportar Excel
+          </button>
+          <button onClick={openNew}
+            className="cult-btn text-white rounded-xl px-4 py-2 text-sm font-bold"
+            style={{ background: '#16a34a' }}>
+            + Nuevo cliente
+          </button>
+        </div>
       </nav>
 
       <div className="p-4 md:p-6 max-w-5xl mx-auto">
