@@ -78,60 +78,146 @@ export default function ResumenPage() {
     return { efectivo, transfer, credito, total }
   }
 
-  const descargarExcel = () => {
+    const descargarExcel = async () => {
     if (!ventas || ventas.length === 0) return
-    const wb = XLSX.utils.book_new()
+    const ExcelJS = (window as any).ExcelJS || await new Promise<any>((resolve, reject) => {
+      const sc = document.createElement('script')
+      sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js'
+      sc.onload = () => resolve((window as any).ExcelJS)
+      sc.onerror = reject
+      document.body.appendChild(sc)
+    })
 
-    // Separar por repartidor (no depósito) y depósito
+    const AZUL = 'FF0D1B3E', CELESTE = 'FF38BDF8', VERDE = 'FF2ECC40'
+    const GRISCLARO = 'FFF0F4F8', AMARILLO = 'FFFFF3CD'
+    const wb = new ExcelJS.Workbook()
+    wb.creator = 'TROMEN - Grupo B&F'
+
+    const COLS = ['Hora', 'Cliente', 'Dirección', 'Forma de pago', 'Efectivo', 'Transferencia', 'Cta corriente', 'Total', 'Notas']
+    const MONEY_COLS = [5, 6, 7, 8]
+
+    // Crea una hoja con encabezado de marca + tabla + totales
+    const crearHoja = (titulo: string, lista: Venta[]) => {
+      const ws = wb.addWorksheet(titulo.slice(0, 31).replace(/[\\/?*[\]:]/g, ''), {
+        views: [{ state: 'frozen', ySplit: 4 }],
+      })
+      // Fila 1: marca
+      ws.mergeCells('A1:I1')
+      const t = ws.getCell('A1')
+      t.value = 'TROMEN · Agua Mineral Natural'
+      t.font = { name: 'Arial', size: 16, bold: true, color: { argb: 'FFFFFFFF' } }
+      t.alignment = { vertical: 'middle', horizontal: 'center' }
+      t.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
+      ws.getRow(1).height = 30
+      // Fila 2: subtitulo
+      ws.mergeCells('A2:I2')
+      const s = ws.getCell('A2')
+      s.value = `${titulo} · ${fecha}`
+      s.font = { name: 'Arial', size: 11, color: { argb: 'FFFFFFFF' } }
+      s.alignment = { vertical: 'middle', horizontal: 'center' }
+      s.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1A2236' } }
+      ws.getRow(2).height = 19
+      ws.getRow(3).height = 6
+      // Fila 4: encabezados
+      const hr = ws.getRow(4)
+      COLS.forEach((h, i) => {
+        const cell = hr.getCell(i + 1)
+        cell.value = h
+        cell.font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FFFFFFFF' } }
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: CELESTE } }
+        cell.alignment = { vertical: 'middle', horizontal: 'center' }
+      })
+      hr.height = 20
+      // Datos
+      const filas = filasDetalle(lista)
+      filas.forEach((f: any, idx: number) => {
+        const row = ws.addRow(COLS.map(c => f[c] ?? (f[c.replace('Dirección','DirecciÃ³n')] ?? '')))
+        row.eachCell((cell: any, col: number) => {
+          cell.font = { name: 'Arial', size: 10 }
+          if (idx % 2 === 1) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: GRISCLARO } }
+          if (MONEY_COLS.includes(col)) {
+            cell.numFmt = '"$"#,##0'
+            cell.alignment = { horizontal: 'right' }
+          }
+        })
+      })
+      // Fila TOTALES
+      const tot = totalesPorPago(lista)
+      const totRow = ws.addRow(['', '', '', 'TOTALES', tot.efectivo, tot.transfer, tot.credito, tot.total, ''])
+      totRow.eachCell((cell: any, col: number) => {
+        cell.font = { name: 'Arial', size: 11, bold: true, color: { argb: AZUL } }
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AMARILLO } }
+        if (MONEY_COLS.includes(col)) { cell.numFmt = '"$"#,##0'; cell.alignment = { horizontal: 'right' } }
+      })
+      totRow.height = 22
+      ws.columns = [
+        { width: 9 }, { width: 26 }, { width: 28 }, { width: 16 },
+        { width: 13 }, { width: 14 }, { width: 14 }, { width: 13 }, { width: 24 },
+      ]
+      return ws
+    }
+
     const reparto = ventas.filter(v => !v.es_deposito)
     const deposito = ventas.filter(v => v.es_deposito)
-
-    // Agrupar reparto por repartidor
     const porRepartidor: Record<string, Venta[]> = {}
     reparto.forEach(v => {
       if (!porRepartidor[v.repartidor]) porRepartidor[v.repartidor] = []
       porRepartidor[v.repartidor].push(v)
     })
-
-    // Una hoja por repartidor
-    Object.entries(porRepartidor).forEach(([nombre, lista]) => {
-      const filas = filasDetalle(lista)
-      const t = totalesPorPago(lista)
-      const datos: any[] = [...filas, {},
-        { 'Cliente': 'TOTALES', 'Efectivo': t.efectivo, 'Transferencia': t.transfer, 'Cta corriente': t.credito, 'Total': t.total },
-      ]
-      const ws = XLSX.utils.json_to_sheet(datos)
-      const sheetName = nombre.slice(0, 31).replace(/[\\/?*[\]:]/g, '')
-      XLSX.utils.book_append_sheet(wb, ws, sheetName || 'Repartidor')
-    })
-
-    // Hoja de depósito
-    if (deposito.length > 0) {
-      const filas = filasDetalle(deposito)
-      const t = totalesPorPago(deposito)
-      const datos: any[] = [...filas, {},
-        { 'Cliente': 'TOTALES', 'Efectivo': t.efectivo, 'Transferencia': t.transfer, 'Cta corriente': t.credito, 'Total': t.total },
-      ]
-      const ws = XLSX.utils.json_to_sheet(datos)
-      XLSX.utils.book_append_sheet(wb, ws, 'Venta en depósito')
-    }
+    Object.entries(porRepartidor).forEach(([nombre, lista]) => crearHoja(nombre || 'Repartidor', lista))
+    if (deposito.length > 0) crearHoja('Venta en depósito', deposito)
 
     // Hoja TOTAL GENERAL
+    const wsT = wb.addWorksheet('TOTAL')
+    wsT.mergeCells('A1:B1')
+    const tt = wsT.getCell('A1')
+    tt.value = 'TROMEN · Resumen general'
+    tt.font = { name: 'Arial', size: 16, bold: true, color: { argb: 'FFFFFFFF' } }
+    tt.alignment = { vertical: 'middle', horizontal: 'center' }
+    tt.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
+    wsT.getRow(1).height = 30
+    wsT.mergeCells('A2:B2')
+    const ts = wsT.getCell('A2')
+    ts.value = `Cierre del día ${fecha}`
+    ts.font = { name: 'Arial', size: 11, color: { argb: 'FFFFFFFF' } }
+    ts.alignment = { vertical: 'middle', horizontal: 'center' }
+    ts.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1A2236' } }
+    wsT.getRow(2).height = 19
+    wsT.getRow(3).height = 6
     const tTotal = totalesPorPago(ventas)
-    const resumenRows = [
-      { 'Concepto': 'Ventas de reparto', 'Monto': totalesPorPago(reparto).total },
-      { 'Concepto': 'Ventas de depósito', 'Monto': totalesPorPago(deposito).total },
-      {},
-      { 'Concepto': 'Total efectivo', 'Monto': tTotal.efectivo },
-      { 'Concepto': 'Total transferencia', 'Monto': tTotal.transfer },
-      { 'Concepto': 'Total cuenta corriente', 'Monto': tTotal.credito },
-      {},
-      { 'Concepto': 'TOTAL GENERAL', 'Monto': tTotal.total },
+    const rows = [
+      ['Ventas de reparto', totalesPorPago(reparto).total],
+      ['Ventas de depósito', totalesPorPago(deposito).total],
+      ['', ''],
+      ['Total efectivo', tTotal.efectivo],
+      ['Total transferencia', tTotal.transfer],
+      ['Total cuenta corriente', tTotal.credito],
     ]
-    const wsTotal = XLSX.utils.json_to_sheet(resumenRows)
-    XLSX.utils.book_append_sheet(wb, wsTotal, 'TOTAL')
+    rows.forEach(r => {
+      const row = wsT.addRow(r)
+      row.getCell(1).font = { name: 'Arial', size: 11 }
+      row.getCell(2).font = { name: 'Arial', size: 11 }
+      row.getCell(2).numFmt = '"$"#,##0'
+      row.getCell(2).alignment = { horizontal: 'right' }
+    })
+    const totalRow = wsT.addRow(['TOTAL GENERAL', tTotal.total])
+    totalRow.eachCell((cell: any) => {
+      cell.font = { name: 'Arial', size: 13, bold: true, color: { argb: 'FFFFFFFF' } }
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: VERDE } }
+    })
+    totalRow.getCell(2).numFmt = '"$"#,##0'
+    totalRow.getCell(2).alignment = { horizontal: 'right' }
+    totalRow.height = 26
+    wsT.columns = [{ width: 30 }, { width: 20 }]
 
-    XLSX.writeFile(wb, `Resumen_TROMEN_${fecha}.xlsx`)
+    const buf = await wb.xlsx.writeBuffer()
+    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `Resumen_TROMEN_${fecha}.xlsx`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const totalGeneral = ventas ? totalesPorPago(ventas) : null

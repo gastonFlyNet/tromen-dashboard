@@ -44,24 +44,95 @@ export default function ClientesPage() {
     loadClients()
   }, [])
 
-  const exportarExcel = async () => {
-    const XLSX = (window as any).XLSX || await new Promise<any>((resolve, reject) => {
+    const exportarExcel = async () => {
+    const ExcelJS = (window as any).ExcelJS || await new Promise<any>((resolve, reject) => {
       const sc = document.createElement('script')
-      sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
-      sc.onload = () => resolve((window as any).XLSX)
+      sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js'
+      sc.onload = () => resolve((window as any).ExcelJS)
       sc.onerror = reject
       document.body.appendChild(sc)
     })
-    const filas = clients.map((c: any) => ({
-      id: c.id, nombre: c.name ?? '', direccion: c.address ?? '',
-      telefono: c.phone ?? '', zona: c.zone ?? c.trade_name ?? '',
-      deuda: c.balance ?? 0, saldo_a_favor: c.credit_balance ?? 0,
-    }))
-    const ws = XLSX.utils.json_to_sheet(filas)
-    const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, 'Clientes')
-    XLSX.writeFile(wb, 'clientes_tromen.xlsx')
+
+    const wb = new ExcelJS.Workbook()
+    wb.creator = 'TROMEN - Grupo B&F'
+    const ws = wb.addWorksheet('Clientes', {
+      views: [{ state: 'frozen', ySplit: 4 }],
+    })
+
+    // Colores de marca
+    const AZUL = 'FF0D1B3E'
+    const VERDE = 'FF2ECC40'
+    const CELESTE = 'FF38BDF8'
+    const GRISCLARO = 'FFF0F4F8'
+
+    // Fila 1-2: titulo
+    ws.mergeCells('A1:G1')
+    const titulo = ws.getCell('A1')
+    titulo.value = 'TROMEN · Agua Mineral Natural'
+    titulo.font = { name: 'Arial', size: 18, bold: true, color: { argb: 'FFFFFFFF' } }
+    titulo.alignment = { vertical: 'middle', horizontal: 'center' }
+    titulo.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
+    ws.getRow(1).height = 32
+
+    ws.mergeCells('A2:G2')
+    const sub = ws.getCell('A2')
+    sub.value = `Listado de clientes · ${new Date().toLocaleDateString('es-AR')} · Total: ${clients.length}`
+    sub.font = { name: 'Arial', size: 11, color: { argb: 'FFFFFFFF' } }
+    sub.alignment = { vertical: 'middle', horizontal: 'center' }
+    sub.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1A2236' } }
+    ws.getRow(2).height = 20
+
+    ws.getRow(3).height = 6
+
+    // Fila 4: encabezados
+    const headers = ['ID', 'Nombre', 'Dirección', 'Teléfono', 'Zona', 'Deuda', 'Saldo a favor']
+    const headerRow = ws.getRow(4)
+    headers.forEach((h, i) => {
+      const cell = headerRow.getCell(i + 1)
+      cell.value = h
+      cell.font = { name: 'Arial', size: 11, bold: true, color: { argb: 'FFFFFFFF' } }
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: CELESTE } }
+      cell.alignment = { vertical: 'middle', horizontal: 'center' }
+      cell.border = { bottom: { style: 'thin', color: { argb: 'FFCCCCCC' } } }
+    })
+    headerRow.height = 22
+
+    // Datos
+    clients.forEach((c: any, idx: number) => {
+      const row = ws.addRow([
+        c.id, c.name ?? '', c.address ?? '', c.phone ?? '',
+        c.zone ?? c.trade_name ?? '', Number(c.balance ?? 0), Number(c.credit_balance ?? 0),
+      ])
+      row.eachCell((cell: any, col: number) => {
+        cell.font = { name: 'Arial', size: 10 }
+        cell.alignment = { vertical: 'middle' }
+        if (idx % 2 === 1) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: GRISCLARO } }
+        if (col === 6 || col === 7) {
+          cell.numFmt = '"$"#,##0'
+          cell.alignment = { vertical: 'middle', horizontal: 'right' }
+        }
+      })
+      // resaltar deuda en rojo si hay
+      if (Number(c.balance ?? 0) > 0) row.getCell(6).font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FFD32F2F' } }
+      if (Number(c.credit_balance ?? 0) > 0) row.getCell(7).font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FF2E7D32' } }
+    })
+
+    // Anchos
+    ws.columns = [
+      { width: 38 }, { width: 28 }, { width: 30 }, { width: 16 },
+      { width: 26 }, { width: 14 }, { width: 14 },
+    ]
+
+    const buf = await wb.xlsx.writeBuffer()
+    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'clientes_tromen.xlsx'
+    a.click()
+    URL.revokeObjectURL(url)
   }
+
   const loadClients = async () => {
     setLoading(true)
     try {
