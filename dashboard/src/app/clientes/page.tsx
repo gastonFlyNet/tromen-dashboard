@@ -44,7 +44,7 @@ export default function ClientesPage() {
     loadClients()
   }, [])
 
-    const exportarExcel = async () => {
+      const exportarExcel = async () => {
     const ExcelJS = (window as any).ExcelJS || await new Promise<any>((resolve, reject) => {
       const sc = document.createElement('script')
       sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js'
@@ -59,14 +59,12 @@ export default function ClientesPage() {
       views: [{ state: 'frozen', ySplit: 4 }],
     })
 
-    // Colores de marca
     const AZUL = 'FF0D1B3E'
-    const VERDE = 'FF2ECC40'
     const CELESTE = 'FF38BDF8'
     const GRISCLARO = 'FFF0F4F8'
 
-    // Fila 1-2: titulo
-    ws.mergeCells('A1:G1')
+    // Fila 1: titulo (6 columnas ahora, sin ID)
+    ws.mergeCells('A1:F1')
     const titulo = ws.getCell('A1')
     titulo.value = 'TROMEN · Agua Mineral Natural'
     titulo.font = { name: 'Arial', size: 18, bold: true, color: { argb: 'FFFFFFFF' } }
@@ -74,7 +72,7 @@ export default function ClientesPage() {
     titulo.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
     ws.getRow(1).height = 32
 
-    ws.mergeCells('A2:G2')
+    ws.mergeCells('A2:F2')
     const sub = ws.getCell('A2')
     sub.value = `Listado de clientes · ${new Date().toLocaleDateString('es-AR')} · Total: ${clients.length}`
     sub.font = { name: 'Arial', size: 11, color: { argb: 'FFFFFFFF' } }
@@ -84,8 +82,8 @@ export default function ClientesPage() {
 
     ws.getRow(3).height = 6
 
-    // Fila 4: encabezados
-    const headers = ['ID', 'Nombre', 'Dirección', 'Teléfono', 'Zona', 'Deuda', 'Saldo a favor']
+    // Fila 4: encabezados (sin ID)
+    const headers = ['Nombre', 'Dirección', 'Teléfono', 'Zona', 'Deuda', 'Saldo a favor']
     const headerRow = ws.getRow(4)
     headers.forEach((h, i) => {
       const cell = headerRow.getCell(i + 1)
@@ -97,30 +95,29 @@ export default function ClientesPage() {
     })
     headerRow.height = 22
 
-    // Datos
+    // Datos (sin ID)
     clients.forEach((c: any, idx: number) => {
       const row = ws.addRow([
-        c.id, c.name ?? '', c.address ?? '', c.phone ?? '',
+        c.name ?? '', c.address ?? '', c.phone ?? '',
         c.zone ?? c.trade_name ?? '', Number(c.balance ?? 0), Number(c.credit_balance ?? 0),
       ])
       row.eachCell((cell: any, col: number) => {
         cell.font = { name: 'Arial', size: 10 }
         cell.alignment = { vertical: 'middle' }
         if (idx % 2 === 1) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: GRISCLARO } }
-        if (col === 6 || col === 7) {
+        if (col === 5 || col === 6) {
           cell.numFmt = '"$"#,##0'
           cell.alignment = { vertical: 'middle', horizontal: 'right' }
         }
       })
-      // resaltar deuda en rojo si hay
-      if (Number(c.balance ?? 0) > 0) row.getCell(6).font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FFD32F2F' } }
-      if (Number(c.credit_balance ?? 0) > 0) row.getCell(7).font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FF2E7D32' } }
+      if (Number(c.balance ?? 0) > 0) row.getCell(5).font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FFD32F2F' } }
+      if (Number(c.credit_balance ?? 0) > 0) row.getCell(6).font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FF2E7D32' } }
     })
 
-    // Anchos
+    // Anchos (sin ID, mas espacio para nombre y direccion)
     ws.columns = [
-      { width: 38 }, { width: 28 }, { width: 30 }, { width: 16 },
-      { width: 26 }, { width: 14 }, { width: 14 },
+      { width: 32 }, { width: 34 }, { width: 18 },
+      { width: 28 }, { width: 15 }, { width: 16 },
     ]
 
     const buf = await wb.xlsx.writeBuffer()
