@@ -125,7 +125,7 @@ export default function ClientesPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'clientes_tromen.xlsx'
+    a.download = `clientes_tromen_${new Date().toISOString().slice(0,10)}.xlsx`
     a.click()
     URL.revokeObjectURL(url)
   }

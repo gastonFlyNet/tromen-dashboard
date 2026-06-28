@@ -78,7 +78,7 @@ export default function ResumenPage() {
     return { efectivo, transfer, credito, total }
   }
 
-    const descargarExcel = async () => {
+      const descargarExcel = async () => {
     if (!ventas || ventas.length === 0) return
     const ExcelJS = (window as any).ExcelJS || await new Promise<any>((resolve, reject) => {
       const sc = document.createElement('script')
@@ -93,24 +93,28 @@ export default function ResumenPage() {
     const wb = new ExcelJS.Workbook()
     wb.creator = 'TROMEN - Grupo B&F'
 
-    const COLS = ['Hora', 'Cliente', 'Dirección', 'Forma de pago', 'Efectivo', 'Transferencia', 'Cta corriente', 'Total', 'Notas']
-    const MONEY_COLS = [5, 6, 7, 8]
+    const fechaCorta = (v: Venta) => v.delivered_at
+      ? new Date(v.delivered_at).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'America/Argentina/Buenos_Aires' })
+      : fecha
+    const horaCorta = (v: Venta) => v.delivered_at
+      ? new Date(v.delivered_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' })
+      : ''
 
-    // Crea una hoja con encabezado de marca + tabla + totales
+    const COLS = ['Fecha', 'Hora', 'Cliente', 'Dirección', 'Forma de pago', 'Efectivo', 'Transferencia', 'Cta corriente', 'Total', 'Notas']
+    const MONEY_COLS = [6, 7, 8, 9]
+
     const crearHoja = (titulo: string, lista: Venta[]) => {
       const ws = wb.addWorksheet(titulo.slice(0, 31).replace(/[\\/?*[\]:]/g, ''), {
         views: [{ state: 'frozen', ySplit: 4 }],
       })
-      // Fila 1: marca
-      ws.mergeCells('A1:I1')
+      ws.mergeCells('A1:J1')
       const t = ws.getCell('A1')
       t.value = 'TROMEN · Agua Mineral Natural'
       t.font = { name: 'Arial', size: 16, bold: true, color: { argb: 'FFFFFFFF' } }
       t.alignment = { vertical: 'middle', horizontal: 'center' }
       t.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
       ws.getRow(1).height = 30
-      // Fila 2: subtitulo
-      ws.mergeCells('A2:I2')
+      ws.mergeCells('A2:J2')
       const s = ws.getCell('A2')
       s.value = `${titulo} · ${fecha}`
       s.font = { name: 'Arial', size: 11, color: { argb: 'FFFFFFFF' } }
@@ -118,7 +122,6 @@ export default function ResumenPage() {
       s.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1A2236' } }
       ws.getRow(2).height = 19
       ws.getRow(3).height = 6
-      // Fila 4: encabezados
       const hr = ws.getRow(4)
       COLS.forEach((h, i) => {
         const cell = hr.getCell(i + 1)
@@ -128,10 +131,13 @@ export default function ResumenPage() {
         cell.alignment = { vertical: 'middle', horizontal: 'center' }
       })
       hr.height = 20
-      // Datos
-      const filas = filasDetalle(lista)
-      filas.forEach((f: any, idx: number) => {
-        const row = ws.addRow(COLS.map(c => f[c] ?? (f[c.replace('Dirección','DirecciÃ³n')] ?? '')))
+      lista.forEach((v: Venta, idx: number) => {
+        const row = ws.addRow([
+          fechaCorta(v), horaCorta(v), v.cliente ?? '', v.direccion ?? '',
+          v.payment_method ? (PAY_LABEL[v.payment_method] ?? v.payment_method) : '',
+          num(v.cash_received), num(v.transfer_amount), num(v.credit_amount), num(v.actual_amount),
+          v.notes ?? '',
+        ])
         row.eachCell((cell: any, col: number) => {
           cell.font = { name: 'Arial', size: 10 }
           if (idx % 2 === 1) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: GRISCLARO } }
@@ -141,9 +147,8 @@ export default function ResumenPage() {
           }
         })
       })
-      // Fila TOTALES
       const tot = totalesPorPago(lista)
-      const totRow = ws.addRow(['', '', '', 'TOTALES', tot.efectivo, tot.transfer, tot.credito, tot.total, ''])
+      const totRow = ws.addRow(['', '', '', '', 'TOTALES', tot.efectivo, tot.transfer, tot.credito, tot.total, ''])
       totRow.eachCell((cell: any, col: number) => {
         cell.font = { name: 'Arial', size: 11, bold: true, color: { argb: AZUL } }
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AMARILLO } }
@@ -151,7 +156,7 @@ export default function ResumenPage() {
       })
       totRow.height = 22
       ws.columns = [
-        { width: 9 }, { width: 26 }, { width: 28 }, { width: 16 },
+        { width: 12 }, { width: 8 }, { width: 26 }, { width: 28 }, { width: 16 },
         { width: 13 }, { width: 14 }, { width: 14 }, { width: 13 }, { width: 24 },
       ]
       return ws
@@ -167,7 +172,6 @@ export default function ResumenPage() {
     Object.entries(porRepartidor).forEach(([nombre, lista]) => crearHoja(nombre || 'Repartidor', lista))
     if (deposito.length > 0) crearHoja('Venta en depósito', deposito)
 
-    // Hoja TOTAL GENERAL
     const wsT = wb.addWorksheet('TOTAL')
     wsT.mergeCells('A1:B1')
     const tt = wsT.getCell('A1')
