@@ -26,6 +26,15 @@ type Venta = {
   repartidor: string
   repartidor_id: string
   es_deposito: boolean
+  productos?: { nombre: string, cantidad: number }[]
+  devueltos?: { nombre: string, cantidad: number }[]
+}
+type CambioBidon = {
+  cantidad: number
+  notes: string | null
+  producto: string | null
+  cliente: string | null
+  repartidor: string | null
 }
 
 export default function ResumenPage() {
@@ -33,6 +42,7 @@ export default function ResumenPage() {
   const [fecha, setFecha]     = useState(new Date().toISOString().slice(0, 10))
   const [loading, setLoading] = useState(false)
   const [ventas, setVentas]   = useState<Venta[] | null>(null)
+  const [cambiosBidon, setCambiosBidon] = useState<CambioBidon[]>([])
   const [error, setError]     = useState('')
 
   const cargar = async () => {
@@ -47,6 +57,7 @@ export default function ResumenPage() {
       if (!res.ok) throw new Error('Error al traer los datos')
       const data = await res.json()
       setVentas(data.ventas ?? [])
+      setCambiosBidon(data.cambios_bidon ?? [])
     } catch (e: any) {
       setError(e.message ?? 'Error')
     } finally {
@@ -55,6 +66,31 @@ export default function ResumenPage() {
   }
 
   const num = (v: any) => Number(v ?? 0)
+  // Clasifica un producto en una de las columnas: TROMEN, Oeste, 6lt, Otros
+  const claseProducto = (nombre: string): 'tromen' | 'oeste' | 'seis' | 'otros' => {
+    const n = (nombre ?? '').toLowerCase()
+    if (n.includes('tromen')) return 'tromen'
+    if (n.includes('oeste')) return 'oeste'
+    if (n.includes('6lt') || n.includes('6 lt') || n.includes('6lts')) return 'seis'
+    return 'otros'
+  }
+  // Suma los productos de una venta por columna
+  const bidonesDeVenta = (v: Venta) => {
+    const r = { tromen: 0, oeste: 0, seis: 0, otros: 0, devueltos: 0 }
+    for (const p of (v.productos ?? [])) r[claseProducto(p.nombre)] += Number(p.cantidad ?? 0)
+    for (const d of (v.devueltos ?? [])) r.devueltos += Number(d.cantidad ?? 0)
+    return r
+  }
+  // Totales de productos de una lista de ventas
+  const totalesBidones = (lista: Venta[]) => {
+    const t = { tromen: 0, oeste: 0, seis: 0, otros: 0, devueltos: 0 }
+    for (const v of lista) {
+      const b = bidonesDeVenta(v)
+      t.tromen += b.tromen; t.oeste += b.oeste; t.seis += b.seis
+      t.otros += b.otros; t.devueltos += b.devueltos
+    }
+    return t
+  }
 
   // Arma las filas de detalle de una lista de ventas
   const filasDetalle = (lista: Venta[]) => lista.map(v => ({
@@ -100,21 +136,22 @@ export default function ResumenPage() {
       ? new Date(v.delivered_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' })
       : ''
 
-    const COLS = ['Fecha', 'Hora', 'Cliente', 'Dirección', 'Forma de pago', 'Efectivo', 'Transferencia', 'Cta corriente', 'Total', 'Notas']
+    const COLS = ['Fecha', 'Hora', 'Cliente', 'Dirección', 'Forma de pago', 'Efectivo', 'Transferencia', 'Cta corriente', 'Total', 'TROMEN', 'Del Oeste', '6lt', 'Otros', 'Devueltos', 'Notas']
     const MONEY_COLS = [6, 7, 8, 9]
+    const PROD_COLS = [10, 11, 12, 13, 14]
 
     const crearHoja = (titulo: string, lista: Venta[]) => {
       const ws = wb.addWorksheet(titulo.slice(0, 31).replace(/[\\/?*[\]:]/g, ''), {
         views: [{ state: 'frozen', ySplit: 4 }],
       })
-      ws.mergeCells('A1:J1')
+      ws.mergeCells('A1:O1')
       const t = ws.getCell('A1')
       t.value = 'TROMEN · Agua Mineral Natural'
       t.font = { name: 'Arial', size: 16, bold: true, color: { argb: 'FFFFFFFF' } }
       t.alignment = { vertical: 'middle', horizontal: 'center' }
       t.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
       ws.getRow(1).height = 30
-      ws.mergeCells('A2:J2')
+      ws.mergeCells('A2:O2')
       const s = ws.getCell('A2')
       s.value = `${titulo} · ${fecha}`
       s.font = { name: 'Arial', size: 11, color: { argb: 'FFFFFFFF' } }
@@ -132,10 +169,12 @@ export default function ResumenPage() {
       })
       hr.height = 20
       lista.forEach((v: Venta, idx: number) => {
+        const b = bidonesDeVenta(v)
         const row = ws.addRow([
           fechaCorta(v), horaCorta(v), v.cliente ?? '', v.direccion ?? '',
           v.payment_method ? (PAY_LABEL[v.payment_method] ?? v.payment_method) : '',
           num(v.cash_received), num(v.transfer_amount), num(v.credit_amount), num(v.actual_amount),
+          b.tromen || '', b.oeste || '', b.seis || '', b.otros || '', b.devueltos || '',
           v.notes ?? '',
         ])
         row.eachCell((cell: any, col: number) => {
@@ -145,19 +184,24 @@ export default function ResumenPage() {
             cell.numFmt = '"$"#,##0'
             cell.alignment = { horizontal: 'right' }
           }
+          if (PROD_COLS.includes(col)) cell.alignment = { horizontal: 'center' }
         })
       })
       const tot = totalesPorPago(lista)
-      const totRow = ws.addRow(['', '', '', '', 'TOTALES', tot.efectivo, tot.transfer, tot.credito, tot.total, ''])
+      const tb = totalesBidones(lista)
+      const totRow = ws.addRow(['', '', '', '', 'TOTALES', tot.efectivo, tot.transfer, tot.credito, tot.total,
+        tb.tromen || '', tb.oeste || '', tb.seis || '', tb.otros || '', tb.devueltos || '', ''])
       totRow.eachCell((cell: any, col: number) => {
         cell.font = { name: 'Arial', size: 11, bold: true, color: { argb: AZUL } }
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AMARILLO } }
         if (MONEY_COLS.includes(col)) { cell.numFmt = '"$"#,##0'; cell.alignment = { horizontal: 'right' } }
+        if (PROD_COLS.includes(col)) cell.alignment = { horizontal: 'center' }
       })
       totRow.height = 22
       ws.columns = [
         { width: 12 }, { width: 8 }, { width: 26 }, { width: 28 }, { width: 16 },
-        { width: 13 }, { width: 14 }, { width: 14 }, { width: 13 }, { width: 24 },
+        { width: 13 }, { width: 14 }, { width: 14 }, { width: 13 },
+        { width: 10 }, { width: 11 }, { width: 8 }, { width: 9 }, { width: 11 }, { width: 24 },
       ]
       return ws
     }
@@ -213,6 +257,45 @@ export default function ResumenPage() {
     totalRow.getCell(2).alignment = { horizontal: 'right' }
     totalRow.height = 26
     wsT.columns = [{ width: 30 }, { width: 20 }]
+
+    // Hoja de cambios por bidon en mal estado
+    if (cambiosBidon && cambiosBidon.length > 0) {
+      const wsCB = wb.addWorksheet('Cambios de bidon')
+      wsCB.mergeCells('A1:E1')
+      const cbt = wsCB.getCell('A1')
+      cbt.value = 'TROMEN · Cambios por bidón en mal estado'
+      cbt.font = { name: 'Arial', size: 15, bold: true, color: { argb: 'FFFFFFFF' } }
+      cbt.alignment = { vertical: 'middle', horizontal: 'center' }
+      cbt.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
+      wsCB.getRow(1).height = 28
+      const cbHead = ['Repartidor', 'Cliente', 'Producto', 'Cantidad', 'Nota']
+      const cbHr = wsCB.getRow(2)
+      cbHead.forEach((h: string, i: number) => {
+        const cell = cbHr.getCell(i + 1)
+        cell.value = h
+        cell.font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FFFFFFFF' } }
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: CELESTE } }
+        cell.alignment = { horizontal: 'center' }
+      })
+      cbHr.height = 20
+      let totCambios = 0
+      cambiosBidon.forEach((cb: CambioBidon, idx: number) => {
+        totCambios += Number(cb.cantidad ?? 0)
+        const row = wsCB.addRow([cb.repartidor ?? '', cb.cliente ?? '', cb.producto ?? 'Bidón', Number(cb.cantidad ?? 0), cb.notes ?? ''])
+        row.eachCell((cell: any, col: number) => {
+          cell.font = { name: 'Arial', size: 10 }
+          if (idx % 2 === 1) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: GRISCLARO } }
+          if (col === 4) cell.alignment = { horizontal: 'center' }
+        })
+      })
+      const cbTot = wsCB.addRow(['', '', 'TOTAL', totCambios, ''])
+      cbTot.eachCell((cell: any, col: number) => {
+        cell.font = { name: 'Arial', size: 11, bold: true, color: { argb: AZUL } }
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AMARILLO } }
+        if (col === 4) cell.alignment = { horizontal: 'center' }
+      })
+      wsCB.columns = [{ width: 22 }, { width: 26 }, { width: 20 }, { width: 10 }, { width: 30 }]
+    }
 
     const buf = await wb.xlsx.writeBuffer()
     const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
