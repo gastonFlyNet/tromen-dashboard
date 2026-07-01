@@ -256,6 +256,35 @@ export default function ResumenPage() {
     totalRow.getCell(2).numFmt = '"$"#,##0'
     totalRow.getCell(2).alignment = { horizontal: 'right' }
     totalRow.height = 26
+
+    // Bidones vendidos discriminados por marca (todas las ventas del dia)
+    const tbTotal = totalesBidones(ventas)
+    wsT.addRow(['', ''])
+    const bTitulo = wsT.addRow(['Bidones vendidos', ''])
+    bTitulo.getCell(1).font = { name: 'Arial', size: 12, bold: true, color: { argb: 'FFFFFFFF' } }
+    bTitulo.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
+    bTitulo.getCell(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
+    bTitulo.height = 22
+    const bRows: [string, number][] = [
+      ['Bidones TROMEN', tbTotal.tromen],
+      ['Bidones Del Oeste', tbTotal.oeste],
+      ['Bidones 6lt', tbTotal.seis],
+      ['Otros productos', tbTotal.otros],
+      ['Envases devueltos', tbTotal.devueltos],
+    ]
+    bRows.forEach(r => {
+      const row = wsT.addRow(r)
+      row.getCell(1).font = { name: 'Arial', size: 11 }
+      row.getCell(2).font = { name: 'Arial', size: 11, bold: true }
+      row.getCell(2).alignment = { horizontal: 'right' }
+    })
+    const bTot = wsT.addRow(['TOTAL BIDONES', tbTotal.tromen + tbTotal.oeste + tbTotal.seis])
+    bTot.eachCell((cell: any) => {
+      cell.font = { name: 'Arial', size: 12, bold: true, color: { argb: AZUL } }
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AMARILLO } }
+    })
+    bTot.getCell(2).alignment = { horizontal: 'right' }
+    bTot.height = 22
     wsT.columns = [{ width: 30 }, { width: 20 }]
 
     // Hoja de cambios por bidon en mal estado
