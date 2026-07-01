@@ -455,10 +455,17 @@ export default function ResumenPage() {
                               <th style={{ padding: '8px 12px', fontWeight: 600, textAlign: 'right' }}>Transf</th>
                               <th style={{ padding: '8px 12px', fontWeight: 600, textAlign: 'right' }}>Cta cte</th>
                               <th style={{ padding: '8px 12px', fontWeight: 600, textAlign: 'right' }}>Total</th>
+                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: '#38bdf8' }}>TROMEN</th>
+                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: '#38bdf8' }}>Oeste</th>
+                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: '#38bdf8' }}>6lt</th>
+                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center' }}>Otros</th>
+                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center' }}>Devuel</th>
                             </tr>
                           </thead>
                           <tbody>
-                            {sec.lista.map(v => (
+                            {sec.lista.map(v => {
+                              const bv = bidonesDeVenta(v)
+                              return (
                               <tr key={v.id} style={{ color: '#cbd5e1', borderTop: '1px solid #1e2d40' }}>
                                 <td style={{ padding: '8px 12px' }}>{v.delivered_at ? new Date(v.delivered_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' }) : ''}</td>
                                 <td style={{ padding: '8px 12px' }}>{v.cliente ?? ''}</td>
@@ -467,14 +474,25 @@ export default function ResumenPage() {
                                 <td style={{ padding: '8px 12px', textAlign: 'right' }}>{num(v.transfer_amount) > 0 ? '$'+num(v.transfer_amount).toLocaleString('es-AR') : '-'}</td>
                                 <td style={{ padding: '8px 12px', textAlign: 'right' }}>{num(v.credit_amount) > 0 ? '$'+num(v.credit_amount).toLocaleString('es-AR') : '-'}</td>
                                 <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 700, color: '#f1f5f9' }}>${num(v.actual_amount).toLocaleString('es-AR')}</td>
+                                <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.tromen || '-'}</td>
+                                <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.oeste || '-'}</td>
+                                <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.seis || '-'}</td>
+                                <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.otros || '-'}</td>
+                                <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.devueltos || '-'}</td>
                               </tr>
-                            ))}
+                              )
+                            })}
                             <tr style={{ borderTop: '2px solid #1e2d40', color: '#f1f5f9', fontWeight: 700 }}>
                               <td style={{ padding: '8px 12px' }} colSpan={3}>TOTALES</td>
                               <td style={{ padding: '8px 12px', textAlign: 'right' }}>${t.efectivo.toLocaleString('es-AR')}</td>
                               <td style={{ padding: '8px 12px', textAlign: 'right' }}>${t.transfer.toLocaleString('es-AR')}</td>
                               <td style={{ padding: '8px 12px', textAlign: 'right' }}>${t.credito.toLocaleString('es-AR')}</td>
                               <td style={{ padding: '8px 12px', textAlign: 'right' }}>${t.total.toLocaleString('es-AR')}</td>
+                              <td style={{ padding: '8px 8px', textAlign: 'center', color: '#38bdf8' }}>{tb.tromen || '-'}</td>
+                              <td style={{ padding: '8px 8px', textAlign: 'center', color: '#38bdf8' }}>{tb.oeste || '-'}</td>
+                              <td style={{ padding: '8px 8px', textAlign: 'center', color: '#38bdf8' }}>{tb.seis || '-'}</td>
+                              <td style={{ padding: '8px 8px', textAlign: 'center' }}>{tb.otros || '-'}</td>
+                              <td style={{ padding: '8px 8px', textAlign: 'center' }}>{tb.devueltos || '-'}</td>
                             </tr>
                           </tbody>
                         </table>
