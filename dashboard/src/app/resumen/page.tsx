@@ -426,6 +426,7 @@ export default function ResumenPage() {
                 {/* Una sección por repartidor + depósito */}
                 {secciones.map(sec => {
                   const t = totalesPorPago(sec.lista)
+                  const tb = totalesBidones(sec.lista)
                   return (
                     <div key={sec.nombre} className="rounded-2xl overflow-hidden" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
                       <div className="px-5 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid #1e2d40' }}>
@@ -434,6 +435,15 @@ export default function ResumenPage() {
                         </p>
                         <p className="text-xs" style={{ color: '#64748b' }}>{sec.lista.length} ventas · ${t.total.toLocaleString('es-AR')}</p>
                       </div>
+                      {(tb.tromen + tb.oeste + tb.seis + tb.otros) > 0 && (
+                        <div className="px-5 py-2 flex flex-wrap gap-x-4 gap-y-1" style={{ borderBottom: '1px solid #1e2d40', background: '#0f1117' }}>
+                          {tb.tromen > 0 && <span className="text-xs" style={{ color: '#38bdf8' }}>TROMEN: <b style={{ color: '#f1f5f9' }}>{tb.tromen}</b></span>}
+                          {tb.oeste > 0 && <span className="text-xs" style={{ color: '#38bdf8' }}>Del Oeste: <b style={{ color: '#f1f5f9' }}>{tb.oeste}</b></span>}
+                          {tb.seis > 0 && <span className="text-xs" style={{ color: '#38bdf8' }}>6lt: <b style={{ color: '#f1f5f9' }}>{tb.seis}</b></span>}
+                          {tb.otros > 0 && <span className="text-xs" style={{ color: '#64748b' }}>Otros: <b style={{ color: '#f1f5f9' }}>{tb.otros}</b></span>}
+                          {tb.devueltos > 0 && <span className="text-xs" style={{ color: '#64748b' }}>Devueltos: <b style={{ color: '#f1f5f9' }}>{tb.devueltos}</b></span>}
+                        </div>
+                      )}
                       <div style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                           <thead>
