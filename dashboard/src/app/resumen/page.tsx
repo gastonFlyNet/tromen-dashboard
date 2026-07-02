@@ -47,6 +47,7 @@ export default function ResumenPage() {
   const [gestionSel, setGestionSel] = useState<any | null>(null)
   const [evidencia, setEvidencia] = useState<any | null>(null)
   const [cargandoEvid, setCargandoEvid] = useState(false)
+  const [imgAmpliada, setImgAmpliada] = useState<string | null>(null)
 
   const cargar = async () => {
     setLoading(true)
@@ -574,7 +575,7 @@ export default function ResumenPage() {
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8 }}>
                           {fotos.map((f: any) => (
                             <div key={f.id}>
-                              <img src={f.file_url} alt={f.type} style={{ width: '100%', borderRadius: 8, border: '1px solid #1e2d40' }} />
+                              <img src={f.file_url} alt={f.type} onClick={() => setImgAmpliada(f.file_url)} style={{ width: '100%', borderRadius: 8, border: '1px solid #1e2d40', cursor: 'zoom-in' }} />
                               <p style={{ color: '#64748b', fontSize: 10, marginTop: 3 }}>{f.type === 'foto_ausente' ? 'Cliente ausente' : f.type === 'foto_entrega' ? 'Entrega' : f.type}</p>
                             </div>
                           ))}
@@ -584,7 +585,7 @@ export default function ResumenPage() {
                     {firma && (
                       <div>
                         <p style={{ color: '#38bdf8', fontSize: 12, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase' }}>Firma del cliente</p>
-                        <img src={firma.file_url} alt="firma" style={{ width: '100%', maxWidth: 300, borderRadius: 8, border: '1px solid #1e2d40', background: '#fff' }} />
+                        <img src={firma.file_url} alt="firma" onClick={() => setImgAmpliada(firma.file_url)} style={{ width: '100%', maxWidth: 300, borderRadius: 8, border: '1px solid #1e2d40', background: '#fff', cursor: 'zoom-in' }} />
                       </div>
                     )}
                   </div>
@@ -592,6 +593,19 @@ export default function ResumenPage() {
               })()}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Lightbox: imagen ampliada a pantalla completa */}
+      {imgAmpliada && (
+        <div onClick={() => setImgAmpliada(null)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', zIndex: 60,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, cursor: 'zoom-out' }}>
+          <img src={imgAmpliada} alt="ampliada"
+            style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: 8, objectFit: 'contain' }} />
+          <button onClick={() => setImgAmpliada(null)}
+            style={{ position: 'absolute', top: 20, right: 20, background: 'rgba(255,255,255,0.15)',
+              border: 'none', borderRadius: 8, color: '#fff', width: 40, height: 40, cursor: 'pointer', fontSize: 20 }}>✕</button>
         </div>
       )}
     </div>
