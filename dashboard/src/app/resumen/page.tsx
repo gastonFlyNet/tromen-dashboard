@@ -44,6 +44,9 @@ export default function ResumenPage() {
   const [ventas, setVentas]   = useState<Venta[] | null>(null)
   const [cambiosBidon, setCambiosBidon] = useState<CambioBidon[]>([])
   const [error, setError]     = useState('')
+  const [gestionSel, setGestionSel] = useState<any | null>(null)
+  const [evidencia, setEvidencia] = useState<any | null>(null)
+  const [cargandoEvid, setCargandoEvid] = useState(false)
 
   const cargar = async () => {
     setLoading(true)
@@ -66,6 +69,26 @@ export default function ResumenPage() {
   }
 
   const num = (v: any) => Number(v ?? 0)
+  // Abre el modal de evidencia de una gestion (carga fotos + firma on-demand)
+  const abrirGestion = async (v: Venta) => {
+    setGestionSel(v)
+    setEvidencia(null)
+    setCargandoEvid(true)
+    try {
+      const token = localStorage.getItem('tromen_token')
+      const res = await fetch(`${API_URL}/api/deliveries/${v.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setEvidencia(data)
+      }
+    } catch (e) {
+      // si falla, el modal muestra que no hay evidencia
+    } finally {
+      setCargandoEvid(false)
+    }
+  }
   // Clasifica un producto en una de las columnas: TROMEN, Oeste, 6lt, Otros
   const claseProducto = (nombre: string): 'tromen' | 'oeste' | 'seis' | 'otros' => {
     const n = (nombre ?? '').toLowerCase()
@@ -466,7 +489,8 @@ export default function ResumenPage() {
                             {sec.lista.map(v => {
                               const bv = bidonesDeVenta(v)
                               return (
-                              <tr key={v.id} style={{ color: '#cbd5e1', borderTop: '1px solid #1e2d40' }}>
+                              <tr key={v.id} onClick={() => abrirGestion(v)} style={{ color: '#cbd5e1', borderTop: '1px solid #1e2d40', cursor: 'pointer' }}
+                                title="Ver evidencia (fotos y firma)">
                                 <td style={{ padding: '8px 12px' }}>{v.delivered_at ? new Date(v.delivered_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' }) : ''}</td>
                                 <td style={{ padding: '8px 12px' }}>{v.cliente ?? ''}</td>
                                 <td style={{ padding: '8px 12px' }}>{v.payment_method ? (PAY_LABEL[v.payment_method] ?? v.payment_method) : ''}</td>
@@ -505,6 +529,71 @@ export default function ResumenPage() {
           )}
         </div>
       </div>
+
+      {/* Modal de evidencia de gestion */}
+      {gestionSel && (
+        <div onClick={() => { setGestionSel(null); setEvidencia(null) }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 50,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div onClick={e => e.stopPropagation()}
+            style={{ background: '#151b27', border: '1px solid #1e2d40', borderRadius: 16,
+              maxWidth: 640, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+            {/* Cabecera */}
+            <div style={{ padding: '18px 20px', borderBottom: '1px solid #1e2d40',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#151b27' }}>
+              <div>
+                <p style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 15 }}>{gestionSel.cliente ?? 'Cliente'}</p>
+                <p style={{ color: '#64748b', fontSize: 12 }}>
+                  {gestionSel.repartidor} · {gestionSel.delivered_at ? new Date(gestionSel.delivered_at).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' }) : ''}
+                </p>
+              </div>
+              <button onClick={() => { setGestionSel(null); setEvidencia(null) }}
+                style={{ background: '#0f1117', border: '1px solid #1e2d40', borderRadius: 8, color: '#cbd5e1',
+                  width: 32, height: 32, cursor: 'pointer', fontSize: 16 }}>✕</button>
+            </div>
+            <div style={{ padding: 20 }}>
+              {/* Datos de la gestion */}
+              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 16 }}>
+                <div><p style={{ color: '#64748b', fontSize: 11 }}>Total</p><p style={{ color: '#16a34a', fontWeight: 700 }}>${num(gestionSel.actual_amount).toLocaleString('es-AR')}</p></div>
+                <div><p style={{ color: '#64748b', fontSize: 11 }}>Pago</p><p style={{ color: '#f1f5f9' }}>{gestionSel.payment_method ? (PAY_LABEL[gestionSel.payment_method] ?? gestionSel.payment_method) : '-'}</p></div>
+                <div><p style={{ color: '#64748b', fontSize: 11 }}>Direccion</p><p style={{ color: '#cbd5e1', fontSize: 13 }}>{gestionSel.direccion ?? '-'}</p></div>
+              </div>
+
+              {cargandoEvid && <p style={{ color: '#64748b', textAlign: 'center', padding: 20 }}>Cargando evidencia...</p>}
+
+              {!cargandoEvid && evidencia && (() => {
+                const evs = evidencia.evidence ?? []
+                const firma = evs.find((e: any) => e.type === 'firma_digital')
+                const fotos = evs.filter((e: any) => e.type !== 'firma_digital')
+                if (evs.length === 0) return <p style={{ color: '#64748b', textAlign: 'center', padding: 20 }}>Esta gestion no tiene fotos ni firma registradas</p>
+                return (
+                  <div>
+                    {fotos.length > 0 && (
+                      <div style={{ marginBottom: 16 }}>
+                        <p style={{ color: '#38bdf8', fontSize: 12, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase' }}>Fotos ({fotos.length})</p>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8 }}>
+                          {fotos.map((f: any) => (
+                            <div key={f.id}>
+                              <img src={f.file_url} alt={f.type} style={{ width: '100%', borderRadius: 8, border: '1px solid #1e2d40' }} />
+                              <p style={{ color: '#64748b', fontSize: 10, marginTop: 3 }}>{f.type === 'foto_ausente' ? 'Cliente ausente' : f.type === 'foto_entrega' ? 'Entrega' : f.type}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {firma && (
+                      <div>
+                        <p style={{ color: '#38bdf8', fontSize: 12, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase' }}>Firma del cliente</p>
+                        <img src={firma.file_url} alt="firma" style={{ width: '100%', maxWidth: 300, borderRadius: 8, border: '1px solid #1e2d40', background: '#fff' }} />
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
