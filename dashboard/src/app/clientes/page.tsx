@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 import CountUp from '@/components/CountUp'
 import FadeIn from '@/components/FadeIn'
+import { theme, cardCls, inputCls, labelCls } from '@/lib/theme'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -211,22 +212,8 @@ export default function ClientesPage() {
     c.zone?.toLowerCase().includes(search.toLowerCase())
   )
 
-  const inputCls =
-    'w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-[#f9fafb] ' +
-    'border border-[#e5e7eb] text-[#1f2937] placeholder-[#9ca3af] ' +
-    'focus:outline-none focus:border-[#0A5C8A] transition-colors'
-  const labelCls = 'text-xs font-semibold text-[#6b7280] uppercase tracking-wide'
-  const cardCls =
-    'rounded-2xl bg-[#ffffff] border border-[#e5e7eb] shadow-[0 1px 3px rgba(0,0,0,0.1)]'
-
-  // ---- estilos claros para los modales ----
-  const modalInputCls =
-    'w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-white border border-gray-300 ' +
-    'text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors'
-  const modalLabelCls = 'text-xs font-semibold text-gray-500 uppercase tracking-wide'
-
   return (
-    <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
+    <div style={{ minHeight: '100vh', background: theme.colors.bg, display: 'flex', flexDirection: 'row' }}>
 
       <Sidebar />
 
@@ -234,23 +221,23 @@ export default function ClientesPage() {
 
       {/* HEADER */}
       <nav className="px-6 py-4 flex items-center justify-between sticky top-0 z-30"
-        style={{ background: '#151b27', borderBottom: '1px solid #1e2d40' }}>
+        style={{ background: theme.colors.surface, borderBottom: `1px solid ${theme.colors.border}` }}>
         <div className="flex items-center gap-3">
           <span className="text-2xl">👥</span>
           <div>
-            <h1 className="font-bold text-lg" style={{ color: '#f1f5f9' }}>Clientes</h1>
-            <p className="text-xs" style={{ color: '#64748b' }}>TROMEN · Catriel</p>
+            <h1 className="font-bold text-lg" style={{ color: theme.colors.text }}>Clientes</h1>
+            <p className="text-xs" style={{ color: theme.colors.textFaint }}>TROMEN · Catriel</p>
           </div>
         </div>
         <div className="flex gap-2">
           <button onClick={exportarExcel}
-            className="cult-btn text-white rounded-xl px-4 py-2 text-sm font-bold"
-            style={{ background: '#0A5C8A' }}>
+            className="cult-btn text-white rounded-xl px-4 py-2 text-sm font-bold hover:brightness-110 transition-all"
+            style={{ background: theme.colors.brand }}>
             Exportar Excel
           </button>
           <button onClick={openNew}
-            className="cult-btn text-white rounded-xl px-4 py-2 text-sm font-bold"
-            style={{ background: '#16a34a' }}>
+            className="cult-btn text-white rounded-xl px-4 py-2 text-sm font-bold hover:brightness-110 transition-all"
+            style={{ background: theme.colors.success }}>
             + Nuevo cliente
           </button>
         </div>
@@ -261,7 +248,7 @@ export default function ClientesPage() {
         {/* BUSCADOR */}
         <div className="mb-5">
           <input
-            className={inputCls + ' !mt-0 py-3 shadow-[0 1px 3px rgba(0,0,0,0.1)]'}
+            className={inputCls + ' !mt-0 py-3'}
             placeholder="🔍 Buscar por nombre, dirección o zona..."
             value={search} onChange={e => setSearch(e.target.value)}
           />
@@ -270,29 +257,29 @@ export default function ClientesPage() {
         {/* STATS */}
         <FadeIn className="grid grid-cols-3 gap-3 mb-6">
           {([
-            ['Total clientes', clients.length, '👥', '#0A5C8A'],
-            ['Con GPS', clients.filter(c => c.latitude && c.longitude).length, '📍', '#16a34a'],
-            ['Con saldo', clients.filter(c => Number(c.balance ?? c.current_balance) > 0).length, '💰', '#d97706'],
+            ['Total clientes', clients.length, '👥', theme.colors.accent],
+            ['Con GPS', clients.filter(c => c.latitude && c.longitude).length, '📍', theme.colors.success],
+            ['Con saldo', clients.filter(c => Number(c.balance ?? c.current_balance) > 0).length, '💰', theme.colors.warning],
           ] as const).map(([l, v, e, c]) => (
             <div key={l} className={cardCls + ' cult-card p-4 text-center'}>
               <p className="text-2xl">{e}</p>
               <p className="text-2xl font-bold mt-1" style={{ color: c }}><CountUp end={v} /></p>
-              <p className="text-xs text-[#9ca3af] mt-1">{l}</p>
+              <p className="text-xs mt-1" style={{ color: theme.colors.textFaint }}>{l}</p>
             </div>
           ))}
         </FadeIn>
 
         {/* LISTA */}
         {loading ? (
-          <div className="text-center py-20 text-[#9ca3af]">Cargando clientes...</div>
+          <div className="text-center py-20" style={{ color: theme.colors.textFaint }}>Cargando clientes...</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-[#9ca3af]">
+          <div className="text-center py-20" style={{ color: theme.colors.textFaint }}>
             <p className="text-4xl mb-3">👥</p>
             <p>{search ? 'Sin resultados para esa búsqueda' : 'No hay clientes cargados'}</p>
             {!search && (
               <button onClick={openNew}
-                className="mt-4 text-white rounded-xl px-6 py-2 text-sm font-bold"
-                style={{ background: '#0A5C8A' }}>
+                className="mt-4 text-white rounded-xl px-6 py-2 text-sm font-bold hover:brightness-110 transition-all"
+                style={{ background: theme.colors.brand }}>
                 + Agregar primer cliente
               </button>
             )}
@@ -304,53 +291,53 @@ export default function ClientesPage() {
               const balance = Number(c.balance ?? c.current_balance)
               return (
                 <div key={c.id}
-                  className={cardCls + ' cult-card p-4 flex items-start gap-4 cursor-pointer hover:border-[#d1d5db]'}
+                  className={cardCls + ' cult-card p-4 flex items-start gap-4 cursor-pointer transition-colors hover:bg-[#1A2236]'}
                   onClick={() => router.push(`/clientes/${c.id}`)}>
                   <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
+                    style={{ background: `linear-gradient(135deg, ${theme.colors.brand}, ${theme.colors.brandLight})` }}>
                     {c.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-bold text-[#1f2937]">{c.name}</p>
+                      <p className="font-bold" style={{ color: theme.colors.text }}>{c.name}</p>
                       {c.remito && (
                         <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                          style={{ background: '#fef3c7', color: '#b45309' }}>📄 Remito</span>
+                          style={{ background: theme.colors.warningSoft, color: theme.colors.warning }}>📄 Remito</span>
                       )}
                       {c.zone && (
                         <span className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: '#e0f2fe', color: '#0A5C8A' }}>{c.zone}</span>
+                          style={{ background: theme.colors.accentSoft, color: theme.colors.accent }}>{c.zone}</span>
                       )}
                       {hasGps
                         ? <span className="text-xs px-2 py-0.5 rounded-full"
-                            style={{ background: '#dcfce7', color: '#16a34a' }}>📍 GPS OK</span>
+                            style={{ background: theme.colors.successSoft, color: theme.colors.success }}>📍 GPS OK</span>
                         : <span className="text-xs px-2 py-0.5 rounded-full"
-                            style={{ background: '#fee2e2', color: '#dc2626' }}>Sin GPS</span>
+                            style={{ background: theme.colors.errorSoft, color: theme.colors.error }}>Sin GPS</span>
                       }
                       {balance > 0 && (
                         <span className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: '#fef3c7', color: '#d97706' }}>
+                          style={{ background: theme.colors.warningSoft, color: theme.colors.warning }}>
                           💰 ${balance.toLocaleString('es-AR')}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-[#6b7280] mt-1">📍 {c.address}</p>
-                    {c.phone && <p className="text-xs text-[#9ca3af] mt-0.5">📞 {c.phone}</p>}
+                    <p className="text-sm mt-1" style={{ color: theme.colors.textMuted }}>📍 {c.address}</p>
+                    {c.phone && <p className="text-xs mt-0.5" style={{ color: theme.colors.textFaint }}>📞 {c.phone}</p>}
                     {hasGps && (
-                      <p className="text-xs text-[#9ca3af] mt-0.5">
+                      <p className="text-xs mt-0.5" style={{ color: theme.colors.textFaint }}>
                         {Number(c.latitude).toFixed(5)}, {Number(c.longitude).toFixed(5)}
                       </p>
                     )}
                   </div>
                   <div className="flex gap-2 flex-shrink-0">
                     <button onClick={(e) => { e.stopPropagation(); openEdit(c) }}
-                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[#f3f4f6]"
-                      style={{ color: '#0A5C8A' }}>
+                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors hover:bg-[#1A2236]"
+                      style={{ color: theme.colors.accent }}>
                       Editar
                     </button>
                     <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(c.id) }}
-                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[#fee2e2]"
-                      style={{ color: '#dc2626' }}>
+                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors hover:bg-[#3a1a1a]"
+                      style={{ color: theme.colors.error }}>
                       Borrar
                     </button>
                   </div>
@@ -365,17 +352,19 @@ export default function ClientesPage() {
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
           style={{ background: 'rgba(0,0,0,0.65)' }}>
-          <div className="rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white border border-gray-200 shadow-xl">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white">
-              <h2 className="font-bold text-lg text-gray-800">
+          <div className={cardCls + ' w-full max-w-lg max-h-[90vh] overflow-y-auto'}>
+            <div className="p-6 border-b flex items-center justify-between sticky top-0"
+              style={{ borderColor: theme.colors.border, background: theme.colors.surface }}>
+              <h2 className="font-bold text-lg" style={{ color: theme.colors.text }}>
                 {editing ? 'Editar cliente' : 'Nuevo cliente'}
               </h2>
               <button onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-700 text-xl transition-colors">✕</button>
+                className="text-xl transition-colors hover:text-[#F1F5F9]" style={{ color: theme.colors.textFaint }}>✕</button>
             </div>
             <div className="p-6 space-y-4">
               {error && (
-                <div className="rounded-xl p-3 text-sm bg-red-50 text-red-600 border border-red-200">
+                <div className="rounded-xl p-3 text-sm border"
+                  style={{ background: theme.colors.errorSoft, color: theme.colors.error, borderColor: theme.colors.error }}>
                   {error}
                 </div>
               )}
@@ -388,9 +377,9 @@ export default function ClientesPage() {
                 { key: 'email',   label: 'Email',        placeholder: 'cliente@email.com' },
               ].map(({ key, label, placeholder }) => (
                 <div key={key}>
-                  <label className={modalLabelCls}>{label}</label>
+                  <label className={labelCls}>{label}</label>
                   <input
-                    className={modalInputCls}
+                    className={inputCls}
                     placeholder={placeholder}
                     value={(form as any)[key]}
                     onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
@@ -401,66 +390,71 @@ export default function ClientesPage() {
               {/* COORDENADAS GPS */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className={modalLabelCls}>Coordenadas GPS</label>
+                  <label className={labelCls}>Coordenadas GPS</label>
                   <button onClick={getCoords}
                     className="text-xs font-semibold hover:brightness-125 transition-all"
-                    style={{ color: '#0A5C8A' }}>
+                    style={{ color: theme.colors.accent }}>
                     🔍 Buscar por dirección
                   </button>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-gray-400">Latitud</label>
-                    <input className={modalInputCls} placeholder="-37.8855"
+                    <label className="text-xs" style={{ color: theme.colors.textFaint }}>Latitud</label>
+                    <input className={inputCls} placeholder="-37.8855"
                       value={form.latitude}
                       onChange={e => setForm(f => ({ ...f, latitude: e.target.value }))} />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-400">Longitud</label>
-                    <input className={modalInputCls} placeholder="-68.0783"
+                    <label className="text-xs" style={{ color: theme.colors.textFaint }}>Longitud</label>
+                    <input className={inputCls} placeholder="-68.0783"
                       value={form.longitude}
                       onChange={e => setForm(f => ({ ...f, longitude: e.target.value }))} />
                   </div>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs mt-1" style={{ color: theme.colors.textFaint }}>
                   Tip: En Google Maps, clic derecho sobre la dirección y copiá las coordenadas
                 </p>
               </div>
 
               <div>
-                <label className={modalLabelCls}>Saldo pendiente</label>
-                <input className={modalInputCls} placeholder="0" type="number"
+                <label className={labelCls}>Saldo pendiente</label>
+                <input className={inputCls} placeholder="0" type="number"
                   value={form.balance}
                   onChange={e => setForm(f => ({ ...f, balance: e.target.value }))} />
               </div>
 
               <div>
-                <label className={modalLabelCls}>Notas</label>
-                <textarea className={modalInputCls + ' h-20 resize-none'}
+                <label className={labelCls}>Notas</label>
+                <textarea className={inputCls + ' h-20 resize-none'}
                   placeholder="Observaciones del cliente..."
                   value={form.notes}
                   onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
               </div>
 
-              <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl"
-                style={{ background: form.remito ? '#eff6ff' : '#f9fafb', border: '1px solid ' + (form.remito ? '#93c5fd' : '#e5e7eb') }}>
+              <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border transition-colors"
+                style={{
+                  background: form.remito ? theme.colors.accentSoft : theme.colors.surface2,
+                  borderColor: form.remito ? theme.colors.accent : theme.colors.border,
+                }}>
                 <input type="checkbox" checked={form.remito}
                   onChange={e => setForm(f => ({ ...f, remito: e.target.checked }))}
-                  style={{ width: 18, height: 18, accentColor: '#0A5C8A' }} />
+                  style={{ width: 18, height: 18, accentColor: theme.colors.accent }} />
                 <div>
-                  <p className="text-sm font-semibold" style={{ color: '#1f2937' }}>📄 Factura con remito</p>
-                  <p className="text-xs" style={{ color: '#6b7280' }}>Este cliente se factura de forma diferente</p>
+                  <p className="text-sm font-semibold" style={{ color: theme.colors.text }}>📄 Factura con remito</p>
+                  <p className="text-xs" style={{ color: theme.colors.textMuted }}>Este cliente se factura de forma diferente</p>
                 </div>
               </label>
             </div>
-            <div className="p-6 border-t border-gray-100 flex gap-3 sticky bottom-0 bg-white">
+            <div className="p-6 border-t flex gap-3 sticky bottom-0"
+              style={{ borderColor: theme.colors.border, background: theme.colors.surface }}>
               <button onClick={() => setShowModal(false)}
-                className="flex-1 rounded-xl py-3 text-sm font-semibold transition-all border border-gray-300 text-gray-600 hover:bg-gray-50">
+                className="flex-1 rounded-xl py-3 text-sm font-semibold transition-colors border hover:bg-[#1A2236]"
+                style={{ borderColor: theme.colors.border, color: theme.colors.textMuted }}>
                 Cancelar
               </button>
               <button onClick={handleSave} disabled={saving}
                 className="flex-1 text-white rounded-xl py-3 text-sm font-bold transition-all disabled:opacity-50 hover:brightness-110"
-                style={{ background: '#0A5C8A' }}>
+                style={{ background: theme.colors.brand }}>
                 {saving ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear cliente'}
               </button>
             </div>
@@ -472,20 +466,21 @@ export default function ClientesPage() {
       {deleteConfirm && (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
           style={{ background: 'rgba(0,0,0,0.65)' }}>
-          <div className="rounded-2xl p-6 max-w-sm w-full bg-white border border-gray-200 shadow-xl">
+          <div className={cardCls + ' p-6 max-w-sm w-full'}>
             <p className="text-3xl text-center mb-3">⚠️</p>
-            <h3 className="font-bold text-center text-gray-800 mb-2">¿Borrar este cliente?</h3>
-            <p className="text-sm text-gray-500 text-center mb-6">
+            <h3 className="font-bold text-center mb-2" style={{ color: theme.colors.text }}>¿Borrar este cliente?</h3>
+            <p className="text-sm text-center mb-6" style={{ color: theme.colors.textMuted }}>
               Esta acción no se puede deshacer. Se eliminarán todos los datos del cliente.
             </p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteConfirm(null)}
-                className="flex-1 rounded-xl py-2.5 text-sm font-semibold border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all">
+                className="flex-1 rounded-xl py-2.5 text-sm font-semibold border transition-colors hover:bg-[#1A2236]"
+                style={{ borderColor: theme.colors.border, color: theme.colors.textMuted }}>
                 Cancelar
               </button>
               <button onClick={() => handleDelete(deleteConfirm)}
                 className="flex-1 text-white rounded-xl py-2.5 text-sm font-bold transition-all hover:brightness-110"
-                style={{ background: '#C0392B' }}>
+                style={{ background: theme.colors.error }}>
                 Sí, borrar
               </button>
             </div>
