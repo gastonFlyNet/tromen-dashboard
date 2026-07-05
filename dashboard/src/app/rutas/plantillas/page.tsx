@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 import FadeIn from '@/components/FadeIn'
+import { theme } from '@/lib/theme'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -20,11 +21,7 @@ async function apiFetch(path: string, options?: RequestInit) {
   return res.json()
 }
 
-const D = {
-  bg: '#0f1117', surface: '#151b27', surface2: '#1a2236',
-  border: '#1e2d40', text: '#f1f5f9', muted: '#64748b',
-  accent: '#38bdf8', blue: '#0A5C8A',
-}
+const D = theme.colors
 
 const WEEKDAYS = [
   { value: 1, label: 'Lunes' },
@@ -221,11 +218,11 @@ export default function PlantillasPage() {
 
   const modalInput = {
     width: '100%', borderRadius: 10, padding: '10px 14px', fontSize: 13,
-    background: '#fff', border: '1px solid #d1d5db', color: '#1f2937',
+    background: D.surface2, border: `1px solid ${D.border}`, color: D.text,
     outline: 'none', fontFamily: 'inherit', marginTop: 4,
   }
   const modalLabel = {
-    fontSize: 11, fontWeight: 600, color: '#6b7280',
+    fontSize: 11, fontWeight: 600, color: D.textMuted,
     textTransform: 'uppercase' as const, letterSpacing: '0.5px',
   }
 
@@ -241,17 +238,17 @@ export default function PlantillasPage() {
           <span style={{ fontSize: 22 }}>📋</span>
           <div>
             <h1 style={{ fontSize: 17, fontWeight: 700, color: D.text, margin: 0 }}>Plantillas de ruta</h1>
-            <p style={{ fontSize: 11, color: D.muted, margin: 0 }}>Rutas fijas por día de la semana</p>
+            <p style={{ fontSize: 11, color: D.textFaint, margin: 0 }}>Rutas fijas por día de la semana</p>
           </div>
         </div>
         <button onClick={openNew} className="cult-btn"
-          style={{ background: '#16a34a', color: '#fff', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+          style={{ background: D.success, color: '#fff', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
           + Nueva plantilla
         </button>
       </nav>
 
       {msg && (
-        <div style={{ position: 'fixed', top: 70, right: 20, zIndex: 50, background: '#16a34a', color: '#fff', padding: '10px 18px', borderRadius: 10, fontWeight: 600, fontSize: 13 }}>
+        <div style={{ position: 'fixed', top: 70, right: 20, zIndex: 50, background: D.success, color: '#fff', padding: '10px 18px', borderRadius: 10, fontWeight: 600, fontSize: 13 }}>
           {msg}
         </div>
       )}
@@ -259,16 +256,16 @@ export default function PlantillasPage() {
       <div style={{ padding: '24px', maxWidth: 900, margin: '0 auto' }}>
 
         {error && !showModal && (
-          <div style={{ background: '#7f1d1d', color: '#fecaca', border: '1px solid #b91c1c', borderRadius: 10, padding: '10px 14px', fontSize: 13, marginBottom: 16 }}>
+          <div style={{ background: D.errorSoft, color: D.error, border: `1px solid ${D.error}`, borderRadius: 10, padding: '10px 14px', fontSize: 13, marginBottom: 16 }}>
             ⚠️ {error}
           </div>
         )}
 
-        <div style={{ background: `${D.accent}10`, border: `1px solid ${D.accent}30`, borderRadius: 12, padding: '14px 16px', marginBottom: 20, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+        <div style={{ background: D.accentSoft, border: `1px solid ${D.border}`, borderRadius: 12, padding: '14px 16px', marginBottom: 20, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
           <span style={{ fontSize: 22 }}>💡</span>
           <div>
             <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>¿Cómo funcionan las plantillas?</p>
-            <p style={{ fontSize: 12, color: D.muted, marginTop: 4 }}>
+            <p style={{ fontSize: 12, color: D.textFaint, marginTop: 4 }}>
               Creá una plantilla con los clientes y geocercas de un repartidor para un día fijo.
               Después, con un clic en "Generar ruta", se crea la ruta real con todas las paradas y geocercas.
             </p>
@@ -276,13 +273,13 @@ export default function PlantillasPage() {
         </div>
 
         {loading ? (
-          <p style={{ textAlign: 'center', color: D.muted, padding: 60, fontSize: 13 }}>Cargando plantillas...</p>
+          <p style={{ textAlign: 'center', color: D.textFaint, padding: 60, fontSize: 13 }}>Cargando plantillas...</p>
         ) : templates.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 60, color: D.muted }}>
+          <div style={{ textAlign: 'center', padding: 60, color: D.textFaint }}>
             <p style={{ fontSize: 40, margin: 0 }}>📋</p>
             <p style={{ marginTop: 12 }}>No hay plantillas creadas todavía</p>
             <button onClick={openNew}
-              style={{ marginTop: 16, background: D.blue, color: '#fff', borderRadius: 10, padding: '8px 20px', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+              style={{ marginTop: 16, background: D.brand, color: '#fff', borderRadius: 10, padding: '8px 20px', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
               + Crear primera plantilla
             </button>
           </div>
@@ -291,20 +288,20 @@ export default function PlantillasPage() {
             {templates.map(t => (
               <div key={t.id} className="cult-card" style={{ background: D.surface, border: `1px solid ${D.border}`, borderRadius: 14, padding: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div style={{ width: 48, height: 48, borderRadius: 12, background: `${D.accent}18`, color: D.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0, textAlign: 'center', lineHeight: 1.1 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 12, background: D.accentSoft, color: D.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0, textAlign: 'center', lineHeight: 1.1 }}>
                     {weekdayLabel(t.weekday).slice(0, 3)}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 14, fontWeight: 700, color: D.text, margin: 0 }}>
                       {weekdayLabel(t.weekday)} · {t.repartidor}
                     </p>
-                    <p style={{ fontSize: 12, color: D.muted, marginTop: 2 }}>
+                    <p style={{ fontSize: 12, color: D.textFaint, marginTop: 2 }}>
                       {t.name ? `${t.name} · ` : ''}{t.stops_count ?? 0} parada(s)
                     </p>
                   </div>
                   <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                     <button onClick={() => { setGenerateConfirm(t); setGenerateDate(new Date().toISOString().slice(0, 10)) }} className="cult-btn"
-                      style={{ background: '#16a34a', color: '#fff', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+                      style={{ background: D.success, color: '#fff', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
                       ⚡ Generar ruta
                     </button>
                     <button onClick={() => openEdit(t.id)}
@@ -312,7 +309,7 @@ export default function PlantillasPage() {
                       Editar
                     </button>
                     <button onClick={() => setDeleteConfirm(t.id)}
-                      style={{ background: 'none', color: '#f87171', borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 600, border: `1px solid ${D.border}`, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      style={{ background: 'none', color: D.error, borderRadius: 8, padding: '7px 12px', fontSize: 12, fontWeight: 600, border: `1px solid ${D.border}`, cursor: 'pointer', fontFamily: 'inherit' }}>
                       Borrar
                     </button>
                   </div>
@@ -325,18 +322,18 @@ export default function PlantillasPage() {
 
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 16 }}>
-          <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 640, maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
-            <div style={{ padding: '18px 20px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h2 style={{ fontSize: 16, fontWeight: 700, color: '#1f2937', margin: 0 }}>
+          <div style={{ background: D.surface, border: `1px solid ${D.border}`, borderRadius: 16, width: '100%', maxWidth: 640, maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
+            <div style={{ padding: '18px 20px', borderBottom: `1px solid ${D.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: D.text, margin: 0 }}>
                 {editingId ? 'Editar plantilla' : 'Nueva plantilla'}
               </h2>
               <button onClick={() => setShowModal(false)}
-                style={{ background: 'none', border: 'none', color: '#9ca3af', fontSize: 20, cursor: 'pointer' }}>✕</button>
+                style={{ background: 'none', border: 'none', color: D.textFaint, fontSize: 20, cursor: 'pointer' }}>✕</button>
             </div>
 
             <div style={{ padding: 20, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
               {error && (
-                <div style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 10, padding: '10px 12px', fontSize: 13 }}>
+                <div style={{ background: D.errorSoft, color: D.error, border: `1px solid ${D.error}`, borderRadius: 10, padding: '10px 12px', fontSize: 13 }}>
                   {error}
                 </div>
               )}
@@ -371,7 +368,7 @@ export default function PlantillasPage() {
               </div>
 
               {editingId && (
-                <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>
+                <p style={{ fontSize: 11, color: D.textFaint, margin: 0 }}>
                   El repartidor y el día no se pueden cambiar al editar. Si necesitás cambiarlos, borrá la plantilla y creá una nueva.
                 </p>
               )}
@@ -379,18 +376,18 @@ export default function PlantillasPage() {
               {/* GEOCERCAS */}
               <div>
                 <label style={modalLabel}>Geocercas de la ruta ({selectedGeofences.length})</label>
-                <div style={{ border: '1px solid #e5e7eb', borderRadius: 10, marginTop: 6, overflow: 'hidden' }}>
+                <div style={{ border: `1px solid ${D.border}`, borderRadius: 10, marginTop: 6, overflow: 'hidden' }}>
                   {geofences.length === 0 ? (
-                    <p style={{ textAlign: 'center', color: '#9ca3af', fontSize: 12, padding: 14 }}>No hay geocercas activas</p>
+                    <p style={{ textAlign: 'center', color: D.textFaint, fontSize: 12, padding: 14 }}>No hay geocercas activas</p>
                   ) : geofences.map((g: any) => (
                     <label key={g.id}
-                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }}>
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderBottom: `1px solid ${D.border}`, cursor: 'pointer' }}>
                       <input type="checkbox"
                         checked={selectedGeofences.includes(g.id)}
                         onChange={() => toggleGeofence(g.id)}
-                        style={{ width: 16, height: 16, accentColor: '#0A5C8A' }} />
-                      <span style={{ fontSize: 13, color: '#1f2937' }}>{g.name}</span>
-                      <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 'auto' }}>
+                        style={{ width: 16, height: 16, accentColor: D.accent }} />
+                      <span style={{ fontSize: 13, color: D.text }}>{g.name}</span>
+                      <span style={{ fontSize: 11, color: D.textFaint, marginLeft: 'auto' }}>
                         {g.radius_meters ? (Number(g.radius_meters) >= 1000 ? `${(Number(g.radius_meters)/1000).toFixed(1)} km` : `${g.radius_meters} m`) : ''}
                       </span>
                     </label>
@@ -401,25 +398,25 @@ export default function PlantillasPage() {
               {/* PARADAS */}
               <div>
                 <label style={modalLabel}>Paradas en orden ({selected.length})</label>
-                <div style={{ border: '1px solid #e5e7eb', borderRadius: 10, marginTop: 6, maxHeight: 200, overflowY: 'auto' }}>
+                <div style={{ border: `1px solid ${D.border}`, borderRadius: 10, marginTop: 6, maxHeight: 200, overflowY: 'auto' }}>
                   {selected.length === 0 ? (
-                    <p style={{ textAlign: 'center', color: '#9ca3af', fontSize: 12, padding: 20 }}>
+                    <p style={{ textAlign: 'center', color: D.textFaint, fontSize: 12, padding: 20 }}>
                       Agregá clientes desde la lista de abajo
                     </p>
                   ) : selected.map((c, i) => (
-                    <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderBottom: '1px solid #f3f4f6' }}>
-                      <div style={{ width: 26, height: 26, borderRadius: '50%', background: D.blue, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+                    <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderBottom: `1px solid ${D.border}` }}>
+                      <div style={{ width: 26, height: 26, borderRadius: '50%', background: D.brand, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
                         {i + 1}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: '#1f2937', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</p>
-                        <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.address}</p>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</p>
+                        <p style={{ fontSize: 11, color: D.textFaint, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.address}</p>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <button onClick={() => moveUp(i)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', fontSize: 11, padding: '0 4px' }}>▲</button>
-                        <button onClick={() => moveDown(i)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', fontSize: 11, padding: '0 4px' }}>▼</button>
+                        <button onClick={() => moveUp(i)} style={{ background: 'none', border: 'none', color: D.textFaint, cursor: 'pointer', fontSize: 11, padding: '0 4px' }}>▲</button>
+                        <button onClick={() => moveDown(i)} style={{ background: 'none', border: 'none', color: D.textFaint, cursor: 'pointer', fontSize: 11, padding: '0 4px' }}>▼</button>
                       </div>
-                      <button onClick={() => toggleClient(c)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 14, padding: '0 4px' }}>✕</button>
+                      <button onClick={() => toggleClient(c)} style={{ background: 'none', border: 'none', color: D.error, cursor: 'pointer', fontSize: 14, padding: '0 4px' }}>✕</button>
                     </div>
                   ))}
                 </div>
@@ -429,35 +426,35 @@ export default function PlantillasPage() {
                 <label style={modalLabel}>Agregar clientes</label>
                 <input style={modalInput} placeholder="🔍 Buscar cliente..."
                   value={search} onChange={e => setSearch(e.target.value)} />
-                <div style={{ border: '1px solid #e5e7eb', borderRadius: 10, marginTop: 6, maxHeight: 180, overflowY: 'auto' }}>
+                <div style={{ border: `1px solid ${D.border}`, borderRadius: 10, marginTop: 6, maxHeight: 180, overflowY: 'auto' }}>
                   {filteredClients.length === 0 ? (
-                    <p style={{ textAlign: 'center', color: '#9ca3af', fontSize: 12, padding: 16 }}>
+                    <p style={{ textAlign: 'center', color: D.textFaint, fontSize: 12, padding: 16 }}>
                       {search ? 'Sin resultados' : 'Todos los clientes ya están agregados'}
                     </p>
                   ) : filteredClients.map(c => (
                     <button key={c.id} onClick={() => toggleClient(c)}
-                      style={{ width: '100%', textAlign: 'left', padding: '10px 12px', borderBottom: '1px solid #f3f4f6', background: 'none', border: 'none', borderBottomWidth: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, flexShrink: 0 }}>
+                      style={{ width: '100%', textAlign: 'left', padding: '10px 12px', borderBottom: `1px solid ${D.border}`, background: 'none', border: 'none', borderBottomWidth: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ width: 30, height: 30, borderRadius: '50%', background: `linear-gradient(135deg, ${D.brand}, ${D.brandLight})`, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, flexShrink: 0 }}>
                         {c.name?.charAt(0).toUpperCase()}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: '#1f2937', margin: 0 }}>{c.name}</p>
-                        <p style={{ fontSize: 11, color: '#9ca3af', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.address}</p>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>{c.name}</p>
+                        <p style={{ fontSize: 11, color: D.textFaint, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.address}</p>
                       </div>
-                      <span style={{ color: '#16a34a', fontSize: 18, flexShrink: 0 }}>+</span>
+                      <span style={{ color: D.success, fontSize: 18, flexShrink: 0 }}>+</span>
                     </button>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div style={{ padding: '14px 20px', borderTop: '1px solid #e5e7eb', display: 'flex', gap: 10 }}>
+            <div style={{ padding: '14px 20px', borderTop: `1px solid ${D.border}`, display: 'flex', gap: 10 }}>
               <button onClick={() => setShowModal(false)}
-                style={{ flex: 1, borderRadius: 10, padding: '11px 0', fontSize: 13, fontWeight: 600, border: '1px solid #d1d5db', background: '#fff', color: '#6b7280', cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ flex: 1, borderRadius: 10, padding: '11px 0', fontSize: 13, fontWeight: 600, border: `1px solid ${D.border}`, background: 'none', color: D.textMuted, cursor: 'pointer', fontFamily: 'inherit' }}>
                 Cancelar
               </button>
               <button onClick={handleSave} disabled={saving}
-                style={{ flex: 1, borderRadius: 10, padding: '11px 0', fontSize: 13, fontWeight: 700, border: 'none', background: saving ? '#9ca3af' : '#0A5C8A', color: '#fff', cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ flex: 1, borderRadius: 10, padding: '11px 0', fontSize: 13, fontWeight: 700, border: 'none', background: saving ? D.textFaint : D.brand, color: '#fff', cursor: 'pointer', fontFamily: 'inherit' }}>
                 {saving ? 'Guardando...' : editingId ? 'Guardar cambios' : 'Crear plantilla'}
               </button>
             </div>
@@ -467,21 +464,21 @@ export default function PlantillasPage() {
 
       {generateConfirm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 16 }}>
-          <div style={{ background: '#fff', borderRadius: 16, maxWidth: 380, width: '100%', padding: 24, boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
+          <div style={{ background: D.surface, border: `1px solid ${D.border}`, borderRadius: 16, maxWidth: 380, width: '100%', padding: 24, boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
             <p style={{ fontSize: 28, textAlign: 'center', margin: 0 }}>⚡</p>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1f2937', textAlign: 'center', marginTop: 8, marginBottom: 6 }}>Generar ruta del día</h3>
-            <p style={{ fontSize: 13, color: '#6b7280', textAlign: 'center', marginBottom: 16 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: D.text, textAlign: 'center', marginTop: 8, marginBottom: 6 }}>Generar ruta del día</h3>
+            <p style={{ fontSize: 13, color: D.textMuted, textAlign: 'center', marginBottom: 16 }}>
               Se creará la ruta de <strong>{generateConfirm.repartidor}</strong> con {generateConfirm.stops_count ?? 0} parada(s).
             </p>
             <label style={modalLabel}>Fecha de la ruta</label>
             <input type="date" style={modalInput} value={generateDate} onChange={e => setGenerateDate(e.target.value)} />
             <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
               <button onClick={() => setGenerateConfirm(null)}
-                style={{ flex: 1, borderRadius: 10, padding: '10px 0', fontSize: 13, fontWeight: 600, border: '1px solid #d1d5db', background: '#fff', color: '#6b7280', cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ flex: 1, borderRadius: 10, padding: '10px 0', fontSize: 13, fontWeight: 600, border: `1px solid ${D.border}`, background: 'none', color: D.textMuted, cursor: 'pointer', fontFamily: 'inherit' }}>
                 Cancelar
               </button>
               <button onClick={handleGenerate}
-                style={{ flex: 1, borderRadius: 10, padding: '10px 0', fontSize: 13, fontWeight: 700, border: 'none', background: '#16a34a', color: '#fff', cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ flex: 1, borderRadius: 10, padding: '10px 0', fontSize: 13, fontWeight: 700, border: 'none', background: D.success, color: '#fff', cursor: 'pointer', fontFamily: 'inherit' }}>
                 Generar ruta
               </button>
             </div>
@@ -491,19 +488,19 @@ export default function PlantillasPage() {
 
       {deleteConfirm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 16 }}>
-          <div style={{ background: '#fff', borderRadius: 16, maxWidth: 360, width: '100%', padding: 24, boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
+          <div style={{ background: D.surface, border: `1px solid ${D.border}`, borderRadius: 16, maxWidth: 360, width: '100%', padding: 24, boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
             <p style={{ fontSize: 28, textAlign: 'center', margin: 0 }}>⚠️</p>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1f2937', textAlign: 'center', marginTop: 8, marginBottom: 6 }}>¿Borrar esta plantilla?</h3>
-            <p style={{ fontSize: 13, color: '#6b7280', textAlign: 'center', marginBottom: 18 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: D.text, textAlign: 'center', marginTop: 8, marginBottom: 6 }}>¿Borrar esta plantilla?</h3>
+            <p style={{ fontSize: 13, color: D.textMuted, textAlign: 'center', marginBottom: 18 }}>
               Esto no afecta las rutas ya generadas. Solo se elimina la plantilla.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setDeleteConfirm(null)}
-                style={{ flex: 1, borderRadius: 10, padding: '10px 0', fontSize: 13, fontWeight: 600, border: '1px solid #d1d5db', background: '#fff', color: '#6b7280', cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ flex: 1, borderRadius: 10, padding: '10px 0', fontSize: 13, fontWeight: 600, border: `1px solid ${D.border}`, background: 'none', color: D.textMuted, cursor: 'pointer', fontFamily: 'inherit' }}>
                 Cancelar
               </button>
               <button onClick={() => handleDelete(deleteConfirm)}
-                style={{ flex: 1, borderRadius: 10, padding: '10px 0', fontSize: 13, fontWeight: 700, border: 'none', background: '#C0392B', color: '#fff', cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ flex: 1, borderRadius: 10, padding: '10px 0', fontSize: 13, fontWeight: 700, border: 'none', background: D.error, color: '#fff', cursor: 'pointer', fontFamily: 'inherit' }}>
                 Sí, borrar
               </button>
             </div>

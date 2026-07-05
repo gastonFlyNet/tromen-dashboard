@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { theme, cardCls } from '@/lib/theme'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -23,20 +24,6 @@ const METODO_LABEL: Record<string, string> = {
   mixto:            '🔀 Pago mixto',
 }
 
-const STATUS_COLOR: Record<string, string> = {
-  entregado:    '#1A7A4A',
-  no_entregado: '#C0392B',
-  pendiente:    '#E67E22',
-  parcial:      '#2980B9',
-}
-
-const STATUS_LABEL: Record<string, string> = {
-  entregado:    'Entregado',
-  no_entregado: 'No entregado',
-  pendiente:    'Pendiente',
-  parcial:      'Parcial',
-}
-
 export default function EntregaDetallePage() {
   const router  = useRouter()
   const params  = useParams()
@@ -56,22 +43,36 @@ export default function EntregaDetallePage() {
       .finally(() => setLoading(false))
   }, [id])
 
+  const STATUS_COLOR: Record<string, string> = {
+    entregado:    theme.colors.success,
+    no_entregado: theme.colors.error,
+    pendiente:    theme.colors.warning,
+    parcial:      theme.colors.accent,
+  }
+
+  const STATUS_LABEL: Record<string, string> = {
+    entregado:    'Entregado',
+    no_entregado: 'No entregado',
+    pendiente:    'Pendiente',
+    parcial:      'Parcial',
+  }
+
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50">
+    <div className="min-h-screen flex items-center justify-center" style={{ background: theme.colors.bg }}>
       <div className="text-center">
         <span className="text-5xl">💧</span>
-        <p className="text-gray-400 mt-3">Cargando entrega...</p>
+        <p className="mt-3" style={{ color: theme.colors.textFaint }}>Cargando entrega...</p>
       </div>
     </div>
   )
 
   if (error || !delivery) return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50">
+    <div className="min-h-screen flex items-center justify-center" style={{ background: theme.colors.bg }}>
       <div className="text-center">
         <p className="text-4xl mb-3">❌</p>
-        <p className="text-gray-500">{error || 'Entrega no encontrada'}</p>
+        <p style={{ color: theme.colors.textFaint }}>{error || 'Entrega no encontrada'}</p>
         <button onClick={() => router.back()}
-          className="mt-4 text-blue-600 text-sm font-semibold">← Volver</button>
+          className="mt-4 text-sm font-semibold" style={{ color: theme.colors.accent }}>← Volver</button>
       </div>
     </div>
   )
@@ -81,11 +82,11 @@ export default function EntregaDetallePage() {
   const totalCobrado = Number(delivery.actual_amount ?? 0)
 
   return (
-    <div className="min-h-screen" style={{ background: '#F0F7FC' }}>
+    <div className="min-h-screen" style={{ background: theme.colors.bg }}>
 
       {/* NAVBAR */}
       <nav className="text-white px-6 py-4 flex items-center justify-between shadow-lg"
-        style={{ background: 'linear-gradient(135deg, #0A5C8A, #1A8FBF)' }}>
+        style={{ background: `linear-gradient(135deg, ${theme.colors.brand}, ${theme.colors.brandLight})` }}>
         <div className="flex items-center gap-3">
           <button onClick={() => router.back()}
             className="text-blue-200 hover:text-white text-sm mr-2">← Volver</button>
@@ -101,9 +102,9 @@ export default function EntregaDetallePage() {
         </div>
         <span className="px-3 py-1.5 rounded-full text-xs font-bold"
           style={{
-            background: (STATUS_COLOR[delivery.status] ?? '#888') + '30',
-            color: STATUS_COLOR[delivery.status] ?? '#888',
-            border: `1px solid ${STATUS_COLOR[delivery.status] ?? '#888'}`,
+            background: (STATUS_COLOR[delivery.status] ?? theme.colors.textFaint) + '30',
+            color: STATUS_COLOR[delivery.status] ?? theme.colors.textFaint,
+            border: `1px solid ${STATUS_COLOR[delivery.status] ?? theme.colors.textFaint}`,
           }}>
           {STATUS_LABEL[delivery.status] ?? delivery.status}
         </span>
@@ -115,28 +116,28 @@ export default function EntregaDetallePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           {/* Datos del cliente */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
-            <h3 className="font-bold text-gray-700 mb-4">👤 Cliente</h3>
+          <div className={cardCls + ' p-5'}>
+            <h3 className="font-bold mb-4" style={{ color: theme.colors.text }}>👤 Cliente</h3>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-400">Nombre</span>
-                <span className="text-sm font-semibold text-gray-800">{delivery.client_name}</span>
+                <span className="text-sm" style={{ color: theme.colors.textFaint }}>Nombre</span>
+                <span className="text-sm font-semibold" style={{ color: theme.colors.text }}>{delivery.client_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-400">Dirección</span>
-                <span className="text-sm text-gray-800 text-right max-w-48">{delivery.address}</span>
+                <span className="text-sm" style={{ color: theme.colors.textFaint }}>Dirección</span>
+                <span className="text-sm text-right max-w-48" style={{ color: theme.colors.text }}>{delivery.address}</span>
               </div>
               {delivery.phone && (
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">Teléfono</span>
+                  <span className="text-sm" style={{ color: theme.colors.textFaint }}>Teléfono</span>
                   <a href={`tel:${delivery.phone}`}
-                    className="text-sm font-semibold text-blue-600">{delivery.phone}</a>
+                    className="text-sm font-semibold" style={{ color: theme.colors.accent }}>{delivery.phone}</a>
                 </div>
               )}
               {delivery.arrived_at && (
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">Hora de llegada</span>
-                  <span className="text-sm text-gray-800">
+                  <span className="text-sm" style={{ color: theme.colors.textFaint }}>Hora de llegada</span>
+                  <span className="text-sm" style={{ color: theme.colors.text }}>
                     {new Date(delivery.arrived_at).toLocaleTimeString('es-AR',
                       { hour: '2-digit', minute: '2-digit' })}
                   </span>
@@ -144,81 +145,81 @@ export default function EntregaDetallePage() {
               )}
               {delivery.delivered_at && (
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">Hora de entrega</span>
-                  <span className="text-sm text-gray-800">
+                  <span className="text-sm" style={{ color: theme.colors.textFaint }}>Hora de entrega</span>
+                  <span className="text-sm" style={{ color: theme.colors.text }}>
                     {new Date(delivery.delivered_at).toLocaleTimeString('es-AR',
                       { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               )}
               {delivery.rejection_reason && (
-                <div className="mt-3 bg-red-50 rounded-xl p-3 border border-red-100">
-                  <p className="text-xs font-semibold text-red-600">Motivo de no entrega:</p>
-                  <p className="text-sm text-red-700 mt-1">{delivery.rejection_reason}</p>
+                <div className="mt-3 rounded-xl p-3 border" style={{ background: theme.colors.errorSoft, borderColor: theme.colors.error }}>
+                  <p className="text-xs font-semibold" style={{ color: theme.colors.error }}>Motivo de no entrega:</p>
+                  <p className="text-sm mt-1" style={{ color: theme.colors.error }}>{delivery.rejection_reason}</p>
                 </div>
               )}
               {delivery.notes && (
-                <div className="mt-3 bg-gray-50 rounded-xl p-3">
-                  <p className="text-xs font-semibold text-gray-500">Notas:</p>
-                  <p className="text-sm text-gray-700 mt-1">{delivery.notes}</p>
+                <div className="mt-3 rounded-xl p-3" style={{ background: theme.colors.surface2 }}>
+                  <p className="text-xs font-semibold" style={{ color: theme.colors.textMuted }}>Notas:</p>
+                  <p className="text-sm mt-1" style={{ color: theme.colors.textMuted }}>{delivery.notes}</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Resumen de pago */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
-            <h3 className="font-bold text-gray-700 mb-4">💰 Resumen de pago</h3>
+          <div className={cardCls + ' p-5'}>
+            <h3 className="font-bold mb-4" style={{ color: theme.colors.text }}>💰 Resumen de pago</h3>
             <div className="space-y-3">
-              <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                
-                <span className="text-sm font-semibold text-gray-800">
+              <div className="flex justify-between items-center pb-3 border-b" style={{ borderColor: theme.colors.border }}>
+                <span className="text-sm" style={{ color: theme.colors.textFaint }}>Monto esperado</span>
+                <span className="text-sm font-semibold" style={{ color: theme.colors.text }}>
                   ${Number(delivery.expected_amount ?? 0).toLocaleString('es-AR')}
                 </span>
               </div>
               {delivery.payment_method && (
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">Método de pago</span>
-                  <span className="text-sm font-semibold text-gray-800">
+                  <span className="text-sm" style={{ color: theme.colors.textFaint }}>Método de pago</span>
+                  <span className="text-sm font-semibold" style={{ color: theme.colors.text }}>
                     {METODO_LABEL[delivery.payment_method] ?? delivery.payment_method}
                   </span>
                 </div>
               )}
               {Number(delivery.cash_received) > 0 && (
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">💵 Efectivo</span>
-                  <span className="text-sm font-semibold text-green-700">
+                  <span className="text-sm" style={{ color: theme.colors.textFaint }}>💵 Efectivo</span>
+                  <span className="text-sm font-semibold" style={{ color: theme.colors.success }}>
                     ${Number(delivery.cash_received).toLocaleString('es-AR')}
                   </span>
                 </div>
               )}
               {Number(delivery.transfer_amount) > 0 && (
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">🏦 Transferencia</span>
-                  <span className="text-sm font-semibold text-blue-700">
+                  <span className="text-sm" style={{ color: theme.colors.textFaint }}>🏦 Transferencia</span>
+                  <span className="text-sm font-semibold" style={{ color: theme.colors.accent }}>
                     ${Number(delivery.transfer_amount).toLocaleString('es-AR')}
                   </span>
                 </div>
               )}
               {Number(delivery.credit_amount) > 0 && (
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">📒 Fiado</span>
-                  <span className="text-sm font-semibold text-orange-600">
+                  <span className="text-sm" style={{ color: theme.colors.textFaint }}>📒 Fiado</span>
+                  <span className="text-sm font-semibold" style={{ color: theme.colors.warning }}>
                     ${Number(delivery.credit_amount).toLocaleString('es-AR')}
                   </span>
                 </div>
               )}
               {Number(delivery.change_given) > 0 && (
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">Vuelto</span>
-                  <span className="text-sm font-semibold text-gray-600">
+                  <span className="text-sm" style={{ color: theme.colors.textFaint }}>Vuelto</span>
+                  <span className="text-sm font-semibold" style={{ color: theme.colors.textMuted }}>
                     ${Number(delivery.change_given).toLocaleString('es-AR')}
                   </span>
                 </div>
               )}
-              <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-                <span className="font-bold text-gray-700">Total cobrado</span>
-                <span className="text-2xl font-bold" style={{ color: '#0A5C8A' }}>
+              <div className="flex justify-between items-center pt-3 border-t" style={{ borderColor: theme.colors.border }}>
+                <span className="font-bold" style={{ color: theme.colors.text }}>Total cobrado</span>
+                <span className="text-2xl font-bold" style={{ color: theme.colors.accent }}>
                   ${totalCobrado.toLocaleString('es-AR')}
                 </span>
               </div>
@@ -228,10 +229,10 @@ export default function EntregaDetallePage() {
 
         {/* FIRMA DIGITAL */}
         {firma && (
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
-            <h3 className="font-bold text-gray-700 mb-4">✍️ Firma del cliente</h3>
+          <div className={cardCls + ' p-5'}>
+            <h3 className="font-bold mb-4" style={{ color: theme.colors.text }}>✍️ Firma del cliente</h3>
             <div className="flex flex-col items-center">
-              <div className="border-2 border-blue-100 rounded-2xl overflow-hidden bg-gray-50 w-full max-w-lg">
+              <div className="border-2 rounded-2xl overflow-hidden w-full max-w-lg" style={{ borderColor: theme.colors.border, background: theme.colors.surface2 }}>
                 <img
                   src={firma.file_url}
                   alt="Firma del cliente"
@@ -240,8 +241,8 @@ export default function EntregaDetallePage() {
                 />
               </div>
               <div className="flex items-center gap-2 mt-3">
-                <span className="w-2 h-2 rounded-full bg-green-500" />
-                <p className="text-xs text-gray-400">
+                <span className="w-2 h-2 rounded-full" style={{ background: theme.colors.success }} />
+                <p className="text-xs" style={{ color: theme.colors.textFaint }}>
                   Firmado el {new Date(firma.captured_at).toLocaleDateString('es-AR', {
                     day: 'numeric', month: 'long', year: 'numeric',
                     hour: '2-digit', minute: '2-digit'
@@ -254,10 +255,10 @@ export default function EntregaDetallePage() {
 
         {/* FOTOS DE EVIDENCIA */}
         {fotos.length > 0 && (
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
-            <h3 className="font-bold text-gray-700 mb-4">
+          <div className={cardCls + ' p-5'}>
+            <h3 className="font-bold mb-4" style={{ color: theme.colors.text }}>
               📷 Fotos de evidencia
-              <span className="ml-2 bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: theme.colors.accentSoft, color: theme.colors.accent }}>
                 {fotos.length}
               </span>
             </h3>
@@ -265,7 +266,7 @@ export default function EntregaDetallePage() {
               {fotos.map((f: any) => (
                 <div key={f.id} className="relative group cursor-pointer"
                   onClick={() => setLightbox(f.file_url)}>
-                  <div className="aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                  <div className="aspect-square rounded-xl overflow-hidden border" style={{ background: theme.colors.surface2, borderColor: theme.colors.border }}>
                     <img
                       src={f.file_url}
                       alt={f.type}
@@ -275,7 +276,7 @@ export default function EntregaDetallePage() {
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-xl transition-all flex items-center justify-center">
                     <span className="text-white text-2xl opacity-0 group-hover:opacity-100 transition-opacity">🔍</span>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1 text-center capitalize">
+                  <p className="text-xs mt-1 text-center capitalize" style={{ color: theme.colors.textFaint }}>
                     {f.type.replace(/_/g, ' ')}
                   </p>
                 </div>
@@ -286,28 +287,28 @@ export default function EntregaDetallePage() {
 
         {/* SIN EVIDENCIA */}
         {!firma && fotos.length === 0 && (
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-blue-50 text-center">
+          <div className={cardCls + ' p-8 text-center'}>
             <p className="text-3xl mb-3">📂</p>
-            <p className="text-gray-400 text-sm">Sin evidencia registrada para esta entrega</p>
+            <p className="text-sm" style={{ color: theme.colors.textFaint }}>Sin evidencia registrada para esta entrega</p>
           </div>
         )}
 
         {/* HISTORIAL DE PAGOS */}
         {delivery.payments?.length > 0 && (
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
-            <h3 className="font-bold text-gray-700 mb-4">🧾 Registro de pagos</h3>
-            <div className="divide-y divide-gray-50">
+          <div className={cardCls + ' p-5'}>
+            <h3 className="font-bold mb-4" style={{ color: theme.colors.text }}>🧾 Registro de pagos</h3>
+            <div className="divide-y divide-[#1E2D40]">
               {delivery.payments.map((p: any) => (
                 <div key={p.id} className="py-3 flex justify-between items-center">
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">
+                    <p className="text-sm font-semibold" style={{ color: theme.colors.text }}>
                       {METODO_LABEL[p.method] ?? p.method}
                     </p>
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-xs mt-0.5" style={{ color: theme.colors.textFaint }}>
                       {new Date(p.created_at).toLocaleString('es-AR')}
                     </p>
                   </div>
-                  <p className="font-bold text-blue-700">
+                  <p className="font-bold" style={{ color: theme.colors.accent }}>
                     ${Number(p.amount).toLocaleString('es-AR')}
                   </p>
                 </div>
