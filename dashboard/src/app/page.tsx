@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import CountUp from '@/components/CountUp'
 import FadeIn from '@/components/FadeIn'
-import Map, { Marker, Source, Layer } from 'react-map-gl'
+import Map, { Marker, Source, Layer, Popup } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { dashboardApi, gpsApi } from '@/lib/api'
 import { formatDistanceToNow } from 'date-fns'
@@ -367,6 +367,8 @@ export default function Dashboard() {
   const [lastUpdate, setLastUpdate]   = useState<Date>(new Date())
   const [selectedRep, setSelectedRep] = useState<string | null>(null)
   const [repTrack, setRepTrack] = useState<{lat: number, lng: number, estado?: string}[]>([])
+  const [ventasGeo, setVentasGeo] = useState<any[]>([])
+  const [ventaPopup, setVentaPopup] = useState<any | null>(null)
 
   // Carga (o limpia) el recorrido del día de un repartidor para dibujarlo en el mapa
   const toggleRepTrack = async (userId: string) => {
@@ -419,6 +421,17 @@ export default function Dashboard() {
       setSummary(todayRes.data.summary)
       setRepartidores(todayRes.data.by_repartidor ?? [])
       setPositions(todayRes.data.live_positions ?? posRes.data ?? [])
+      // Cargar gestiones georreferenciadas del dia para los marcadores del mapa
+      try {
+        const hoy = new Date().toISOString().slice(0, 10)
+        const vgRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'}/api/dashboard/ventas-geo?date=${hoy}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('tromen_token')}` },
+        })
+        if (vgRes.ok) {
+          const vgData = await vgRes.json()
+          setVentasGeo(vgData.ventas ?? [])
+        }
+      } catch (e) { /* sin ventas geo, el mapa sigue funcionando */ }
       setAlerts(alertsRes.data)
       setLastUpdate(new Date())
     } catch (err) { console.error(err) }
@@ -597,6 +610,40 @@ export default function Dashboard() {
                     </div>
                   </Marker>
                 ))}
+                {/* Marcadores de venta georreferenciados (por tipo de gestion) */}
+                {ventasGeo.map(v => {
+                  const colorTipo = v.tipo === 'calle' ? '#38bdf8' : v.tipo === 'ausente' ? '#ef4444' : '#16a34a'
+                  return (
+                    <Marker key={`vg-${v.id}`} longitude={Number(v.longitude)} latitude={Number(v.latitude)}>
+                      <div onClick={(e) => { e.stopPropagation(); setVentaPopup(v) }}
+                        title={v.cliente ?? 'Venta'}
+                        style={{ width: 14, height: 14, borderRadius: '50%', background: colorTipo,
+                          border: '2px solid #fff', boxShadow: `0 0 6px ${colorTipo}`, cursor: 'pointer' }} />
+                    </Marker>
+                  )
+                })}
+                {ventaPopup && (
+                  <Popup longitude={Number(ventaPopup.longitude)} latitude={Number(ventaPopup.latitude)}
+                    anchor="bottom" onClose={() => setVentaPopup(null)} closeButton={true}
+                    offset={16}>
+                    <div style={{ fontSize: 12, minWidth: 160 }}>
+                      <p style={{ fontWeight: 700, color: '#0f1117', marginBottom: 4 }}>{ventaPopup.cliente ?? 'Cliente'}</p>
+                      <p style={{ color: '#334155' }}>
+                        {ventaPopup.tipo === 'calle' ? 'Venta fuera de ruta' : ventaPopup.tipo === 'ausente' ? 'Cliente ausente' : 'Entrega'}
+                      </p>
+                      <p style={{ color: '#0f1117', fontWeight: 600, marginTop: 2 }}>${Number(ventaPopup.monto ?? 0).toLocaleString('es-AR')}</p>
+                      <p style={{ color: '#64748b', fontSize: 11, marginTop: 2 }}>{ventaPopup.repartidor}</p>
+                      <p style={{ color: '#64748b', fontSize: 11 }}>
+                        {ventaPopup.delivered_at ? new Date(ventaPopup.delivered_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' }) : ''}
+                      </p>
+                      {ventaPopup.productos && ventaPopup.productos.length > 0 && (
+                        <p style={{ color: '#334155', fontSize: 11, marginTop: 4 }}>
+                          {ventaPopup.productos.map((p: any) => `${p.cantidad} ${p.nombre}`).join(', ')}
+                        </p>
+                      )}
+                    </div>
+                  </Popup>
+                )}
                 {repSegmentos.length > 0 && (
                   <Source id="home-rep-track" type="geojson" data={{
                     type: 'FeatureCollection',
