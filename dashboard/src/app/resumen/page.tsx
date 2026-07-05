@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
+import { theme, cardCls } from '@/lib/theme'
 import * as XLSX from 'xlsx'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
@@ -374,35 +375,35 @@ export default function ResumenPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
+    <div style={{ minHeight: '100vh', background: theme.colors.bg, display: 'flex', flexDirection: 'row' }}>
       <Sidebar />
       <div style={{ flex: 1, height: '100vh', overflowY: 'auto' }}>
         <nav className="px-6 py-4 flex items-center gap-3 sticky top-0 z-30"
-          style={{ background: '#151b27', borderBottom: '1px solid #1e2d40' }}>
+          style={{ background: theme.colors.surface, borderBottom: `1px solid ${theme.colors.border}` }}>
           <span className="text-2xl">📊</span>
           <div>
-            <h1 className="font-bold text-lg" style={{ color: '#f1f5f9' }}>Resumen diario</h1>
-            <p className="text-xs" style={{ color: '#64748b' }}>Ventas del día · descargá el Excel</p>
+            <h1 className="font-bold text-lg" style={{ color: theme.colors.text }}>Resumen diario</h1>
+            <p className="text-xs" style={{ color: theme.colors.textFaint }}>Ventas del día · descargá el Excel</p>
           </div>
         </nav>
 
         <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-6">
           {/* Selector de fecha + acciones */}
-          <div className="rounded-2xl p-5" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
-            <label className="text-xs font-semibold uppercase block mb-2" style={{ color: '#64748b' }}>Fecha</label>
+          <div className={cardCls + ' p-5'}>
+            <label className="text-xs font-semibold uppercase block mb-2" style={{ color: theme.colors.textFaint }}>Fecha</label>
             <div className="flex flex-wrap items-center gap-3">
               <input type="date" value={fecha} onChange={e => setFecha(e.target.value)}
                 className="rounded-xl px-4 py-2.5 text-sm"
-                style={{ background: '#0f1117', border: '1px solid #1e2d40', color: '#f1f5f9' }} />
+                style={{ background: theme.colors.bg, border: `1px solid ${theme.colors.border}`, color: theme.colors.text }} />
               <button onClick={cargar} disabled={loading}
                 className="rounded-xl px-5 py-2.5 text-sm font-bold"
-                style={{ background: '#38bdf8', color: '#0f1117', opacity: loading ? 0.5 : 1 }}>
+                style={{ background: theme.colors.accent, color: theme.colors.bg, opacity: loading ? 0.5 : 1 }}>
                 {loading ? 'Cargando...' : 'Ver resumen'}
               </button>
               {ventas && ventas.length > 0 && (
                 <button onClick={descargarExcel}
                   className="rounded-xl px-5 py-2.5 text-sm font-bold"
-                  style={{ background: '#16a34a', color: '#fff' }}>
+                  style={{ background: theme.colors.success, color: '#fff' }}>
                   ⬇ Descargar Excel
                 </button>
               )}
@@ -410,7 +411,7 @@ export default function ResumenPage() {
           </div>
 
           {error && (
-            <div className="rounded-xl p-4 text-sm" style={{ background: '#3a1a1a', color: '#fca5a5', border: '1px solid #7f1d1d' }}>
+            <div className="rounded-xl p-4 text-sm border" style={{ background: theme.colors.errorSoft, color: theme.colors.error, borderColor: theme.colors.error }}>
               {error}
             </div>
           )}
@@ -418,30 +419,30 @@ export default function ResumenPage() {
           {/* Vista previa */}
           {ventas && (
             ventas.length === 0 ? (
-              <div className="rounded-2xl p-8 text-center text-sm" style={{ background: '#151b27', border: '1px solid #1e2d40', color: '#64748b' }}>
+              <div className={cardCls + ' p-8 text-center text-sm'} style={{ color: theme.colors.textFaint }}>
                 No hay ventas registradas para esta fecha
               </div>
             ) : (
               <div className="space-y-5">
                 {/* Total general arriba */}
                 {totalGeneral && (
-                  <div className="rounded-2xl p-5" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
+                  <div className={cardCls + ' p-5'}>
                     <div className="flex items-center justify-between mb-3">
-                      <p className="font-bold text-sm" style={{ color: '#f1f5f9' }}>Total del día · {ventas.length} ventas</p>
-                      <p className="font-bold text-xl" style={{ color: '#16a34a' }}>${totalGeneral.total.toLocaleString('es-AR')}</p>
+                      <p className="font-bold text-sm" style={{ color: theme.colors.text }}>Total del día · {ventas.length} ventas</p>
+                      <p className="font-bold text-xl" style={{ color: theme.colors.success }}>${totalGeneral.total.toLocaleString('es-AR')}</p>
                     </div>
                     <div className="grid grid-cols-3 gap-3">
-                      <div className="rounded-xl p-3" style={{ background: '#0f1117' }}>
-                        <p className="text-xs" style={{ color: '#64748b' }}>Efectivo</p>
-                        <p className="font-bold text-sm" style={{ color: '#f1f5f9' }}>${totalGeneral.efectivo.toLocaleString('es-AR')}</p>
+                      <div className="rounded-xl p-3" style={{ background: theme.colors.bg }}>
+                        <p className="text-xs" style={{ color: theme.colors.textFaint }}>Efectivo</p>
+                        <p className="font-bold text-sm" style={{ color: theme.colors.text }}>${totalGeneral.efectivo.toLocaleString('es-AR')}</p>
                       </div>
-                      <div className="rounded-xl p-3" style={{ background: '#0f1117' }}>
-                        <p className="text-xs" style={{ color: '#64748b' }}>Transferencia</p>
-                        <p className="font-bold text-sm" style={{ color: '#f1f5f9' }}>${totalGeneral.transfer.toLocaleString('es-AR')}</p>
+                      <div className="rounded-xl p-3" style={{ background: theme.colors.bg }}>
+                        <p className="text-xs" style={{ color: theme.colors.textFaint }}>Transferencia</p>
+                        <p className="font-bold text-sm" style={{ color: theme.colors.text }}>${totalGeneral.transfer.toLocaleString('es-AR')}</p>
                       </div>
-                      <div className="rounded-xl p-3" style={{ background: '#0f1117' }}>
-                        <p className="text-xs" style={{ color: '#64748b' }}>Cta corriente</p>
-                        <p className="font-bold text-sm" style={{ color: '#f1f5f9' }}>${totalGeneral.credito.toLocaleString('es-AR')}</p>
+                      <div className="rounded-xl p-3" style={{ background: theme.colors.bg }}>
+                        <p className="text-xs" style={{ color: theme.colors.textFaint }}>Cta corriente</p>
+                        <p className="font-bold text-sm" style={{ color: theme.colors.text }}>${totalGeneral.credito.toLocaleString('es-AR')}</p>
                       </div>
                     </div>
                   </div>
@@ -452,26 +453,26 @@ export default function ResumenPage() {
                   const t = totalesPorPago(sec.lista)
                   const tb = totalesBidones(sec.lista)
                   return (
-                    <div key={sec.nombre} className="rounded-2xl overflow-hidden" style={{ background: '#151b27', border: '1px solid #1e2d40' }}>
-                      <div className="px-5 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid #1e2d40' }}>
-                        <p className="font-bold text-sm" style={{ color: sec.deposito ? '#fbbf24' : '#38bdf8' }}>
+                    <div key={sec.nombre} className={cardCls + ' overflow-hidden'}>
+                      <div className="px-5 py-3 flex items-center justify-between" style={{ borderBottom: `1px solid ${theme.colors.border}` }}>
+                        <p className="font-bold text-sm" style={{ color: sec.deposito ? theme.colors.warning : theme.colors.accent }}>
                           {sec.deposito ? '🏪 ' : '🚚 '}{sec.nombre}
                         </p>
-                        <p className="text-xs" style={{ color: '#64748b' }}>{sec.lista.length} ventas · ${t.total.toLocaleString('es-AR')}</p>
+                        <p className="text-xs" style={{ color: theme.colors.textFaint }}>{sec.lista.length} ventas · ${t.total.toLocaleString('es-AR')}</p>
                       </div>
                       {(tb.tromen + tb.oeste + tb.seis + tb.otros) > 0 && (
-                        <div className="px-5 py-2 flex flex-wrap gap-x-4 gap-y-1" style={{ borderBottom: '1px solid #1e2d40', background: '#0f1117' }}>
-                          {tb.tromen > 0 && <span className="text-xs" style={{ color: '#38bdf8' }}>TROMEN: <b style={{ color: '#f1f5f9' }}>{tb.tromen}</b></span>}
-                          {tb.oeste > 0 && <span className="text-xs" style={{ color: '#38bdf8' }}>Del Oeste: <b style={{ color: '#f1f5f9' }}>{tb.oeste}</b></span>}
-                          {tb.seis > 0 && <span className="text-xs" style={{ color: '#38bdf8' }}>6lt: <b style={{ color: '#f1f5f9' }}>{tb.seis}</b></span>}
-                          {tb.otros > 0 && <span className="text-xs" style={{ color: '#64748b' }}>Otros: <b style={{ color: '#f1f5f9' }}>{tb.otros}</b></span>}
-                          {tb.devueltos > 0 && <span className="text-xs" style={{ color: '#64748b' }}>Devueltos: <b style={{ color: '#f1f5f9' }}>{tb.devueltos}</b></span>}
+                        <div className="px-5 py-2 flex flex-wrap gap-x-4 gap-y-1" style={{ borderBottom: `1px solid ${theme.colors.border}`, background: theme.colors.bg }}>
+                          {tb.tromen > 0 && <span className="text-xs" style={{ color: theme.colors.accent }}>TROMEN: <b style={{ color: theme.colors.text }}>{tb.tromen}</b></span>}
+                          {tb.oeste > 0 && <span className="text-xs" style={{ color: theme.colors.accent }}>Del Oeste: <b style={{ color: theme.colors.text }}>{tb.oeste}</b></span>}
+                          {tb.seis > 0 && <span className="text-xs" style={{ color: theme.colors.accent }}>6lt: <b style={{ color: theme.colors.text }}>{tb.seis}</b></span>}
+                          {tb.otros > 0 && <span className="text-xs" style={{ color: theme.colors.textFaint }}>Otros: <b style={{ color: theme.colors.text }}>{tb.otros}</b></span>}
+                          {tb.devueltos > 0 && <span className="text-xs" style={{ color: theme.colors.textFaint }}>Devueltos: <b style={{ color: theme.colors.text }}>{tb.devueltos}</b></span>}
                         </div>
                       )}
                       <div style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                           <thead>
-                            <tr style={{ color: '#64748b', textAlign: 'left' }}>
+                            <tr style={{ color: theme.colors.textFaint, textAlign: 'left' }}>
                               <th style={{ padding: '8px 12px', fontWeight: 600 }}>Hora</th>
                               <th style={{ padding: '8px 12px', fontWeight: 600 }}>Cliente</th>
                               <th style={{ padding: '8px 12px', fontWeight: 600 }}>Pago</th>
@@ -479,9 +480,9 @@ export default function ResumenPage() {
                               <th style={{ padding: '8px 12px', fontWeight: 600, textAlign: 'right' }}>Transf</th>
                               <th style={{ padding: '8px 12px', fontWeight: 600, textAlign: 'right' }}>Cta cte</th>
                               <th style={{ padding: '8px 12px', fontWeight: 600, textAlign: 'right' }}>Total</th>
-                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: '#38bdf8' }}>TROMEN</th>
-                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: '#38bdf8' }}>Oeste</th>
-                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: '#38bdf8' }}>6lt</th>
+                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: theme.colors.accent }}>TROMEN</th>
+                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: theme.colors.accent }}>Oeste</th>
+                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: theme.colors.accent }}>6lt</th>
                               <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center' }}>Otros</th>
                               <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center' }}>Devuel</th>
                             </tr>
@@ -490,7 +491,7 @@ export default function ResumenPage() {
                             {sec.lista.map(v => {
                               const bv = bidonesDeVenta(v)
                               return (
-                              <tr key={v.id} onClick={() => abrirGestion(v)} style={{ color: '#cbd5e1', borderTop: '1px solid #1e2d40', cursor: 'pointer' }}
+                              <tr key={v.id} onClick={() => abrirGestion(v)} style={{ color: '#cbd5e1', borderTop: `1px solid ${theme.colors.border}`, cursor: 'pointer' }}
                                 title="Ver evidencia (fotos y firma)">
                                 <td style={{ padding: '8px 12px' }}>{v.delivered_at ? new Date(v.delivered_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' }) : ''}</td>
                                 <td style={{ padding: '8px 12px' }}>{v.cliente ?? ''}</td>
@@ -498,7 +499,7 @@ export default function ResumenPage() {
                                 <td style={{ padding: '8px 12px', textAlign: 'right' }}>{num(v.cash_received) > 0 ? '$'+num(v.cash_received).toLocaleString('es-AR') : '-'}</td>
                                 <td style={{ padding: '8px 12px', textAlign: 'right' }}>{num(v.transfer_amount) > 0 ? '$'+num(v.transfer_amount).toLocaleString('es-AR') : '-'}</td>
                                 <td style={{ padding: '8px 12px', textAlign: 'right' }}>{num(v.credit_amount) > 0 ? '$'+num(v.credit_amount).toLocaleString('es-AR') : '-'}</td>
-                                <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 700, color: '#f1f5f9' }}>${num(v.actual_amount).toLocaleString('es-AR')}</td>
+                                <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 700, color: theme.colors.text }}>${num(v.actual_amount).toLocaleString('es-AR')}</td>
                                 <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.tromen || '-'}</td>
                                 <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.oeste || '-'}</td>
                                 <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.seis || '-'}</td>
@@ -507,15 +508,15 @@ export default function ResumenPage() {
                               </tr>
                               )
                             })}
-                            <tr style={{ borderTop: '2px solid #1e2d40', color: '#f1f5f9', fontWeight: 700 }}>
+                            <tr style={{ borderTop: `2px solid ${theme.colors.border}`, color: theme.colors.text, fontWeight: 700 }}>
                               <td style={{ padding: '8px 12px' }} colSpan={3}>TOTALES</td>
                               <td style={{ padding: '8px 12px', textAlign: 'right' }}>${t.efectivo.toLocaleString('es-AR')}</td>
                               <td style={{ padding: '8px 12px', textAlign: 'right' }}>${t.transfer.toLocaleString('es-AR')}</td>
                               <td style={{ padding: '8px 12px', textAlign: 'right' }}>${t.credito.toLocaleString('es-AR')}</td>
                               <td style={{ padding: '8px 12px', textAlign: 'right' }}>${t.total.toLocaleString('es-AR')}</td>
-                              <td style={{ padding: '8px 8px', textAlign: 'center', color: '#38bdf8' }}>{tb.tromen || '-'}</td>
-                              <td style={{ padding: '8px 8px', textAlign: 'center', color: '#38bdf8' }}>{tb.oeste || '-'}</td>
-                              <td style={{ padding: '8px 8px', textAlign: 'center', color: '#38bdf8' }}>{tb.seis || '-'}</td>
+                              <td style={{ padding: '8px 8px', textAlign: 'center', color: theme.colors.accent }}>{tb.tromen || '-'}</td>
+                              <td style={{ padding: '8px 8px', textAlign: 'center', color: theme.colors.accent }}>{tb.oeste || '-'}</td>
+                              <td style={{ padding: '8px 8px', textAlign: 'center', color: theme.colors.accent }}>{tb.seis || '-'}</td>
                               <td style={{ padding: '8px 8px', textAlign: 'center' }}>{tb.otros || '-'}</td>
                               <td style={{ padding: '8px 8px', textAlign: 'center' }}>{tb.devueltos || '-'}</td>
                             </tr>
@@ -537,46 +538,46 @@ export default function ResumenPage() {
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 50,
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
           <div onClick={e => e.stopPropagation()}
-            style={{ background: '#151b27', border: '1px solid #1e2d40', borderRadius: 16,
+            style={{ background: theme.colors.surface, border: `1px solid ${theme.colors.border}`, borderRadius: 16,
               maxWidth: 640, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
             {/* Cabecera */}
-            <div style={{ padding: '18px 20px', borderBottom: '1px solid #1e2d40',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#151b27' }}>
+            <div style={{ padding: '18px 20px', borderBottom: `1px solid ${theme.colors.border}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: theme.colors.surface }}>
               <div>
-                <p style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 15 }}>{gestionSel.cliente ?? 'Cliente'}</p>
-                <p style={{ color: '#64748b', fontSize: 12 }}>
+                <p style={{ color: theme.colors.text, fontWeight: 700, fontSize: 15 }}>{gestionSel.cliente ?? 'Cliente'}</p>
+                <p style={{ color: theme.colors.textFaint, fontSize: 12 }}>
                   {gestionSel.repartidor} · {gestionSel.delivered_at ? new Date(gestionSel.delivered_at).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' }) : ''}
                 </p>
               </div>
               <button onClick={() => { setGestionSel(null); setEvidencia(null) }}
-                style={{ background: '#0f1117', border: '1px solid #1e2d40', borderRadius: 8, color: '#cbd5e1',
+                style={{ background: theme.colors.bg, border: `1px solid ${theme.colors.border}`, borderRadius: 8, color: '#cbd5e1',
                   width: 32, height: 32, cursor: 'pointer', fontSize: 16 }}>✕</button>
             </div>
             <div style={{ padding: 20 }}>
               {/* Datos de la gestion */}
               <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 16 }}>
-                <div><p style={{ color: '#64748b', fontSize: 11 }}>Total</p><p style={{ color: '#16a34a', fontWeight: 700 }}>${num(gestionSel.actual_amount).toLocaleString('es-AR')}</p></div>
-                <div><p style={{ color: '#64748b', fontSize: 11 }}>Pago</p><p style={{ color: '#f1f5f9' }}>{gestionSel.payment_method ? (PAY_LABEL[gestionSel.payment_method] ?? gestionSel.payment_method) : '-'}</p></div>
-                <div><p style={{ color: '#64748b', fontSize: 11 }}>Direccion</p><p style={{ color: '#cbd5e1', fontSize: 13 }}>{gestionSel.direccion ?? '-'}</p></div>
+                <div><p style={{ color: theme.colors.textFaint, fontSize: 11 }}>Total</p><p style={{ color: theme.colors.success, fontWeight: 700 }}>${num(gestionSel.actual_amount).toLocaleString('es-AR')}</p></div>
+                <div><p style={{ color: theme.colors.textFaint, fontSize: 11 }}>Pago</p><p style={{ color: theme.colors.text }}>{gestionSel.payment_method ? (PAY_LABEL[gestionSel.payment_method] ?? gestionSel.payment_method) : '-'}</p></div>
+                <div><p style={{ color: theme.colors.textFaint, fontSize: 11 }}>Direccion</p><p style={{ color: '#cbd5e1', fontSize: 13 }}>{gestionSel.direccion ?? '-'}</p></div>
               </div>
 
-              {cargandoEvid && <p style={{ color: '#64748b', textAlign: 'center', padding: 20 }}>Cargando evidencia...</p>}
+              {cargandoEvid && <p style={{ color: theme.colors.textFaint, textAlign: 'center', padding: 20 }}>Cargando evidencia...</p>}
 
               {!cargandoEvid && evidencia && (() => {
                 const evs = evidencia.evidence ?? []
                 const firma = evs.find((e: any) => e.type === 'firma_digital')
                 const fotos = evs.filter((e: any) => e.type !== 'firma_digital')
-                if (evs.length === 0) return <p style={{ color: '#64748b', textAlign: 'center', padding: 20 }}>Esta gestion no tiene fotos ni firma registradas</p>
+                if (evs.length === 0) return <p style={{ color: theme.colors.textFaint, textAlign: 'center', padding: 20 }}>Esta gestion no tiene fotos ni firma registradas</p>
                 return (
                   <div>
                     {fotos.length > 0 && (
                       <div style={{ marginBottom: 16 }}>
-                        <p style={{ color: '#38bdf8', fontSize: 12, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase' }}>Fotos ({fotos.length})</p>
+                        <p style={{ color: theme.colors.accent, fontSize: 12, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase' }}>Fotos ({fotos.length})</p>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8 }}>
                           {fotos.map((f: any) => (
                             <div key={f.id}>
-                              <img src={f.file_url} alt={f.type} onClick={() => setImgAmpliada(f.file_url)} style={{ width: '100%', borderRadius: 8, border: '1px solid #1e2d40', cursor: 'zoom-in' }} />
-                              <p style={{ color: '#64748b', fontSize: 10, marginTop: 3 }}>{f.type === 'foto_ausente' ? 'Cliente ausente' : f.type === 'foto_entrega' ? 'Entrega' : f.type}</p>
+                              <img src={f.file_url} alt={f.type} onClick={() => setImgAmpliada(f.file_url)} style={{ width: '100%', borderRadius: 8, border: `1px solid ${theme.colors.border}`, cursor: 'zoom-in' }} />
+                              <p style={{ color: theme.colors.textFaint, fontSize: 10, marginTop: 3 }}>{f.type === 'foto_ausente' ? 'Cliente ausente' : f.type === 'foto_entrega' ? 'Entrega' : f.type}</p>
                             </div>
                           ))}
                         </div>
@@ -584,8 +585,8 @@ export default function ResumenPage() {
                     )}
                     {firma && (
                       <div>
-                        <p style={{ color: '#38bdf8', fontSize: 12, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase' }}>Firma del cliente</p>
-                        <img src={firma.file_url} alt="firma" onClick={() => setImgAmpliada(firma.file_url)} style={{ width: '100%', maxWidth: 300, borderRadius: 8, border: '1px solid #1e2d40', background: '#fff', cursor: 'zoom-in' }} />
+                        <p style={{ color: theme.colors.accent, fontSize: 12, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase' }}>Firma del cliente</p>
+                        <img src={firma.file_url} alt="firma" onClick={() => setImgAmpliada(firma.file_url)} style={{ width: '100%', maxWidth: 300, borderRadius: 8, border: `1px solid ${theme.colors.border}`, background: '#fff', cursor: 'zoom-in' }} />
                       </div>
                     )}
                   </div>

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 import FadeIn from '@/components/FadeIn'
+import { theme, cardCls, inputCls, labelCls } from '@/lib/theme'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tromen-backend-production.up.railway.app'
 
@@ -117,17 +118,8 @@ export default function ProductosPage() {
     } catch {}
   }
 
-  // ---- estilos reutilizables (tokens del design system) ----
-  const inputCls =
-    'w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-[#f9fafb] ' +
-    'border border-[#e5e7eb] text-[#1f2937] placeholder-[#9ca3af] ' +
-    'focus:outline-none focus:border-[#0A5C8A] transition-colors'
-  const labelCls = 'text-xs font-semibold text-[#6b7280] uppercase tracking-wide'
-  const cardCls =
-    'rounded-2xl bg-[#ffffff] border border-[#e5e7eb] shadow-[0 1px 3px rgba(0,0,0,0.1)]'
-
   return (
-    <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', flexDirection: 'row' }}>
+    <div style={{ minHeight: '100vh', background: theme.colors.bg, display: 'flex', flexDirection: 'row' }}>
 
       <Sidebar />
 
@@ -135,17 +127,17 @@ export default function ProductosPage() {
 
       {/* HEADER */}
       <nav className="px-6 py-4 flex items-center justify-between sticky top-0 z-30"
-        style={{ background: '#151b27', borderBottom: '1px solid #1e2d40' }}>
+        style={{ background: theme.colors.surface, borderBottom: `1px solid ${theme.colors.border}` }}>
         <div className="flex items-center gap-3">
           <span className="text-2xl">🛒</span>
           <div>
-            <h1 className="font-bold text-lg" style={{ color: '#f1f5f9' }}>Productos y precios</h1>
-            <p className="text-xs" style={{ color: '#64748b' }}>TROMEN · Catriel</p>
+            <h1 className="font-bold text-lg" style={{ color: theme.colors.text }}>Productos y precios</h1>
+            <p className="text-xs" style={{ color: theme.colors.textFaint }}>TROMEN · Catriel</p>
           </div>
         </div>
         <button onClick={openNew}
-          className="cult-btn text-white rounded-xl px-4 py-2 text-sm font-bold"
-          style={{ background: '#16a34a' }}>
+          className="cult-btn text-white rounded-xl px-4 py-2 text-sm font-bold hover:brightness-110 transition-all"
+          style={{ background: theme.colors.success }}>
           + Nuevo producto
         </button>
       </nav>
@@ -153,19 +145,19 @@ export default function ProductosPage() {
       <div className="p-4 md:p-6 max-w-4xl mx-auto">
 
         {error && (
-          <div className="rounded-xl p-3 text-sm mb-4"
-            style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #dc2626' }}>
+          <div className="rounded-xl p-3 text-sm mb-4 border"
+            style={{ background: theme.colors.errorSoft, color: theme.colors.error, borderColor: theme.colors.error }}>
             {error}
           </div>
         )}
 
         {/* INFO */}
-        <div className="rounded-xl p-4 mb-6 flex items-start gap-3"
-          style={{ background: '#e0f2fe', border: '1px solid #e5e7eb' }}>
+        <div className="rounded-xl p-4 mb-6 flex items-start gap-3 border"
+          style={{ background: theme.colors.accentSoft, borderColor: theme.colors.border }}>
           <span className="text-2xl">💡</span>
           <div>
-            <p className="font-semibold text-sm" style={{ color: '#1f2937' }}>Precios que ve el repartidor</p>
-            <p className="text-xs mt-1" style={{ color: '#6b7280' }}>
+            <p className="font-semibold text-sm" style={{ color: theme.colors.text }}>Precios que ve el repartidor</p>
+            <p className="text-xs mt-1" style={{ color: theme.colors.textMuted }}>
               Estos precios aparecen en la app del repartidor al registrar una entrega.
               Podés editarlos en cualquier momento y se actualizan automáticamente.
             </p>
@@ -174,7 +166,7 @@ export default function ProductosPage() {
 
         {/* LISTA */}
         {loading ? (
-          <div className="text-center py-20 text-[#9ca3af]">Cargando productos...</div>
+          <div className="text-center py-20" style={{ color: theme.colors.textFaint }}>Cargando productos...</div>
         ) : (
           <FadeIn className="space-y-3">
             {products.map(p => (
@@ -184,38 +176,38 @@ export default function ProductosPage() {
                 <div className="flex items-center gap-4">
                   {/* Orden */}
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                    style={{ background: '#e0f2fe', color: '#0A5C8A' }}>
+                    style={{ background: theme.colors.accentSoft, color: theme.colors.accent }}>
                     {p.sort_order}
                   </div>
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-bold text-[#1f2937]">{p.name}</p>
+                      <p className="font-bold" style={{ color: theme.colors.text }}>{p.name}</p>
                       <span className="text-xs px-2 py-0.5 rounded-full"
-                        style={{ background: '#f3f4f6', color: '#6b7280' }}>
+                        style={{ background: theme.colors.surface2, color: theme.colors.textMuted }}>
                         por {p.unit}
                       </span>
                       {p.has_empty_return && (
                         <span className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: '#fef3c7', color: '#d97706' }}>
+                          style={{ background: theme.colors.warningSoft, color: theme.colors.warning }}>
                           🫙 devuelve envase
                         </span>
                       )}
                       {!p.active && (
                         <span className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: '#fee2e2', color: '#dc2626' }}>Inactivo</span>
+                          style={{ background: theme.colors.errorSoft, color: theme.colors.error }}>Inactivo</span>
                       )}
                     </div>
                   </div>
 
                   {/* Precio editable rápido */}
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-[#9ca3af] text-sm">$</span>
+                    <span className="text-sm" style={{ color: theme.colors.textFaint }}>$</span>
                     <input
                       type="number"
-                      className="w-28 rounded-xl px-3 py-2 text-sm font-bold text-center bg-[#f9fafb] border border-[#e5e7eb] focus:outline-none focus:border-[#0A5C8A] transition-colors"
-                      style={{ color: '#0A5C8A' }}
+                      className="w-28 rounded-xl px-3 py-2 text-sm font-bold text-center transition-colors focus:outline-none"
+                      style={{ background: theme.colors.surface2, border: `1px solid ${theme.colors.border}`, color: theme.colors.accent }}
                       defaultValue={Number(p.price)}
                       onBlur={e => {
                         if (e.target.value !== String(Number(p.price))) {
@@ -234,13 +226,13 @@ export default function ProductosPage() {
                   {/* Acciones */}
                   <div className="flex gap-2 flex-shrink-0">
                     <button onClick={() => openEdit(p)}
-                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:bg-[#f3f4f6]"
-                      style={{ color: '#0A5C8A' }}>
+                      className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors hover:bg-[#1A2236]"
+                      style={{ color: theme.colors.accent }}>
                       Editar
                     </button>
                     <button onClick={() => handleToggleActive(p)}
                       className="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all hover:brightness-125"
-                      style={{ color: p.active ? '#dc2626' : '#16a34a' }}>
+                      style={{ color: p.active ? theme.colors.error : theme.colors.success }}>
                       {p.active ? 'Desactivar' : 'Activar'}
                     </button>
                   </div>
@@ -249,12 +241,12 @@ export default function ProductosPage() {
             ))}
 
             {products.length === 0 && (
-              <div className="text-center py-20 text-[#9ca3af]">
+              <div className="text-center py-20" style={{ color: theme.colors.textFaint }}>
                 <p className="text-4xl mb-3">🛒</p>
                 <p>No hay productos cargados</p>
                 <button onClick={openNew}
-                  className="mt-4 text-white rounded-xl px-6 py-2 text-sm font-bold"
-                  style={{ background: '#0A5C8A' }}>
+                  className="mt-4 text-white rounded-xl px-6 py-2 text-sm font-bold hover:brightness-110 transition-all"
+                  style={{ background: theme.colors.brand }}>
                   + Agregar primer producto
                 </button>
               </div>
@@ -266,70 +258,73 @@ export default function ProductosPage() {
       {/* MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="rounded-2xl w-full max-w-md bg-white border border-gray-200 shadow-xl">
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="font-bold text-lg text-gray-800">
+          <div className={cardCls + ' w-full max-w-md'}>
+            <div className="p-5 border-b flex items-center justify-between" style={{ borderColor: theme.colors.border }}>
+              <h2 className="font-bold text-lg" style={{ color: theme.colors.text }}>
                 {editing ? 'Editar producto' : 'Nuevo producto'}
               </h2>
               <button onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-700 text-xl transition-colors">✕</button>
+                className="text-xl transition-colors hover:text-[#F1F5F9]" style={{ color: theme.colors.textFaint }}>✕</button>
             </div>
             <div className="p-5 space-y-4">
               {error && (
-                <div className="rounded-xl p-3 text-sm bg-red-50 text-red-600 border border-red-200">
+                <div className="rounded-xl p-3 text-sm border"
+                  style={{ background: theme.colors.errorSoft, color: theme.colors.error, borderColor: theme.colors.error }}>
                   {error}
                 </div>
               )}
               <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Nombre *</label>
+                <label className={labelCls}>Nombre *</label>
                 <input
-                  className="w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-white border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                  className={inputCls}
                   placeholder="Ej: Bidón de agua 20L"
                   value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Unidad</label>
+                  <label className={labelCls}>Unidad</label>
                   <select
-                    className="w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-white border border-gray-300 text-gray-800 focus:outline-none focus:border-blue-500 transition-colors"
+                    className={inputCls}
                     value={form.unit} onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}>
                     {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Precio $ *</label>
+                  <label className={labelCls}>Precio $ *</label>
                   <input type="number"
-                    className="w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-white border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                    className={inputCls}
                     placeholder="0.00"
                     value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Orden en app</label>
+                  <label className={labelCls}>Orden en app</label>
                   <input type="number"
-                    className="w-full rounded-xl px-4 py-2.5 text-sm mt-1 bg-white border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                    className={inputCls}
                     placeholder="1"
                     value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: e.target.value }))} />
                 </div>
                 <div className="flex flex-col justify-end">
-                  <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-gray-300 hover:bg-gray-50 transition-colors">
-                    <input type="checkbox" className="w-4 h-4 accent-blue-600"
+                  <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border transition-colors hover:bg-[#1A2236]"
+                    style={{ borderColor: theme.colors.border }}>
+                    <input type="checkbox" className="w-4 h-4 accent-[#38BDF8]"
                       checked={form.has_empty_return}
                       onChange={e => setForm(f => ({ ...f, has_empty_return: e.target.checked }))} />
-                    <span className="text-sm text-gray-600">🫙 Devuelve envase</span>
+                    <span className="text-sm" style={{ color: theme.colors.textMuted }}>🫙 Devuelve envase</span>
                   </label>
                 </div>
               </div>
             </div>
-            <div className="p-5 border-t border-gray-100 flex gap-3">
+            <div className="p-5 border-t flex gap-3" style={{ borderColor: theme.colors.border }}>
               <button onClick={() => setShowModal(false)}
-                className="flex-1 rounded-xl py-3 text-sm font-semibold transition-all border border-gray-300 text-gray-600 hover:bg-gray-50">
+                className="flex-1 rounded-xl py-3 text-sm font-semibold transition-colors border hover:bg-[#1A2236]"
+                style={{ borderColor: theme.colors.border, color: theme.colors.textMuted }}>
                 Cancelar
               </button>
               <button onClick={handleSave} disabled={saving}
                 className="flex-1 text-white rounded-xl py-3 text-sm font-bold transition-all disabled:opacity-50 hover:brightness-110"
-                style={{ background: '#0A5C8A' }}>
+                style={{ background: theme.colors.brand }}>
                 {saving ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear producto'}
               </button>
             </div>
