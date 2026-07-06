@@ -106,6 +106,14 @@ export default function ResumenPage() {
     for (const d of (v.devueltos ?? [])) r.devueltos += Number(d.cantidad ?? 0)
     return r
   }
+  // Bidones que quedaron en cuenta corriente: total de envases SOLO si el pago fue cuenta_corriente
+  const bidonesACuenta = (v: Venta) => {
+    if (v.payment_method !== 'cuenta_corriente') return 0
+    const b = bidonesDeVenta(v)
+    return b.tromen + b.oeste + b.seis + b.otros
+  }
+  // Total de bidones a cuenta corriente de una lista
+  const totalACuenta = (lista: Venta[]) => lista.reduce((s, v) => s + bidonesACuenta(v), 0)
   // Totales de productos de una lista de ventas
   const totalesBidones = (lista: Venta[]) => {
     const t = { tromen: 0, oeste: 0, seis: 0, otros: 0, devueltos: 0 }
@@ -161,22 +169,22 @@ export default function ResumenPage() {
       ? new Date(v.delivered_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' })
       : ''
 
-    const COLS = ['Fecha', 'Hora', 'Cliente', 'Dirección', 'Forma de pago', 'Efectivo', 'Transferencia', 'Cta corriente', 'Total', 'TROMEN', 'Del Oeste', '6lt', 'Otros', 'Devueltos', 'Notas']
+    const COLS = ['Fecha', 'Hora', 'Cliente', 'Dirección', 'Forma de pago', 'Efectivo', 'Transferencia', 'Cta corriente', 'Total', 'TROMEN', 'Del Oeste', 'A cuenta', 'Devueltos', 'Notas']
     const MONEY_COLS = [6, 7, 8, 9]
-    const PROD_COLS = [10, 11, 12, 13, 14]
+    const PROD_COLS = [10, 11, 12, 13]
 
     const crearHoja = (titulo: string, lista: Venta[]) => {
       const ws = wb.addWorksheet(titulo.slice(0, 31).replace(/[\\/?*[\]:]/g, ''), {
         views: [{ state: 'frozen', ySplit: 4 }],
       })
-      ws.mergeCells('A1:O1')
+      ws.mergeCells('A1:N1')
       const t = ws.getCell('A1')
       t.value = 'TROMEN · Agua Mineral Natural'
       t.font = { name: 'Arial', size: 16, bold: true, color: { argb: 'FFFFFFFF' } }
       t.alignment = { vertical: 'middle', horizontal: 'center' }
       t.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL } }
       ws.getRow(1).height = 30
-      ws.mergeCells('A2:O2')
+      ws.mergeCells('A2:N2')
       const s = ws.getCell('A2')
       s.value = `${titulo} · ${fecha}`
       s.font = { name: 'Arial', size: 11, color: { argb: 'FFFFFFFF' } }
@@ -199,7 +207,7 @@ export default function ResumenPage() {
           fechaCorta(v), horaCorta(v), v.cliente ?? '', v.direccion ?? '',
           v.payment_method ? (PAY_LABEL[v.payment_method] ?? v.payment_method) : '',
           num(v.cash_received), num(v.transfer_amount), num(v.credit_amount), num(v.actual_amount),
-          b.tromen || '', b.oeste || '', b.seis || '', b.otros || '', b.devueltos || '',
+          b.tromen || '', b.oeste || '', bidonesACuenta(v) || '', b.devueltos || '',
           v.notes ?? '',
         ])
         row.eachCell((cell: any, col: number) => {
@@ -215,7 +223,7 @@ export default function ResumenPage() {
       const tot = totalesPorPago(lista)
       const tb = totalesBidones(lista)
       const totRow = ws.addRow(['', '', '', '', 'TOTALES', tot.efectivo, tot.transfer, tot.credito, tot.total,
-        tb.tromen || '', tb.oeste || '', tb.seis || '', tb.otros || '', tb.devueltos || '', ''])
+        tb.tromen || '', tb.oeste || '', totalACuenta(lista) || '', tb.devueltos || '', ''])
       totRow.eachCell((cell: any, col: number) => {
         cell.font = { name: 'Arial', size: 11, bold: true, color: { argb: AZUL } }
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AMARILLO } }
@@ -226,7 +234,7 @@ export default function ResumenPage() {
       ws.columns = [
         { width: 12 }, { width: 8 }, { width: 26 }, { width: 28 }, { width: 16 },
         { width: 13 }, { width: 14 }, { width: 14 }, { width: 13 },
-        { width: 10 }, { width: 11 }, { width: 8 }, { width: 9 }, { width: 11 }, { width: 24 },
+        { width: 10 }, { width: 11 }, { width: 12 }, { width: 11 }, { width: 24 },
       ]
       return ws
     }
@@ -482,8 +490,7 @@ export default function ResumenPage() {
                               <th style={{ padding: '8px 12px', fontWeight: 600, textAlign: 'right' }}>Total</th>
                               <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: theme.colors.accent }}>TROMEN</th>
                               <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: theme.colors.accent }}>Oeste</th>
-                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: theme.colors.accent }}>6lt</th>
-                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center' }}>Otros</th>
+                              <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center', color: theme.colors.warning }}>A cuenta</th>
                               <th style={{ padding: '8px 8px', fontWeight: 600, textAlign: 'center' }}>Devuel</th>
                             </tr>
                           </thead>
@@ -502,8 +509,7 @@ export default function ResumenPage() {
                                 <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 700, color: theme.colors.text }}>${num(v.actual_amount).toLocaleString('es-AR')}</td>
                                 <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.tromen || '-'}</td>
                                 <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.oeste || '-'}</td>
-                                <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.seis || '-'}</td>
-                                <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.otros || '-'}</td>
+                                <td style={{ padding: '8px 8px', textAlign: 'center', fontWeight: 700, color: bidonesACuenta(v) > 0 ? theme.colors.warning : undefined }}>{bidonesACuenta(v) || '-'}</td>
                                 <td style={{ padding: '8px 8px', textAlign: 'center' }}>{bv.devueltos || '-'}</td>
                               </tr>
                               )
@@ -516,8 +522,7 @@ export default function ResumenPage() {
                               <td style={{ padding: '8px 12px', textAlign: 'right' }}>${t.total.toLocaleString('es-AR')}</td>
                               <td style={{ padding: '8px 8px', textAlign: 'center', color: theme.colors.accent }}>{tb.tromen || '-'}</td>
                               <td style={{ padding: '8px 8px', textAlign: 'center', color: theme.colors.accent }}>{tb.oeste || '-'}</td>
-                              <td style={{ padding: '8px 8px', textAlign: 'center', color: theme.colors.accent }}>{tb.seis || '-'}</td>
-                              <td style={{ padding: '8px 8px', textAlign: 'center' }}>{tb.otros || '-'}</td>
+                              <td style={{ padding: '8px 8px', textAlign: 'center', color: theme.colors.warning }}>{totalACuenta(sec.lista) || '-'}</td>
                               <td style={{ padding: '8px 8px', textAlign: 'center' }}>{tb.devueltos || '-'}</td>
                             </tr>
                           </tbody>
