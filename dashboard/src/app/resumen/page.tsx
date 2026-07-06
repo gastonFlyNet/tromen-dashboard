@@ -49,6 +49,13 @@ export default function ResumenPage() {
   const [evidencia, setEvidencia] = useState<any | null>(null)
   const [cargandoEvid, setCargandoEvid] = useState(false)
   const [imgAmpliada, setImgAmpliada] = useState<string | null>(null)
+  // --- Editor de gestiones (Fase 2) ---
+  const [modoEdicion, setModoEdicion] = useState(false)
+  const [formEdit, setFormEdit] = useState<any>({})
+  const [productosLista, setProductosLista] = useState<any[]>([])
+  const [itemsEdit, setItemsEdit] = useState<Record<string, number>>({})
+  const [guardando, setGuardando] = useState(false)
+  const [userRole, setUserRole] = useState<string>('')
 
   const cargar = async () => {
     setLoading(true)
@@ -74,6 +81,20 @@ export default function ResumenPage() {
   // Abre el modal de evidencia de una gestion (carga fotos + firma on-demand)
   const abrirGestion = async (v: Venta) => {
     setGestionSel(v)
+    setModoEdicion(false)
+    // Rol del usuario (para mostrar el boton editar solo a admin/supervisor)
+    try {
+      const u = localStorage.getItem('tromen_user')
+      if (u) setUserRole(JSON.parse(u).role ?? '')
+    } catch {}
+    // Lista de productos para el selector de bidones (una sola vez)
+    if (productosLista.length === 0) {
+      try {
+        const token = localStorage.getItem('tromen_token')
+        const rp = await fetch(`${API_URL}/api/products`, { headers: { Authorization: `Bearer ${token}` } })
+        if (rp.ok) setProductosLista(await rp.json())
+      } catch {}
+    }
     setEvidencia(null)
     setCargandoEvid(true)
     try {
@@ -92,6 +113,55 @@ export default function ResumenPage() {
     }
   }
   // Clasifica un producto en una de las columnas: TROMEN, Oeste, 6lt, Otros
+  // Prepara el formulario con los datos actuales de la gestion
+  const iniciarEdicion = () => {
+    const g = gestionSel
+    setFormEdit({
+      actual_amount: Number(g.actual_amount ?? 0),
+      payment_method: g.payment_method ?? 'efectivo',
+      cash_received: Number(g.cash_received ?? 0),
+      transfer_amount: Number(g.transfer_amount ?? 0),
+      credit_amount: Number(g.credit_amount ?? 0),
+      notes: g.notes ?? '',
+    })
+    // Precargar cantidades de productos actuales
+    const cant: Record<string, number> = {}
+    for (const p of (g.productos ?? [])) {
+      const match = productosLista.find(pl => pl.name === p.nombre)
+      if (match) cant[match.id] = Number(p.cantidad ?? 0)
+    }
+    setItemsEdit(cant)
+    setModoEdicion(true)
+  }
+  // Guarda la correccion via PUT /:id/correccion y refresca el resumen
+  const guardarCorreccion = async () => {
+    if (!gestionSel) return
+    setGuardando(true)
+    try {
+      const token = localStorage.getItem('tromen_token')
+      const itemsArr = productosLista
+        .filter(p => (itemsEdit[p.id] ?? 0) > 0)
+        .map(p => ({ product_id: p.id, name: p.name, qty: itemsEdit[p.id], price: p.price }))
+      const res = await fetch(`${API_URL}/api/deliveries/${gestionSel.id}/correccion`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formEdit, items: itemsArr }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        alert('Error al guardar: ' + (err.error ?? res.status))
+      } else {
+        setModoEdicion(false)
+        setGestionSel(null)
+        setEvidencia(null)
+        await cargar()  // refresca la tabla del resumen
+      }
+    } catch (e: any) {
+      alert('Error de red: ' + (e.message ?? ''))
+    } finally {
+      setGuardando(false)
+    }
+  }
   const claseProducto = (nombre: string): 'tromen' | 'oeste' | 'seis' | 'otros' => {
     const n = (nombre ?? '').toLowerCase()
     if (n.includes('tromen')) return 'tromen'
@@ -554,17 +624,101 @@ export default function ResumenPage() {
                   {gestionSel.repartidor} · {gestionSel.delivered_at ? new Date(gestionSel.delivered_at).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' }) : ''}
                 </p>
               </div>
-              <button onClick={() => { setGestionSel(null); setEvidencia(null) }}
-                style={{ background: theme.colors.bg, border: `1px solid ${theme.colors.border}`, borderRadius: 8, color: '#cbd5e1',
-                  width: 32, height: 32, cursor: 'pointer', fontSize: 16 }}>✕</button>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                {!modoEdicion && ['admin', 'supervisor'].includes(userRole) && (
+                  <button onClick={iniciarEdicion}
+                    style={{ background: theme.colors.warning, border: 'none', borderRadius: 8, color: '#0f1117',
+                      padding: '6px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>Editar</button>
+                )}
+                <button onClick={() => { setGestionSel(null); setEvidencia(null); setModoEdicion(false) }}
+                  style={{ background: theme.colors.bg, border: `1px solid ${theme.colors.border}`, borderRadius: 8, color: '#cbd5e1',
+                    width: 32, height: 32, cursor: 'pointer', fontSize: 16 }}>✕</button>
+              </div>
             </div>
             <div style={{ padding: 20 }}>
-              {/* Datos de la gestion */}
+              {modoEdicion ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 16 }}>
+                  <div>
+                    <label style={{ color: theme.colors.textFaint, fontSize: 11, display: 'block', marginBottom: 4 }}>Metodo de pago</label>
+                    <select value={formEdit.payment_method}
+                      onChange={e => setFormEdit({ ...formEdit, payment_method: e.target.value })}
+                      style={{ width: '100%', background: theme.colors.bg, border: `1px solid ${theme.colors.border}`, borderRadius: 8, color: theme.colors.text, padding: '8px 12px', fontSize: 13 }}>
+                      <option value="efectivo">Efectivo</option>
+                      <option value="transferencia">Transferencia</option>
+                      <option value="cuenta_corriente">Cuenta corriente</option>
+                      <option value="mixto">Mixto</option>
+                    </select>
+                  </div>
+                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: 120 }}>
+                      <label style={{ color: theme.colors.textFaint, fontSize: 11, display: 'block', marginBottom: 4 }}>Total</label>
+                      <input type="number" value={formEdit.actual_amount}
+                        onChange={e => setFormEdit({ ...formEdit, actual_amount: Number(e.target.value) })}
+                        style={{ width: '100%', background: theme.colors.bg, border: `1px solid ${theme.colors.border}`, borderRadius: 8, color: theme.colors.text, padding: '8px 12px', fontSize: 13 }} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 120 }}>
+                      <label style={{ color: theme.colors.textFaint, fontSize: 11, display: 'block', marginBottom: 4 }}>A cuenta corriente</label>
+                      <input type="number" value={formEdit.credit_amount}
+                        onChange={e => setFormEdit({ ...formEdit, credit_amount: Number(e.target.value) })}
+                        style={{ width: '100%', background: theme.colors.bg, border: `1px solid ${theme.colors.border}`, borderRadius: 8, color: theme.colors.text, padding: '8px 12px', fontSize: 13 }} />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ color: theme.colors.textFaint, fontSize: 11, display: 'block', marginBottom: 6 }}>Productos</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {productosLista.map(p => (
+                        <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: theme.colors.bg, borderRadius: 8, border: `1px solid ${theme.colors.border}` }}>
+                          <span style={{ color: '#cbd5e1', fontSize: 13 }}>{p.name}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <button onClick={() => setItemsEdit(prev => ({ ...prev, [p.id]: Math.max(0, (prev[p.id] ?? 0) - 1) }))}
+                              style={{ width: 26, height: 26, borderRadius: '50%', background: theme.colors.surface, border: `1px solid ${theme.colors.border}`, color: theme.colors.text, cursor: 'pointer', fontWeight: 700 }}>-</button>
+                            <span style={{ color: theme.colors.text, fontWeight: 700, minWidth: 18, textAlign: 'center' }}>{itemsEdit[p.id] ?? 0}</span>
+                            <button onClick={() => setItemsEdit(prev => ({ ...prev, [p.id]: (prev[p.id] ?? 0) + 1 }))}
+                              style={{ width: 26, height: 26, borderRadius: '50%', background: theme.colors.accent, border: 'none', color: '#0f1117', cursor: 'pointer', fontWeight: 700 }}>+</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ color: theme.colors.textFaint, fontSize: 11, display: 'block', marginBottom: 4 }}>Notas</label>
+                    <textarea value={formEdit.notes}
+                      onChange={e => setFormEdit({ ...formEdit, notes: e.target.value })}
+                      rows={2}
+                      style={{ width: '100%', background: theme.colors.bg, border: `1px solid ${theme.colors.border}`, borderRadius: 8, color: theme.colors.text, padding: '8px 12px', fontSize: 13, fontFamily: 'inherit', resize: 'vertical' }} />
+                  </div>
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <button onClick={() => setModoEdicion(false)} disabled={guardando}
+                      style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: `1px solid ${theme.colors.border}`, background: 'none', color: theme.colors.textFaint, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>Cancelar</button>
+                    <button onClick={guardarCorreccion} disabled={guardando}
+                      style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: 'none', background: theme.colors.accent, color: '#0f1117', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
+                      {guardando ? 'Guardando...' : 'Guardar cambios'}</button>
+                  </div>
+                </div>
+              ) : (
               <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 16 }}>
                 <div><p style={{ color: theme.colors.textFaint, fontSize: 11 }}>Total</p><p style={{ color: theme.colors.success, fontWeight: 700 }}>${num(gestionSel.actual_amount).toLocaleString('es-AR')}</p></div>
                 <div><p style={{ color: theme.colors.textFaint, fontSize: 11 }}>Pago</p><p style={{ color: theme.colors.text }}>{gestionSel.payment_method ? (PAY_LABEL[gestionSel.payment_method] ?? gestionSel.payment_method) : '-'}</p></div>
                 <div><p style={{ color: theme.colors.textFaint, fontSize: 11 }}>Direccion</p><p style={{ color: '#cbd5e1', fontSize: 13 }}>{gestionSel.direccion ?? '-'}</p></div>
               </div>
+              )}
+
+              {/* Historial de correcciones */}
+              {!modoEdicion && evidencia?.historial && evidencia.historial.length > 0 && (
+                <div style={{ marginBottom: 16, padding: 12, background: theme.colors.bg, borderRadius: 10, border: `1px solid ${theme.colors.border}` }}>
+                  <p style={{ color: theme.colors.warning, fontSize: 12, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase' }}>Historial de cambios</p>
+                  {evidencia.historial.map((h: any) => (
+                    <div key={h.id} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: `1px solid ${theme.colors.border}` }}>
+                      <p style={{ color: '#cbd5e1', fontSize: 11 }}>
+                        {h.editado_por} · {new Date(h.edited_at).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })}
+                      </p>
+                      <p style={{ color: theme.colors.textFaint, fontSize: 11, marginTop: 2 }}>
+                        {Object.keys(h.changes ?? {}).join(', ')}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {cargandoEvid && <p style={{ color: theme.colors.textFaint, textAlign: 'center', padding: 20 }}>Cargando evidencia...</p>}
 
