@@ -172,7 +172,7 @@ export default function ClientesPage() {
         balance: parseFloat(form.balance || '0'),
       }
       if (editing) {
-        await apiFetch(`/api/clients/${editing.id}`, { method: 'PUT', body: JSON.stringify(body) })
+        await apiFetch(`/api/clients/${editing.id}`, { method: 'PATCH', body: JSON.stringify(body) })
       } else {
         await apiFetch('/api/clients', { method: 'POST', body: JSON.stringify(body) })
       }

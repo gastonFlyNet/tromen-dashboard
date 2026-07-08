@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -rnoE \"\\(bg|text|border\\)-\\\\[#[0-9a-fA-F]{3,6}\\\\]\" src/app src/components)",
+      "Bash(rm \"src/app/repartidores/[id]/page_temp.tsx\")",
+      "Bash(npm run *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(cd \"C:/Users/flyne/AppData/Local/Temp/claude/c--Users-flyne-OneDrive-Desktop-App-TROMEN-tromen-dashboard-web-tromen-dashboard-dashboard-dashboard/../c--Users-flyne-OneDrive-Desktop-App-TROMEN-tromen-dashboard-web-tromen-dashboard-dashboard/405b84a7-8704-4cd6-b866-69568581285d/scratchpad\")",
+      "Bash(node __TRACKED_VAR__/make_diff_html.js __TRACKED_VAR__/batch1.diff __TRACKED_VAR__/batch1-diff-body.html 'Tanda 1: resumen, stock, productos, bidones, cuenta')",
+      "Bash(node C:/Users/flyne/AppData/Local/Temp/claude/c--Users-flyne-OneDrive-Desktop-App-TROMEN-tromen-dashboard-web-tromen-dashboard-dashboard/405b84a7-8704-4cd6-b866-69568581285d/scratchpad/make_diff_html.js C:/Users/flyne/AppData/Local/Temp/claude/c--Users-flyne-OneDrive-Desktop-App-TROMEN-tromen-dashboard-web-tromen-dashboard-dashboard/405b84a7-8704-4cd6-b866-69568581285d/scratchpad/batch2.diff C:/Users/flyne/AppData/Local/Temp/claude/c--Users-flyne-OneDrive-Desktop-App-TROMEN-tromen-dashboard-web-tromen-dashboard-dashboard/405b84a7-8704-4cd6-b866-69568581285d/scratchpad/batch2-diff-body.html 'Tanda 2: clientes/[id], entregas/[id], repartidores, rutas/plantillas')"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\flyne\\OneDrive\\Desktop\\App TROMEN\\tromen-dashboard web\\tromen\\dashboard\\dashboard\\src\\app\\repartidores\\[id]"
+    ]
+  }
+}
