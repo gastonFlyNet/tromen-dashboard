@@ -198,6 +198,15 @@ export default function RutaDetallePage() {
     </div>
   )
 
+  const quitarParada = async (deliveryId: string, clientName: string) => {
+    if (!confirm(`Quitar a ${clientName} de la ruta?`)) return
+    try {
+      await apiFetch(`/api/routes/${routeId}/stops/${deliveryId}`, { method: 'DELETE' })
+      await loadRoute()
+    } catch (err: any) {
+      alert(err.message ?? 'No se pudo quitar la parada')
+    }
+  }
   const deliveries   = route.deliveries ?? []
 
   // Recorrido partido en tramos por estado, para colorear
@@ -405,27 +414,35 @@ export default function RutaDetallePage() {
             </div>
             <div className="flex-1 overflow-y-auto divide-y divide-slate-800">
               {deliveries.map((d: any, i: number) => (
-                <button key={d.id}
-                  onClick={() => router.push(`/entregas/${d.id}`)}
-                  className="w-full text-left p-4 hover:bg-slate-800/50 transition-colors flex items-center gap-3">
+                <div key={d.id}
+                  className="w-full p-4 hover:bg-slate-800/50 transition-colors flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
                     style={{ background: d.status === 'pendiente' ? '#E67E22' : STATUS_COLOR[d.status] ?? '#888' }}>
                     {d.status === 'pendiente' ? i + 1 : '✓'}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-slate-100 text-sm truncate">{d.client_name}</p>
-                    <p className="text-xs text-gray-400 truncate">{d.address}</p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-xs font-bold" style={{ color: STATUS_COLOR[d.status] ?? '#E67E22' }}>
-                      {STATUS_LABEL[d.status] ?? 'Pendiente'}
-                    </p>
-                    {d.actual_amount > 0 && (
-                      <p className="text-xs text-slate-400 mt-0.5">${Number(d.actual_amount).toLocaleString('es-AR')}</p>
-                    )}
-                  </div>
-                  <span className="text-slate-500 text-sm flex-shrink-0">›</span>
-                </button>
+                  <button onClick={() => router.push(`/entregas/${d.id}`)}
+                    className="flex-1 min-w-0 text-left flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-slate-100 text-sm truncate">{d.client_name}</p>
+                      <p className="text-xs text-gray-400 truncate">{d.address}</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-xs font-bold" style={{ color: STATUS_COLOR[d.status] ?? '#E67E22' }}>
+                        {STATUS_LABEL[d.status] ?? 'Pendiente'}
+                      </p>
+                      {d.actual_amount > 0 && (
+                        <p className="text-xs text-slate-400 mt-0.5">${Number(d.actual_amount).toLocaleString('es-AR')}</p>
+                      )}
+                    </div>
+                  </button>
+                  {d.status === 'pendiente' ? (
+                    <button onClick={() => quitarParada(d.id, d.client_name)}
+                      className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-red-400 hover:bg-red-500/15 transition-colors"
+                      title="Quitar de la ruta">✕</button>
+                  ) : (
+                    <span className="text-slate-500 text-sm flex-shrink-0 w-8 text-center">›</span>
+                  )}
+                </div>
               ))}
             </div>
           </div>
