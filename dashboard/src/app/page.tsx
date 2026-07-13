@@ -729,6 +729,15 @@ export default function Dashboard() {
                             <div style={{ height: 4, borderRadius: 99, width: `${repPct}%`, background: STATUS_COLOR[r.route_status] ?? D.accent, transition: 'width 0.5s ease' }} />
                           </div>
                         </div>
+                        {r.route_id && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); router.push('/rutas/' + r.route_id) }}
+                            style={{ marginTop: 10, width: '100%', padding: '7px 0', fontSize: 11, fontWeight: 700,
+                              color: D.accent, background: `${D.accent}14`, border: `1px solid ${D.accent}35`,
+                              borderRadius: 8, cursor: 'pointer' }}>
+                            Editar ruta
+                          </button>
+                        )}
                       </div>
                     )
                   })}
