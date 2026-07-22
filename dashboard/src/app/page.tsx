@@ -585,7 +585,23 @@ export default function Dashboard() {
                 {positions.length} activo(s)
               </span>
             </div>
-            <div style={{ height: 420 }}>
+            <div style={{ height: 420, position: 'relative' }}>
+              <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 5, background: D.surface, border: `1px solid ${D.border}`, borderRadius: 10, padding: '10px 12px', maxWidth: 220, maxHeight: 380, overflowY: 'auto' }}>
+                <p style={{ fontSize: 10, fontWeight: 700, color: D.muted, textTransform: 'uppercase', letterSpacing: 0.4 }}>Repartidores activos</p>
+                {positions.length === 0
+                  ? <p style={{ fontSize: 11, color: D.muted, marginTop: 8 }}>Sin repartidores activos</p>
+                  : positions.map(pos => (
+                    <div key={pos.user_id} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginTop: 8 }}>
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_COLOR[pos.route_status] ?? '#888', display: 'inline-block', marginTop: 4, flexShrink: 0 }} />
+                      <div>
+                        <p style={{ fontSize: 12, fontWeight: 700, color: D.text }}>{pos.repartidor}</p>
+                        <p style={{ fontSize: 11, color: D.muted, marginTop: 1 }}>
+                          {pos.speed ? `${Number(pos.speed).toFixed(0)} km/h` : 'Detenido'} · {pos.recorded_at ? formatDistanceToNow(new Date(pos.recorded_at), { locale: es, addSuffix: true }) : '—'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
               <Map
                 mapboxAccessToken={MAPBOX_TOKEN}
                 initialViewState={{ longitude: -67.7989, latitude: -37.8785, zoom: 12 }}
@@ -598,15 +614,6 @@ export default function Dashboard() {
                       <div style={{ width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: '2px solid #1e2d40', background: STATUS_COLOR[pos.route_status] + '33', boxShadow: `0 0 12px ${STATUS_COLOR[pos.route_status]}66` }}>
                         🚚
                       </div>
-                      {selectedRep === pos.user_id && (
-                        <div style={{ position: 'absolute', bottom: 48, left: '50%', transform: 'translateX(-50%)', background: D.surface, border: `1px solid ${D.border}`, borderRadius: 10, padding: '8px 12px', fontSize: 11, whiteSpace: 'nowrap', zIndex: 10 }}>
-                          <p style={{ fontWeight: 700, color: D.text }}>{pos.repartidor}</p>
-                          <p style={{ color: D.muted, marginTop: 2 }}>{pos.speed ? `${Number(pos.speed).toFixed(0)} km/h` : 'Detenido'}</p>
-                          <p style={{ color: D.muted, marginTop: 1 }}>
-                            {pos.recorded_at ? formatDistanceToNow(new Date(pos.recorded_at), { locale: es, addSuffix: true }) : '—'}
-                          </p>
-                        </div>
-                      )}
                     </div>
                   </Marker>
                 ))}
