@@ -532,14 +532,8 @@ export default function Dashboard() {
       <div style={{ flex: 1, padding: '20px 24px', maxWidth: 1400, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', height: '100vh' }}>
 
         {/* ALERTAS */}
-        {alerts && (alerts.overdue_clients > 0 || alerts.stopped_routes > 0 || (alerts.out_of_zone ?? 0) > 0) && (
+        {alerts && (alerts.stopped_routes > 0 || (alerts.out_of_zone ?? 0) > 0) && (
           <FadeIn style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {alerts.overdue_clients > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: '#fb923c22', border: '1px solid #fb923c55', borderRadius: 10, fontSize: 12, fontWeight: 700, color: '#fb923c' }}>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fb923c', animation: 'pulse 1.5s infinite', flexShrink: 0 }} />
-                ⚠️ {alerts.overdue_clients} cliente(s) con saldo vencido
-              </div>
-            )}
             {alerts.stopped_routes > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: '#f8717122', border: '1px solid #f8717155', borderRadius: 10, fontSize: 12, fontWeight: 700, color: '#f87171' }}>
                 <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f87171', animation: 'pulse 1.5s infinite', flexShrink: 0 }} />
